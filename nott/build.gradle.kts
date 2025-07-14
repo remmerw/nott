@@ -50,6 +50,7 @@ kotlin {
         commonTest {
             dependencies {
                 implementation(libs.kotlin.test)
+                implementation("io.github.remmerw:borr:0.0.2")
             }
         }
 
