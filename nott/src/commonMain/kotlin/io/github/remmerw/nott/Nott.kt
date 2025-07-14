@@ -705,8 +705,8 @@ suspend fun newNott(nodeId: ByteArray, port: Int, bootstrap: List<InetSocketAddr
 fun nodeId(): ByteArray {
     val id = ByteArray(SHA1_HASH_LENGTH)
     id[0] = '-'.code.toByte()
-    id[1] = 'T'.code.toByte()
-    id[2] = 'H'.code.toByte()
+    id[1] = 'N'.code.toByte()
+    id[2] = 'O'.code.toByte()
     id[3] = '0'.code.toByte()
     id[4] = '8'.code.toByte()
     id[5] = '1'.code.toByte()
