@@ -43,6 +43,7 @@ kotlin {
             dependencies {
                 implementation(libs.kotlin.stdlib)
                 implementation(libs.ktor.network)
+                implementation("io.github.remmerw:buri:0.0.1")
             }
         }
 
