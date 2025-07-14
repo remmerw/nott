@@ -1,3 +1,12 @@
+<div>
+    <div>
+        <img src="https://img.shields.io/maven-central/v/io.github.remmerw/nott" alt="Kotlin Maven Version" />
+        <img src="https://img.shields.io/badge/Platform-Android-brightgreen.svg?logo=android" alt="Badge Android" />
+        <img src="https://img.shields.io/badge/Platform-iOS%20%2F%20macOS-lightgrey.svg?logo=apple" alt="Badge iOS" />
+        <img src="https://img.shields.io/badge/Platform-JVM-8A2BE2.svg?logo=openjdk" alt="Badge JVM" />
+    </div>
+</div>
+
 ## Nott
 Read Only DHT node (https://www.bittorrent.org/beps/bep_0043.html)
 
@@ -38,3 +47,25 @@ further network traffic.
 ### References
 [1]	BEP_0005. DHT Protocol (http://www.bittorrent.org/beps/bep_0005.html)
 
+
+## Integration
+
+```
+    
+kotlin {
+    sourceSets {
+        commonMain.dependencies {
+            ...
+            implementation("io.github.remmerw:nott:0.0.1")
+        }
+        ...
+    }
+}
+    
+```
+
+## API
+
+```
+
+```
