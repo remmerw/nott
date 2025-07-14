@@ -11,9 +11,9 @@ class LookupTest {
 
 
     @Test
-    fun fakeKey(): Unit = runBlocking(Dispatchers.IO) {
+    fun lookupTest(): Unit = runBlocking(Dispatchers.IO) {
 
-        val key = createRandomKey(SHA1_HASH_LENGTH)
+        val key = createRandomKey(SHA1_HASH_LENGTH) // Note: it is a fake key
 
         withTimeoutOrNull(60 * 1000) {
 
