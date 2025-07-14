@@ -10,7 +10,7 @@
 ## Nott
 Read Only DHT node (https://www.bittorrent.org/beps/bep_0043.html)
 
-**Note** A Nott DHT node enters directly the *Read-Only State* 
+**Note:** A Nott DHT node enters directly the *Read-Only State* 
 
 ### Abstract
 This extension introduces the concept of a 'read-only' DHT node for devices which are behind a
