@@ -10,7 +10,6 @@ import io.ktor.network.sockets.aSocket
 import io.ktor.util.collections.ConcurrentMap
 import io.ktor.util.sha1
 import io.ktor.utils.io.core.remaining
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.cancel
@@ -32,7 +31,6 @@ class Nott(val nodeId: ByteArray, val port: Int, val readOnlyState: Boolean = tr
     private val requestCalls: ConcurrentMap<Int, Call> = ConcurrentMap()
 
     private val database: Database = Database()
-    private val scope = CoroutineScope(Dispatchers.IO)
     private val selectorManager = SelectorManager(Dispatchers.IO)
     private var socket: BoundDatagramSocket? = null
     private val routingTable = RoutingTable()
@@ -42,7 +40,7 @@ class Nott(val nodeId: ByteArray, val port: Int, val readOnlyState: Boolean = tr
             InetSocketAddress("::", port)
         )
 
-        scope.launch {
+        selectorManager.launch {
             while (isActive) {
                 val datagram = socket!!.receive()
                 handleDatagram(datagram)
@@ -87,7 +85,7 @@ class Nott(val nodeId: ByteArray, val port: Int, val readOnlyState: Boolean = tr
         }
 
         try {
-            scope.cancel()
+            selectorManager.cancel()
         } catch (throwable: Throwable) {
             debug(throwable)
         }
