@@ -67,9 +67,9 @@ class PutTest {
 
 
         withTimeoutOrNull(30 * 1000) {
-            val mdht = newNott(nodeId(), 6007, bootstrap())
+            val nott = newNott(nodeId(), 6007, bootstrap())
             try {
-                val channel = requestGet(mdht, target) {
+                val channel = requestGet(nott, target) {
                     5000
                 }
 
@@ -77,7 +77,7 @@ class PutTest {
                     println("data received " + data.data.toString() + " " + data.k?.encodeBase64())
                 }
             } finally {
-                mdht.shutdown()
+                nott.shutdown()
             }
         }
 

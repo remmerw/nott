@@ -10,8 +10,10 @@ import io.ktor.network.sockets.aSocket
 import io.ktor.util.collections.ConcurrentMap
 import io.ktor.util.sha1
 import io.ktor.utils.io.core.remaining
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.io.Buffer
@@ -30,6 +32,7 @@ class Nott(val nodeId: ByteArray, val port: Int, val readOnlyState: Boolean = tr
     private val requestCalls: ConcurrentMap<Int, Call> = ConcurrentMap()
 
     private val database: Database = Database()
+    private val scope = CoroutineScope(Dispatchers.IO)
     private val selectorManager = SelectorManager(Dispatchers.IO)
     private var socket: BoundDatagramSocket? = null
     private val routingTable = RoutingTable()
@@ -39,7 +42,7 @@ class Nott(val nodeId: ByteArray, val port: Int, val readOnlyState: Boolean = tr
             InetSocketAddress("::", port)
         )
 
-        selectorManager.launch {
+        scope.launch {
             while (isActive) {
                 val datagram = socket!!.receive()
                 handleDatagram(datagram)
@@ -66,7 +69,7 @@ class Nott(val nodeId: ByteArray, val port: Int, val readOnlyState: Boolean = tr
             enqueuedSend.associatedCall?.hasSend()
 
         } catch (throwable: Throwable) {
-            debug("Mdht", throwable)
+            debug(throwable)
 
             if (enqueuedSend.associatedCall != null) {
                 enqueuedSend.associatedCall.injectStall()
@@ -78,15 +81,21 @@ class Nott(val nodeId: ByteArray, val port: Int, val readOnlyState: Boolean = tr
     fun shutdown() {
 
         try {
-            socket?.close()
+            selectorManager.close()
         } catch (throwable: Throwable) {
-            debug("Mdht", throwable)
+            debug(throwable)
         }
 
         try {
-            selectorManager.close()
+            scope.cancel()
         } catch (throwable: Throwable) {
-            debug("Mdht", throwable)
+            debug(throwable)
+        }
+
+        try {
+            socket?.close()
+        } catch (throwable: Throwable) {
+            debug(throwable)
         }
     }
 
@@ -460,7 +469,7 @@ class Nott(val nodeId: ByteArray, val port: Int, val readOnlyState: Boolean = tr
         try {
             map = decodeBencodeToMap(source)
         } catch (throwable: Throwable) {
-            debug("Node", throwable)
+            debug(throwable)
             return
         }
 
@@ -470,7 +479,7 @@ class Nott(val nodeId: ByteArray, val port: Int, val readOnlyState: Boolean = tr
                 requestCalls[tid.contentHashCode()]?.request
             } ?: return
         } catch (throwable: Throwable) {
-            debug("Node", throwable)
+            debug(throwable)
             return
         }
 
@@ -721,7 +730,6 @@ fun createInetSocketAddress(address: ByteArray, port: Int): InetSocketAddress {
 }
 
 
-
 fun bootstrap(): List<InetSocketAddress> {
     return listOf(
         InetSocketAddress("dht.transmissionbt.com", 6881),
@@ -745,9 +753,8 @@ internal fun debug(text: String) {
     }
 }
 
-internal fun debug(tag: String, throwable: Throwable) {
+internal fun debug(throwable: Throwable) {
     if (isError) {
-        println(tag + " " + throwable.message)
         throwable.printStackTrace()
     }
 }
