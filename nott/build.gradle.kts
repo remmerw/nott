@@ -50,7 +50,8 @@ kotlin {
         commonTest {
             dependencies {
                 implementation(libs.kotlin.test)
-                implementation("io.github.remmerw:borr:0.0.3")
+                // TODO activate again when Borr can do IOS
+                //  implementation("io.github.remmerw:borr:0.0.3")
             }
         }
 
