@@ -1,11 +1,11 @@
 package io.github.remmerw.nott
 
-import io.ktor.util.collections.ConcurrentMap
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.random.Random
 
 internal class Database internal constructor() {
     private val tokenManager = TokenManager()
-    private val items: MutableMap<Int, MutableList<Address>> = ConcurrentMap()
+    private val items: MutableMap<Int, MutableList<Address>> = ConcurrentHashMap()
 
     fun store(key: ByteArray, address: Address) {
 

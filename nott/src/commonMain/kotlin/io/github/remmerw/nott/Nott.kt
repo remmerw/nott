@@ -2,9 +2,6 @@ package io.github.remmerw.nott
 
 import io.github.remmerw.buri.BEObject
 import io.github.remmerw.buri.decodeBencodeToMap
-import io.ktor.util.collections.ConcurrentMap
-import io.ktor.util.sha1
-import io.ktor.utils.io.core.remaining
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -16,9 +13,11 @@ import kotlinx.io.Buffer
 import kotlinx.io.Source
 import kotlinx.io.readByteArray
 import kotlinx.io.writeUShort
+import org.kotlincrypto.hash.sha1.SHA1
 import java.net.DatagramPacket
 import java.net.DatagramSocket
 import java.net.InetSocketAddress
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.min
 import kotlin.random.Random
 import kotlin.time.TimeSource.Monotonic.ValueTimeMark
@@ -28,7 +27,7 @@ class Nott(val nodeId: ByteArray, val port: Int, val readOnlyState: Boolean = tr
     private val unsolicitedThrottle: MutableMap<InetSocketAddress, Long> =
         mutableMapOf() // runs in same thread
 
-    private val requestCalls: ConcurrentMap<Int, Call> = ConcurrentMap()
+    private val requestCalls: MutableMap<Int, Call> = ConcurrentHashMap()
 
     private val database: Database = Database()
     private val mutex = Mutex()
@@ -455,14 +454,15 @@ class Nott(val nodeId: ByteArray, val port: Int, val readOnlyState: Boolean = tr
 
     private suspend fun handleDatagramPacket(datagram: DatagramPacket) {
         val inet = InetSocketAddress(datagram.address, datagram.port)
-        val source = Buffer()
-        source.write(datagram.data, 0, datagram.length)
+        val length = datagram.length
 
         // * no conceivable DHT message is smaller than 10 bytes
         // * port 0 is reserved
         // -> immediately discard junk on the read loop, don't even allocate a buffer for it
-        if (source.remaining < 10 || inet.port == 0) return
+        if (length < 10 || inet.port == 0) return
 
+        val source = Buffer()
+        source.write(datagram.data, 0, length)
         handlePacket(source, inet)
     }
 
@@ -731,6 +731,12 @@ fun bootstrap(): List<InetSocketAddress> {
         InetSocketAddress("router.utorrent.com", 6881),
         InetSocketAddress("dht.aelitis.com", 6881)
     )
+}
+
+fun sha1(bytes: ByteArray): ByteArray {
+    val digest = SHA1()
+    digest.update(bytes)
+    return digest.digest()
 }
 
 @Suppress("SameReturnValue")

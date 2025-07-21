@@ -7,7 +7,7 @@ kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotl
 kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlin" }
 kotlinx-io-core = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version = "0.8.0" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version = "1.10.2" }
-ktor-utils = { module = "io.ktor:ktor-utils", version = "3.2.2" }
+sha1 = { module = "org.kotlincrypto.hash:sha1", version = "0.7.0" }
 
 [plugins]
 androidLibrary = { id = "com.android.library", version.ref = "agp" }

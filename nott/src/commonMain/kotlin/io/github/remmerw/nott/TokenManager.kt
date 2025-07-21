@@ -1,6 +1,5 @@
 package io.github.remmerw.nott
 
-import io.ktor.util.sha1
 import kotlinx.io.Buffer
 import kotlinx.io.readByteArray
 import kotlin.random.Random

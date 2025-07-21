@@ -43,7 +43,7 @@ kotlin {
                 implementation(libs.kotlin.stdlib)
                 implementation(libs.kotlinx.io.core)
                 implementation(libs.kotlinx.coroutines.core)
-                implementation(libs.ktor.utils)
+                implementation(libs.sha1)
                 implementation("io.github.remmerw:buri:0.0.1")
             }
         }

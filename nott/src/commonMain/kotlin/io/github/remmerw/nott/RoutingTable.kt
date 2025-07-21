@@ -1,12 +1,13 @@
 package io.github.remmerw.nott
 
-import io.ktor.util.collections.ConcurrentMap
+import java.util.concurrent.ConcurrentHashMap
+
 
 internal class RoutingTable internal constructor() {
 
     // note int key is not perfect (better would be long value or best the peer id)
     // but it is not yet really necessary (not enough peers in the routing table)
-    private val entries: MutableMap<Int, Peer> = ConcurrentMap()
+    private val entries: MutableMap<Int, Peer> = ConcurrentHashMap()
 
     fun insertOrRefresh(peer: Peer) {
         val entry = findPeerById(peer.id)

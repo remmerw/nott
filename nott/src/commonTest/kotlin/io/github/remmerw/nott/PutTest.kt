@@ -3,8 +3,6 @@ package io.github.remmerw.nott
 
 import io.github.remmerw.borr.Ed25519Sign
 import io.github.remmerw.buri.BEString
-import io.ktor.util.encodeBase64
-import io.ktor.util.sha1
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
@@ -73,7 +71,10 @@ class PutTest {
                 }
 
                 for (data in channel) {
-                    println("data received " + data.data.toString() + " " + data.k?.encodeBase64())
+                    println(
+                        "data received " + data.data.toString() + " " +
+                                data.k?.decodeToString()
+                    )
                 }
             } finally {
                 nott.shutdown()
