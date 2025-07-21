@@ -12,7 +12,7 @@ plugins {
 }
 
 group = "io.github.remmerw"
-version = "0.0.3"
+version = "0.0.4"
 
 kotlin {
 
@@ -27,10 +27,9 @@ kotlin {
 
 
     jvm()
-    iosX64()
-    iosArm64()
-    iosSimulatorArm64()
-
+    // iosX64()
+    // iosArm64()
+    // iosSimulatorArm64()
     // linuxArm64()
     // linuxX64()
     // linuxArm64()
@@ -42,7 +41,9 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(libs.kotlin.stdlib)
-                implementation(libs.ktor.network)
+                implementation(libs.kotlinx.io.core)
+                implementation(libs.kotlinx.coroutines.core)
+                implementation(libs.ktor.utils)
                 implementation("io.github.remmerw:buri:0.0.1")
             }
         }
@@ -50,8 +51,7 @@ kotlin {
         commonTest {
             dependencies {
                 implementation(libs.kotlin.test)
-                // TODO activate again when Borr can do IOS
-                //  implementation("io.github.remmerw:borr:0.0.3")
+                implementation("io.github.remmerw:borr:0.0.3")
             }
         }
 

@@ -1,10 +1,9 @@
 package io.github.remmerw.nott
 
-import io.ktor.network.sockets.InetSocketAddress
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
+import java.net.InetSocketAddress
 import kotlin.test.Test
 
 class PingTest {

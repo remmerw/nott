@@ -1,7 +1,7 @@
 package io.github.remmerw.nott
 
-import io.ktor.network.sockets.InetSocketAddress
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import java.net.InetSocketAddress
 import kotlin.concurrent.atomics.AtomicBoolean
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
 

@@ -1,6 +1,6 @@
 package io.github.remmerw.nott
 
-import io.ktor.network.sockets.InetSocketAddress
+import java.net.InetSocketAddress
 import kotlin.time.TimeSource
 import kotlin.time.TimeSource.Monotonic.ValueTimeMark
 

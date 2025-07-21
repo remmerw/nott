@@ -6,10 +6,10 @@ import io.github.remmerw.buri.BEMap
 import io.github.remmerw.buri.BEObject
 import io.github.remmerw.buri.BEString
 import io.github.remmerw.buri.bencode
-import io.ktor.network.sockets.InetSocketAddress
 import kotlinx.io.Buffer
 import kotlinx.io.readByteArray
 import kotlinx.io.readUShort
+import java.net.InetSocketAddress
 
 private fun parseError(
     address: InetSocketAddress,
@@ -80,7 +80,7 @@ private fun extractNodes(
 internal fun writeBuckets(list: List<Peer>): BEString {
     val buffer = Buffer()
     list.forEach { peer: Peer ->
-        val address = peer.address.encoded()!!
+        val address = peer.address.encoded()
         buffer.write(peer.id)
         buffer.write(address)
     }

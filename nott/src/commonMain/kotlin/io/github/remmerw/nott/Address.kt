@@ -1,9 +1,9 @@
 package io.github.remmerw.nott
 
-import io.ktor.network.sockets.InetSocketAddress
 import kotlinx.io.Buffer
 import kotlinx.io.readByteArray
 import kotlinx.io.writeUShort
+import java.net.InetSocketAddress
 
 internal data class Address(val data: ByteArray, val port: UShort) {
 
@@ -15,7 +15,7 @@ internal data class Address(val data: ByteArray, val port: UShort) {
     }
 
     fun toInetSocketAddress(): InetSocketAddress {
-        return createInetSocketAddress(data, port.toInt())
+        return InetSocketAddress(hostname(data), port.toInt())
     }
 
     override fun equals(other: Any?): Boolean {

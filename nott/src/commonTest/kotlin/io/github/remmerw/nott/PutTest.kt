@@ -1,10 +1,17 @@
 package io.github.remmerw.nott
 
 
+import io.github.remmerw.borr.Ed25519Sign
+import io.github.remmerw.buri.BEString
+import io.ktor.util.encodeBase64
+import io.ktor.util.sha1
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeoutOrNull
+import kotlinx.io.Buffer
+import kotlinx.io.readByteArray
 import kotlin.test.Test
+import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 class PutTest {
@@ -13,7 +20,6 @@ class PutTest {
     @Test
     fun putTest(): Unit = runBlocking(Dispatchers.IO) {
 
-        /** TODO activate again when Borr supports IOS
 
         // https://www.bittorrent.org/beps/bep_0044.html
 
@@ -51,7 +57,7 @@ class PutTest {
                 }
 
                 for (address in channel) {
-                    println("put to " + address.hostname)
+                    println("put to $address")
                 }
             } finally {
                 nott.shutdown()
@@ -73,7 +79,5 @@ class PutTest {
                 nott.shutdown()
             }
         }
-         */
     }
-
 }

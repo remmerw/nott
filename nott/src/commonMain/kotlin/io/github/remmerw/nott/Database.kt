@@ -5,7 +5,7 @@ import kotlin.random.Random
 
 internal class Database internal constructor() {
     private val tokenManager = TokenManager()
-    private val items: ConcurrentMap<Int, MutableList<Address>> = ConcurrentMap()
+    private val items: MutableMap<Int, MutableList<Address>> = ConcurrentMap()
 
     fun store(key: ByteArray, address: Address) {
 

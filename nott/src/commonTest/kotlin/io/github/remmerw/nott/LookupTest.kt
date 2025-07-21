@@ -1,7 +1,6 @@
 package io.github.remmerw.nott
 
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.test.Test
@@ -24,7 +23,7 @@ class LookupTest {
                 }
 
                 for (address in channel) {
-                    println("Fake " + address.hostname)
+                    println("Fake $address")
                 }
             } finally {
                 nott.shutdown()

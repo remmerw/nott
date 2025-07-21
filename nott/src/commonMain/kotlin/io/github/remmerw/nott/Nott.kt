@@ -2,24 +2,23 @@ package io.github.remmerw.nott
 
 import io.github.remmerw.buri.BEObject
 import io.github.remmerw.buri.decodeBencodeToMap
-import io.ktor.network.selector.SelectorManager
-import io.ktor.network.sockets.BoundDatagramSocket
-import io.ktor.network.sockets.Datagram
-import io.ktor.network.sockets.InetSocketAddress
-import io.ktor.network.sockets.aSocket
 import io.ktor.util.collections.ConcurrentMap
 import io.ktor.util.sha1
 import io.ktor.utils.io.core.remaining
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.io.Buffer
 import kotlinx.io.Source
 import kotlinx.io.readByteArray
 import kotlinx.io.writeUShort
+import java.net.DatagramPacket
+import java.net.DatagramSocket
+import java.net.InetSocketAddress
 import kotlin.math.min
 import kotlin.random.Random
 import kotlin.time.TimeSource.Monotonic.ValueTimeMark
@@ -32,20 +31,28 @@ class Nott(val nodeId: ByteArray, val port: Int, val readOnlyState: Boolean = tr
     private val requestCalls: ConcurrentMap<Int, Call> = ConcurrentMap()
 
     private val database: Database = Database()
-    private val selectorManager = SelectorManager(Dispatchers.IO)
+    private val mutex = Mutex()
+
     private val scope = CoroutineScope(Dispatchers.IO)
-    private var socket: BoundDatagramSocket? = null
+    private var socket: DatagramSocket? = null
     private val routingTable = RoutingTable()
 
-    suspend fun startup() {
-        socket = aSocket(selectorManager).udp().bind(
-            InetSocketAddress("::", port)
-        )
+    fun startup() {
+        socket = DatagramSocket(port)
 
         scope.launch {
-            while (isActive) {
-                val datagram = socket!!.receive()
-                handleDatagram(datagram)
+            try {
+                val data = ByteArray(1280)
+                while (isActive) {
+                    val packet = DatagramPacket(data, 1280)
+
+                    socket!!.receive(packet)
+                    handleDatagramPacket(packet)
+                }
+            } catch (throwable: Throwable) {
+                if (socket?.isClosed == false) {
+                    debug(throwable)
+                }
             }
         }
     }
@@ -55,36 +62,32 @@ class Nott(val nodeId: ByteArray, val port: Int, val readOnlyState: Boolean = tr
     }
 
     private suspend fun send(enqueuedSend: EnqueuedSend) {
+        mutex.withLock {
+            try {
+                val buffer = Buffer()
+                enqueuedSend.message.encode(buffer)
+                val address = enqueuedSend.message.address
 
-        try {
-            val buffer = Buffer()
-            enqueuedSend.message.encode(buffer)
-            val address = enqueuedSend.message.address
+                val data = buffer.readByteArray()
 
+                val datagram = DatagramPacket(data, data.size, address)
 
-            val datagram = Datagram(buffer, address)
+                socket!!.send(datagram)
 
-            socket!!.send(datagram)
+                enqueuedSend.associatedCall?.hasSend()
 
-            enqueuedSend.associatedCall?.hasSend()
+            } catch (throwable: Throwable) {
+                debug(throwable)
 
-        } catch (throwable: Throwable) {
-            debug(throwable)
-
-            if (enqueuedSend.associatedCall != null) {
-                enqueuedSend.associatedCall.injectStall()
-                timeout(enqueuedSend.associatedCall)
+                if (enqueuedSend.associatedCall != null) {
+                    enqueuedSend.associatedCall.injectStall()
+                    timeout(enqueuedSend.associatedCall)
+                }
             }
         }
     }
 
     fun shutdown() {
-
-        try {
-            selectorManager.close()
-        } catch (throwable: Throwable) {
-            debug(throwable)
-        }
 
         try {
             scope.cancel()
@@ -143,10 +146,10 @@ class Nott(val nodeId: ByteArray, val port: Int, val readOnlyState: Boolean = tr
             tid = request.tid,
             ip = request.address.encoded(),
             nodes = entries.filter { peer: Peer ->
-                peer.address.resolveAddress()?.size == 4
+                peer.address.address.address.size == 4
             },
             nodes6 = entries.filter { peer: Peer ->
-                peer.address.resolveAddress()?.size == 16
+                peer.address.address.address.size == 16
             }
         )
 
@@ -170,7 +173,7 @@ class Nott(val nodeId: ByteArray, val port: Int, val readOnlyState: Boolean = tr
         if (database.insertForKeyAllowed(request.infoHash)) token =
             database.generateToken(
                 request.id,
-                request.address.encoded()!!,
+                request.address.encoded(),
                 request.infoHash
             )
 
@@ -185,10 +188,10 @@ class Nott(val nodeId: ByteArray, val port: Int, val readOnlyState: Boolean = tr
             ip = request.address.encoded(),
             token = token,
             nodes = entries.filter { peer: Peer ->
-                peer.address.resolveAddress()?.size == 4
+                peer.address.address.address.size == 4
             },
             nodes6 = entries.filter { peer: Peer ->
-                peer.address.resolveAddress()?.size == 16
+                peer.address.address.address.size == 16
             },
             values = values
         )
@@ -209,7 +212,7 @@ class Nott(val nodeId: ByteArray, val port: Int, val readOnlyState: Boolean = tr
         if (database.insertForKeyAllowed(request.target)) token =
             database.generateToken(
                 request.id,
-                request.address.encoded()!!,
+                request.address.encoded(),
                 request.target
             )
 
@@ -224,10 +227,10 @@ class Nott(val nodeId: ByteArray, val port: Int, val readOnlyState: Boolean = tr
             ip = request.address.encoded(),
             token = token,
             nodes = entries.filter { peer: Peer ->
-                peer.address.resolveAddress()?.size == 4
+                peer.address.address.address.size == 4
             },
             nodes6 = entries.filter { peer: Peer ->
-                peer.address.resolveAddress()?.size == 16
+                peer.address.address.address.size == 16
             },
             null, null, null, null // TODO [Low Priority]
         )
@@ -250,7 +253,7 @@ class Nott(val nodeId: ByteArray, val port: Int, val readOnlyState: Boolean = tr
         if (!database.checkToken(
                 request.token,
                 request.id,
-                request.address.encoded()!!,
+                request.address.encoded(),
                 sha1(data)
             )
         ) {
@@ -287,7 +290,7 @@ class Nott(val nodeId: ByteArray, val port: Int, val readOnlyState: Boolean = tr
         if (!database.checkToken(
                 request.token,
                 request.id,
-                request.address.encoded()!!,
+                request.address.encoded(),
                 request.infoHash
             )
         ) {
@@ -302,7 +305,7 @@ class Nott(val nodeId: ByteArray, val port: Int, val readOnlyState: Boolean = tr
 
         // everything OK, so store the value
         val address = Address(
-            request.address.resolveAddress()!!,
+            request.address.address.address,
             request.address.port.toUShort()
         )
 
@@ -450,10 +453,10 @@ class Nott(val nodeId: ByteArray, val port: Int, val readOnlyState: Boolean = tr
         doRequestCall(Call(pr, id)) // expectedId can not be available (only address is known)
     }
 
-    private suspend fun handleDatagram(datagram: Datagram) {
-        val inet = datagram.address as InetSocketAddress
-        val source = datagram.packet
-
+    private suspend fun handleDatagramPacket(datagram: DatagramPacket) {
+        val inet = InetSocketAddress(datagram.address, datagram.port)
+        val source = Buffer()
+        source.write(datagram.data, 0, datagram.length)
 
         // * no conceivable DHT message is smaller than 10 bytes
         // * port 0 is reserved
@@ -689,15 +692,11 @@ internal fun mismatch(a: ByteArray, b: ByteArray): Int {
 }
 
 
-internal fun InetSocketAddress.encoded(): ByteArray? {
-    val address = this.resolveAddress()
-    if (address != null) {
-        val buffer = Buffer()
-        buffer.write(address)
-        buffer.writeUShort(this.port.toUShort())
-        return buffer.readByteArray()
-    }
-    return null
+internal fun InetSocketAddress.encoded(): ByteArray {
+    val buffer = Buffer()
+    buffer.write(address.address)
+    buffer.writeUShort(this.port.toUShort())
+    return buffer.readByteArray()
 }
 
 
@@ -722,11 +721,6 @@ fun nodeId(): ByteArray {
     id[6] = '5'.code.toByte()
     id[7] = '-'.code.toByte()
     return Random.nextBytes(id, 8)
-}
-
-
-fun createInetSocketAddress(address: ByteArray, port: Int): InetSocketAddress {
-    return InetSocketAddress(hostname(address), port)
 }
 
 

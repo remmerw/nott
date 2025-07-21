@@ -1,7 +1,6 @@
 package io.github.remmerw.nott
 
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.test.Test
@@ -21,7 +20,7 @@ class AnnounceTest {
                 }
 
                 for (address in channel) {
-                    println("announce to " + address.hostname)
+                    println("announce to $address")
                 }
             } finally {
                 nott.shutdown()
@@ -37,7 +36,7 @@ class AnnounceTest {
                 }
 
                 for (address in channel) {
-                    println("find from " + address.hostname)
+                    println("find from $address")
                 }
             } finally {
                 mdht.shutdown()

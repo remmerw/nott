@@ -4,8 +4,8 @@ package io.github.remmerw.nott
 import io.github.remmerw.buri.BEObject
 import io.github.remmerw.buri.bencode
 import io.github.remmerw.buri.encodeBencodeTo
-import io.ktor.network.sockets.InetSocketAddress
 import kotlinx.io.Sink
+import java.net.InetSocketAddress
 
 
 internal interface Message {

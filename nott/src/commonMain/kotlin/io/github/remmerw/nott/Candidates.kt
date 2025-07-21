@@ -1,6 +1,6 @@
 package io.github.remmerw.nott
 
-import io.ktor.network.sockets.InetSocketAddress
+import java.net.InetSocketAddress
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.random.Random
