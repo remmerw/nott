@@ -9,6 +9,7 @@ import io.github.remmerw.buri.bencode
 import kotlinx.io.Buffer
 import kotlinx.io.readByteArray
 import kotlinx.io.readUShort
+import java.net.InetAddress
 import java.net.InetSocketAddress
 
 private fun parseError(
@@ -97,14 +98,18 @@ internal fun readBuckets(src: ByteArray, length: Int): List<Peer> {
         val raw = buffer.readByteArray(length - 2) // -2 because of port
         val port = buffer.readUShort()
         if (port > 0.toUShort() && port <= 65535.toUShort()) {
-            val peer = Peer(
-                InetSocketAddress(
-                    hostname(raw),
-                    port.toInt()
-                ),
-                rawId
-            )
-            result.add(peer)
+            try {
+                val peer = Peer(
+                    InetSocketAddress(
+                        InetAddress.getByAddress(raw),
+                        port.toInt()
+                    ),
+                    rawId
+                )
+                result.add(peer)
+            } catch (throwable: Throwable) {
+                debug(throwable)
+            }
         }
     }
     return result
@@ -455,40 +460,6 @@ private fun parseResponse(
     }
 
     return msg
-}
-
-
-private fun numericInet4(address: ByteArray): String {
-    return (address[0].toInt() and 255).toString() + "." +
-            (address[1].toInt() and 255) + "." +
-            (address[2].toInt() and 255) + "." + (address[3].toInt() and 255)
-}
-
-private fun numericInet6(address: ByteArray): String {
-    val builder = StringBuilder(39)
-
-    for (i in 0 until 8) {
-        val highByte = address[i * 2].toInt() and 0xFF
-        val lowByte = address[i * 2 + 1].toInt() and 0xFF
-        val segment = (highByte shl 8) or lowByte
-        builder.append(segment.toString(16))
-
-        if (i < 7) {
-            builder.append(":")
-        }
-    }
-
-    return builder.toString()
-}
-
-internal fun hostname(address: ByteArray): String {
-    if (address.size == 4) {
-        return numericInet4(address)
-    }
-    if (address.size == 16) {
-        return numericInet6(address)
-    }
-    throw Exception("Invalid address")
 }
 
 

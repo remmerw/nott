@@ -62,7 +62,11 @@ fun CoroutineScope.requestGetPeers(
 
                         for (item in message.values) {
                             if (peers.add(item)) {
-                                send(item.toInetSocketAddress())
+                                try {
+                                    send(item.toInetSocketAddress())
+                                } catch (throwable: Throwable) {
+                                    debug(throwable)
+                                }
                             }
                         }
 

@@ -22,22 +22,19 @@ import kotlin.math.min
 import kotlin.random.Random
 import kotlin.time.TimeSource.Monotonic.ValueTimeMark
 
-class Nott(val nodeId: ByteArray, val port: Int, val readOnlyState: Boolean = true) {
+class Nott(val nodeId: ByteArray, port: Int, val readOnlyState: Boolean = true) {
 
     private val unsolicitedThrottle: MutableMap<InetSocketAddress, Long> =
         mutableMapOf() // runs in same thread
 
     private val requestCalls: MutableMap<Int, Call> = ConcurrentHashMap()
-
     private val database: Database = Database()
     private val mutex = Mutex()
-
     private val scope = CoroutineScope(Dispatchers.IO)
-    private var socket: DatagramSocket? = null
+    private var socket = DatagramSocket(port)
     private val routingTable = RoutingTable()
 
     fun startup() {
-        socket = DatagramSocket(port)
 
         scope.launch {
             try {
@@ -45,11 +42,11 @@ class Nott(val nodeId: ByteArray, val port: Int, val readOnlyState: Boolean = tr
                 while (isActive) {
                     val packet = DatagramPacket(data, 1280)
 
-                    socket!!.receive(packet)
+                    socket.receive(packet)
                     handleDatagramPacket(packet)
                 }
             } catch (throwable: Throwable) {
-                if (socket?.isClosed == false) {
+                if (!socket.isClosed) {
                     debug(throwable)
                 }
             }
@@ -71,7 +68,7 @@ class Nott(val nodeId: ByteArray, val port: Int, val readOnlyState: Boolean = tr
 
                 val datagram = DatagramPacket(data, data.size, address)
 
-                socket!!.send(datagram)
+                socket.send(datagram)
 
                 enqueuedSend.associatedCall?.hasSend()
 
@@ -95,7 +92,7 @@ class Nott(val nodeId: ByteArray, val port: Int, val readOnlyState: Boolean = tr
         }
 
         try {
-            socket?.close()
+            socket.close()
         } catch (throwable: Throwable) {
             debug(throwable)
         }
@@ -360,7 +357,7 @@ class Nott(val nodeId: ByteArray, val port: Int, val readOnlyState: Boolean = tr
                val port = buffer.readUShort()
                val addr = createInetSocketAddress(rawIP, port.toInt())
 
-                debug("My IP " + addr.hostname)
+                debug("My IP " + addr)
             }
         }*/
 

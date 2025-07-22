@@ -3,6 +3,7 @@ package io.github.remmerw.nott
 import kotlinx.io.Buffer
 import kotlinx.io.readByteArray
 import kotlinx.io.writeUShort
+import java.net.InetAddress
 import java.net.InetSocketAddress
 
 internal data class Address(val data: ByteArray, val port: UShort) {
@@ -15,7 +16,8 @@ internal data class Address(val data: ByteArray, val port: UShort) {
     }
 
     fun toInetSocketAddress(): InetSocketAddress {
-        return InetSocketAddress(hostname(data), port.toInt())
+        val address = InetAddress.getByAddress(data)
+        return InetSocketAddress(address, port.toInt())
     }
 
     override fun equals(other: Any?): Boolean {
