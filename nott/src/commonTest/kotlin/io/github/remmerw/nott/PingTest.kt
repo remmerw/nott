@@ -13,7 +13,7 @@ class PingTest {
 
         val target = createRandomKey(SHA1_HASH_LENGTH) // random peer id
 
-        val nott = newNott(nodeId(), 6005, bootstrap())
+        val nott = newNott(nodeId())
         try {
             val addresses: MutableSet<InetSocketAddress> = mutableSetOf()
             withTimeoutOrNull(30 * 1000) {

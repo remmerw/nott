@@ -57,7 +57,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             ...
-            implementation("io.github.remmerw:nott:0.0.5")
+            implementation("io.github.remmerw:nott:0.0.6")
         }
         ...
     }

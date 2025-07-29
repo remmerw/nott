@@ -16,7 +16,7 @@ class LookupTest {
 
         withTimeoutOrNull(60 * 1000) {
 
-            val nott = newNott(nodeId(), 6004, bootstrap())
+            val nott = newNott(nodeId())
             try {
                 val channel = requestGetPeers(nott, key) {
                     5000

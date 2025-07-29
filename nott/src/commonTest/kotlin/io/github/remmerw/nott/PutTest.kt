@@ -46,7 +46,7 @@ class PutTest {
 
 
         withTimeoutOrNull(60 * 1000) {
-            val nott = newNott(nodeId(), 6006, bootstrap())
+            val nott = newNott(nodeId())
             try {
                 val channel = requestPut(
                     nott, target, v, cas, k, salt, seq, sig
@@ -64,7 +64,7 @@ class PutTest {
 
 
         withTimeoutOrNull(30 * 1000) {
-            val nott = newNott(nodeId(), 6007, bootstrap())
+            val nott = newNott(nodeId())
             try {
                 val channel = requestGet(nott, target) {
                     5000

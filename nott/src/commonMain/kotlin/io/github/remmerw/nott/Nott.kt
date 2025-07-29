@@ -22,7 +22,7 @@ import kotlin.math.min
 import kotlin.random.Random
 import kotlin.time.TimeSource.Monotonic.ValueTimeMark
 
-class Nott(val nodeId: ByteArray, port: Int, val readOnlyState: Boolean = true) {
+class Nott(val nodeId: ByteArray, port: Int = 0, val readOnlyState: Boolean = true) {
 
     private val unsolicitedThrottle: MutableMap<InetSocketAddress, Long> =
         mutableMapOf() // runs in same thread
@@ -33,6 +33,11 @@ class Nott(val nodeId: ByteArray, port: Int, val readOnlyState: Boolean = true) 
     private val scope = CoroutineScope(Dispatchers.IO)
     private var socket = DatagramSocket(port)
     private val routingTable = RoutingTable()
+
+
+    fun port() : Int {
+        return socket.localPort
+    }
 
     fun startup() {
 
@@ -697,7 +702,9 @@ internal fun InetSocketAddress.encoded(): ByteArray {
 }
 
 
-suspend fun newNott(nodeId: ByteArray, port: Int, bootstrap: List<InetSocketAddress>): Nott {
+suspend fun newNott(nodeId: ByteArray,
+                    port: Int = 0,
+                    bootstrap: List<InetSocketAddress> = bootstrap()): Nott {
     val nott = Nott(nodeId, port)
     nott.startup()
 

@@ -13,7 +13,7 @@ class AnnounceTest {
         val key = createRandomKey(SHA1_HASH_LENGTH)
 
         withTimeoutOrNull(60 * 1000) {
-            val nott = newNott(nodeId(), 6001, bootstrap())
+            val nott = newNott(nodeId())
             try {
                 val channel = requestAnnounce(nott, key, 3443) {
                     5000
@@ -29,9 +29,9 @@ class AnnounceTest {
 
         withTimeoutOrNull(30 * 1000) {
 
-            val mdht = newNott(nodeId(), 6002, bootstrap())
+            val nott = newNott(nodeId())
             try {
-                val channel = requestGetPeers(mdht, key) {
+                val channel = requestGetPeers(nott, key) {
                     5000
                 }
 
@@ -39,7 +39,7 @@ class AnnounceTest {
                     println("find from $address")
                 }
             } finally {
-                mdht.shutdown()
+                nott.shutdown()
             }
 
         }
