@@ -35,7 +35,7 @@ class Nott(val nodeId: ByteArray, port: Int = 0, val readOnlyState: Boolean = tr
     private val routingTable = RoutingTable()
 
 
-    fun port() : Int {
+    fun port(): Int {
         return socket.localPort
     }
 
@@ -44,11 +44,25 @@ class Nott(val nodeId: ByteArray, port: Int = 0, val readOnlyState: Boolean = tr
         scope.launch {
             try {
                 val data = ByteArray(1280)
+                val source = Buffer()
                 while (isActive) {
                     val packet = DatagramPacket(data, 1280)
 
                     socket.receive(packet)
-                    handleDatagramPacket(packet)
+
+
+                    val inet = InetSocketAddress(packet.address, packet.port)
+                    val length = packet.length
+
+                    // * no conceivable DHT message is smaller than 10 bytes
+                    // * port 0 is reserved
+                    // -> immediately discard junk on the read loop, don't even allocate a
+                    // buffer for it
+                    if (length < 10 || inet.port == 0) continue
+
+                    source.clear()
+                    source.write(packet.data, 0, length)
+                    handlePacket(source, inet)
                 }
             } catch (throwable: Throwable) {
                 if (!socket.isClosed) {
@@ -454,19 +468,6 @@ class Nott(val nodeId: ByteArray, port: Int = 0, val readOnlyState: Boolean = tr
         doRequestCall(Call(pr, id)) // expectedId can not be available (only address is known)
     }
 
-    private suspend fun handleDatagramPacket(datagram: DatagramPacket) {
-        val inet = InetSocketAddress(datagram.address, datagram.port)
-        val length = datagram.length
-
-        // * no conceivable DHT message is smaller than 10 bytes
-        // * port 0 is reserved
-        // -> immediately discard junk on the read loop, don't even allocate a buffer for it
-        if (length < 10 || inet.port == 0) return
-
-        val source = Buffer()
-        source.write(datagram.data, 0, length)
-        handlePacket(source, inet)
-    }
 
     private suspend fun handlePacket(source: Source, address: InetSocketAddress) {
 
@@ -702,9 +703,11 @@ internal fun InetSocketAddress.encoded(): ByteArray {
 }
 
 
-suspend fun newNott(nodeId: ByteArray,
-                    port: Int = 0,
-                    bootstrap: List<InetSocketAddress> = bootstrap()): Nott {
+suspend fun newNott(
+    nodeId: ByteArray,
+    port: Int = 0,
+    bootstrap: List<InetSocketAddress> = bootstrap()
+): Nott {
     val nott = Nott(nodeId, port)
     nott.startup()
 
