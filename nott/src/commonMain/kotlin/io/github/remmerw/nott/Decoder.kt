@@ -100,11 +100,11 @@ internal fun readBuckets(src: ByteArray, length: Int): List<Peer> {
         if (port > 0.toUShort() && port <= 65535.toUShort()) {
             try {
                 val peer = Peer(
+                    rawId,
                     InetSocketAddress(
                         InetAddress.getByAddress(raw),
                         port.toInt()
-                    ),
-                    rawId
+                    )
                 )
                 result.add(peer)
             } catch (throwable: Throwable) {

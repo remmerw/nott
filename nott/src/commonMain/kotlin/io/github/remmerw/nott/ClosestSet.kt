@@ -13,9 +13,13 @@ internal class ClosestSet(
     private var insertAttemptsSinceTailModification = 0
 
 
-    init {
+    suspend fun initialize() {
         val entries = nott.closestPeers(target, 32)
-        candidates.addCandidates(null, entries)
+        if (entries.isEmpty()) {
+            nott.bootstrap()
+        } else {
+            candidates.addCandidates(null, entries)
+        }
     }
 
     fun nextCandidate(inFlight: Set<Call>): Peer? {

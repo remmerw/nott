@@ -4,9 +4,8 @@ import java.net.InetSocketAddress
 import kotlin.time.TimeSource
 import kotlin.time.TimeSource.Monotonic.ValueTimeMark
 
-internal class Peer(val address: InetSocketAddress, val id: ByteArray) {
+class Peer(val id: ByteArray, val address: InetSocketAddress) {
     private var lastSeen: ValueTimeMark = TimeSource.Monotonic.markNow()
-    private var verified = false
     private var failedQueries = 0
 
 
@@ -25,37 +24,28 @@ internal class Peer(val address: InetSocketAddress, val id: ByteArray) {
     }
 
     fun eligibleForNodesList(): Boolean {
-        // 1 timeout can occasionally happen. should be fine to hand
-        // it out as long as we've verified it at least once
-        return verifiedReachable() && failedQueries < 2
+        return failedQueries < 2
     }
 
-    fun verifiedReachable(): Boolean {
-        return verified
-    }
 
     // old entries, e.g. from routing table reload
     private fun oldAndStale(): Boolean {
-        return failedQueries > OLD_AND_STALE_TIMEOUTS &&
-                lastSeen.elapsedNow().inWholeMilliseconds > OLD_AND_STALE_TIME
+        return lastSeen.elapsedNow().inWholeMilliseconds > OLD_AND_STALE_TIME
     }
 
     fun needsReplacement(): Boolean {
-        return (failedQueries > 1 && !verifiedReachable()) ||
-                failedQueries > MAX_TIMEOUTS || oldAndStale()
+        return (failedQueries > 2) || oldAndStale()
     }
 
     fun mergeInTimestamps(other: Peer) {
         if (!this.equals(other) || this === other) return
         lastSeen = newerTimeMark(lastSeen, other.lastSeen)!!
-        if (other.verifiedReachable()) setVerified()
     }
 
 
     fun signalResponse() {
         lastSeen = TimeSource.Monotonic.markNow()
         failedQueries = 0
-        verified = true
     }
 
     /**
@@ -65,11 +55,9 @@ internal class Peer(val address: InetSocketAddress, val id: ByteArray) {
         failedQueries++
     }
 
-
-    private fun setVerified() {
-        verified = true
+    override fun toString(): String {
+        return "Peer(address=$address)"
     }
-
 
     class DistanceOrder(val target: ByteArray) : Comparator<Peer> {
         override fun compare(a: Peer, b: Peer): Int {

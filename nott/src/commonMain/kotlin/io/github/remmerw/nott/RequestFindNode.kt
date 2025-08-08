@@ -24,6 +24,7 @@ fun CoroutineScope.findNode(
     while (true) {
 
         val closest = ClosestSet(nott, target)
+        closest.initialize()
 
         val inFlight: MutableSet<Call> = mutableSetOf()
 

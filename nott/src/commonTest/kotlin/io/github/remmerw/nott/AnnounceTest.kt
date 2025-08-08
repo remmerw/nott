@@ -35,8 +35,8 @@ class AnnounceTest {
                     5000
                 }
 
-                for (address in channel) {
-                    println("find from $address")
+                for (response in channel) {
+                    println("find from ${response.peer} " + response.addresses)
                 }
             } finally {
                 nott.shutdown()

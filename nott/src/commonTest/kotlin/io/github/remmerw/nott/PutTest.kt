@@ -3,18 +3,26 @@ package io.github.remmerw.nott
 
 import io.github.remmerw.borr.Ed25519Sign
 import io.github.remmerw.buri.BEString
+import junit.framework.TestCase.assertTrue
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancelChildren
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.io.Buffer
 import kotlinx.io.readByteArray
+import kotlin.concurrent.atomics.AtomicInt
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
+import kotlin.concurrent.atomics.incrementAndFetch
 import kotlin.test.Test
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 class PutTest {
 
-    @OptIn(ExperimentalTime::class)
+    @OptIn(ExperimentalTime::class, ExperimentalAtomicApi::class)
     @Test
     fun putTest(): Unit = runBlocking(Dispatchers.IO) {
 
@@ -44,8 +52,9 @@ class PutTest {
 
         val target = sha1(k)
 
-
-        withTimeoutOrNull(60 * 1000) {
+        val peers = mutableListOf<Peer>()
+        val added = AtomicInt(0)
+        withTimeout(60 * 1000) {
             val nott = newNott(nodeId())
             try {
                 val channel = requestPut(
@@ -54,17 +63,25 @@ class PutTest {
                     5000
                 }
 
-                for (address in channel) {
-                    println("put to $address")
+                for (peer in channel) {
+                    println("put to $peer")
+                    peers.add(peer)
+                    if (added.incrementAndFetch() > 20) {
+                        coroutineContext.cancelChildren()
+                    }
                 }
+            } catch (_: CancellationException) {
+
             } finally {
                 nott.shutdown()
             }
         }
 
+        delay(5000)
 
+        val read = AtomicInt(0)
         withTimeoutOrNull(30 * 1000) {
-            val nott = newNott(nodeId())
+            val nott = newNott(nodeId(), peers = peers)
             try {
                 val channel = requestGet(nott, target) {
                     5000
@@ -75,10 +92,16 @@ class PutTest {
                         "data received " + data.data.toString() + " " +
                                 data.k?.decodeToString()
                     )
+                    if (read.incrementAndFetch() > 5) {
+                        coroutineContext.cancelChildren()
+                    }
                 }
+            } catch (_: CancellationException) {
             } finally {
                 nott.shutdown()
             }
         }
+
+        assertTrue(read.load() >= 5)
     }
 }

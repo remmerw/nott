@@ -18,7 +18,7 @@ class Tests {
     }
 
     @Test
-    fun testNottPort() : Unit = runBlocking(Dispatchers.IO) {
+    fun testNottPort(): Unit = runBlocking(Dispatchers.IO) {
         val nott = newNott(nodeId())
         assertTrue(nott.port() > 0)
         nott.shutdown()

@@ -7,7 +7,6 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
-import java.net.InetSocketAddress
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -21,12 +20,13 @@ fun CoroutineScope.requestPut(
     seq: Long? = null,
     sig: ByteArray? = null,
     intermediateTimeout: () -> Long
-): ReceiveChannel<InetSocketAddress> = produce {
+): ReceiveChannel<Peer> = produce {
 
 
     while (true) {
 
         val closest = ClosestSet(nott, target)
+        closest.initialize()
 
         val inFlight: MutableSet<Call> = mutableSetOf()
 
@@ -69,7 +69,7 @@ fun CoroutineScope.requestPut(
                     removed.add(call)
                     val message = call.response
                     if (message is PutResponse) {
-                        send(message.address)
+                        send(Peer(message.id, message.address))
                     } else if (message is GetPeersResponse) {
                         val match = closest.acceptResponse(call)
 

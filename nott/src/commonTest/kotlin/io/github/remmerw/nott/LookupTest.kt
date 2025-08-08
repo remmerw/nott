@@ -22,8 +22,8 @@ class LookupTest {
                     5000
                 }
 
-                for (address in channel) {
-                    println("Fake $address")
+                for (response in channel) {
+                    println("Fake from ${response.peer} " + response.addresses)
                 }
             } finally {
                 nott.shutdown()

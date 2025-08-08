@@ -8,21 +8,21 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import java.net.InetSocketAddress
 
+data class PeerResponse(val peer: Peer, val addresses: List<InetSocketAddress>)
 
 @OptIn(ExperimentalCoroutinesApi::class)
 fun CoroutineScope.requestGetPeers(
     nott: Nott,
     target: ByteArray,
     intermediateTimeout: () -> Long
-): ReceiveChannel<InetSocketAddress> = produce {
-
+): ReceiveChannel<PeerResponse> = produce {
 
     val peers: MutableSet<Address> = mutableSetOf()
-
 
     while (true) {
 
         val closest = ClosestSet(nott, target)
+        closest.initialize()
 
         val inFlight: MutableSet<Call> = mutableSetOf()
 
@@ -60,14 +60,20 @@ fun CoroutineScope.requestGetPeers(
                         val message = call.response
                         message as GetPeersResponse
 
+                        val list = mutableListOf<InetSocketAddress>()
                         for (item in message.values) {
                             if (peers.add(item)) {
                                 try {
-                                    send(item.toInetSocketAddress())
+                                    list.add(item.toInetSocketAddress())
                                 } catch (throwable: Throwable) {
                                     debug(throwable)
                                 }
                             }
+                        }
+
+                        if (list.isNotEmpty()) {
+                            val peer = Peer(message.id, message.address)
+                            send(PeerResponse(peer, list))
                         }
 
                         // if we scrape we don't care about tokens.

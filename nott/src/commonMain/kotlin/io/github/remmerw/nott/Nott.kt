@@ -22,7 +22,11 @@ import kotlin.math.min
 import kotlin.random.Random
 import kotlin.time.TimeSource.Monotonic.ValueTimeMark
 
-class Nott(val nodeId: ByteArray, port: Int = 0, val readOnlyState: Boolean = true) {
+class Nott(
+    val nodeId: ByteArray, port: Int = 0,
+    val readOnlyState: Boolean = true,
+    val bootstrap: List<InetSocketAddress> = bootstrap()
+) {
 
     private val unsolicitedThrottle: MutableMap<InetSocketAddress, Long> =
         mutableMapOf() // runs in same thread
@@ -37,6 +41,23 @@ class Nott(val nodeId: ByteArray, port: Int = 0, val readOnlyState: Boolean = tr
 
     fun port(): Int {
         return socket.localPort
+    }
+
+    suspend fun initialize(peers: List<Peer>) {
+        peers.forEach { peer ->
+            routingTable.insertOrRefresh(peer)
+        }
+        bootstrap()
+    }
+
+    suspend fun bootstrap() {
+        try {
+            bootstrap.forEach { address: InetSocketAddress ->
+                ping(address, null)
+            }
+        } catch (throwable: Throwable) {
+            debug(throwable)
+        }
     }
 
     fun startup() {
@@ -400,7 +421,7 @@ class Nott(val nodeId: ByteArray, port: Int = 0, val readOnlyState: Boolean = tr
         // it's fishy at least. don't insert even if it proves useful during a lookup
         if (entryById == null && expectedId != null && !expectedId.contentEquals(id)) return
 
-        val newEntry = Peer(msg.address, id)
+        val newEntry = Peer(id, msg.address)
         // throttle the insert-attempts for unsolicited requests, update-only once they exceed the threshold
         // does not apply to responses
         if (associatedCall == null && updateAndCheckThrottle(newEntry.address)) {
@@ -617,13 +638,9 @@ internal data class EnqueuedSend(val message: Message, val associatedCall: Call?
 internal const val TID_LENGTH = 6
 
 
-// 5 timeouts, used for exponential backoff as per kademlia paper
-internal const val MAX_TIMEOUTS = 5
-
 // haven't seen it for a long time + timeout == evict sooner than pure timeout
 // based threshold. e.g. for old entries that we haven't touched for a long time
 internal const val OLD_AND_STALE_TIME = 15 * 60 * 1000
-internal const val OLD_AND_STALE_TIMEOUTS = 2
 
 // DHT
 internal const val RESPONSE_TIMEOUT = 3000
@@ -706,14 +723,12 @@ internal fun InetSocketAddress.encoded(): ByteArray {
 suspend fun newNott(
     nodeId: ByteArray,
     port: Int = 0,
-    bootstrap: List<InetSocketAddress> = bootstrap()
+    bootstrap: List<InetSocketAddress> = bootstrap(),
+    peers: List<Peer> = emptyList()
 ): Nott {
-    val nott = Nott(nodeId, port)
+    val nott = Nott(nodeId, port = port, bootstrap = bootstrap)
     nott.startup()
-
-    bootstrap.forEach { address: InetSocketAddress ->
-        nott.ping(address, null)
-    }
+    nott.initialize(peers)
     return nott
 }
 

@@ -24,6 +24,8 @@ fun CoroutineScope.requestGet(
     while (true) {
 
         val closest = ClosestSet(nott, key)
+        closest.initialize()
+
         val inFlight: MutableSet<Call> = mutableSetOf()
         do {
             do {
