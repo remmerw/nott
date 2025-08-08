@@ -57,7 +57,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             ...
-            implementation("io.github.remmerw:nott:0.0.7")
+            implementation("io.github.remmerw:nott:0.0.8")
         }
         ...
     }
@@ -75,14 +75,14 @@ kotlin {
 
         withTimeoutOrNull(60 * 1000) {
 
-            val nott = newNott(nodeId(), 6004, bootstrap())
+            val nott = newNott(nodeId())
             try {
                 val channel = requestGetPeers(nott, key) {
                     5000
                 }
 
-                for (address in channel) {
-                    println("Fake " + address.hostname)
+                for (response in channel) {
+                    println("Fake from ${response.peer} " + response.addresses)
                 }
             } finally {
                 nott.shutdown()
