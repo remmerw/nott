@@ -16,6 +16,7 @@ fun CoroutineScope.requestAnnounce(
     port: Int,
     intermediateTimeout: () -> Long
 ): ReceiveChannel<InetSocketAddress> = produce {
+    val announced: MutableSet<Peer> = mutableSetOf()
 
     while (true) {
 
@@ -70,24 +71,27 @@ fun CoroutineScope.requestAnnounce(
 
                         if (match != null) {
 
-                            // if we scrape we don't care about tokens.
-                            // otherwise we're only done if we have found the closest
-                            // nodes that also returned tokens
-                            if (rsp.token != null) {
-                                closest.insert(match)
+                            // do not announce again to the same peer
+                            if (announced.add(match)) {
+                                // if we scrape we don't care about tokens.
+                                // otherwise we're only done if we have found the closest
+                                // nodes that also returned tokens
+                                if (rsp.token != null) {
+                                    closest.insert(match)
 
-                                val tid = createRandomKey(TID_LENGTH)
-                                val request = AnnounceRequest(
-                                    address = match.address,
-                                    id = nott.nodeId,
-                                    tid = tid,
-                                    ro = nott.readOnlyState,
-                                    infoHash = target,
-                                    port = port,
-                                    token = rsp.token,
-                                    name = null
-                                )
-                                announces.put(match, request)
+                                    val tid = createRandomKey(TID_LENGTH)
+                                    val request = AnnounceRequest(
+                                        address = match.address,
+                                        id = nott.nodeId,
+                                        tid = tid,
+                                        ro = nott.readOnlyState,
+                                        infoHash = target,
+                                        port = port,
+                                        token = rsp.token,
+                                        name = null
+                                    )
+                                    announces.put(match, request)
+                                }
                             }
                         }
                     }

@@ -13,6 +13,7 @@ import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.io.Buffer
 import kotlinx.io.readByteArray
+import java.net.InetSocketAddress
 import kotlin.concurrent.atomics.AtomicInt
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.concurrent.atomics.incrementAndFetch
@@ -52,7 +53,7 @@ class PutTest {
 
         val target = sha1(k)
 
-        val peers = mutableListOf<Peer>()
+        val peers = mutableListOf<InetSocketAddress>()
         val added = AtomicInt(0)
         withTimeout(60 * 1000) {
             val nott = newNott(nodeId())
@@ -63,9 +64,9 @@ class PutTest {
                     5000
                 }
 
-                for (peer in channel) {
-                    println("put to $peer")
-                    peers.add(peer)
+                for (address in channel) {
+                    println("put to $address")
+                    peers.add(address)
                     if (added.incrementAndFetch() > 20) {
                         coroutineContext.cancelChildren()
                     }
@@ -79,9 +80,13 @@ class PutTest {
 
         delay(5000)
 
+        val bootstrap : MutableSet<InetSocketAddress> = mutableSetOf()
+        bootstrap.addAll(defaultBootstrap())
+        bootstrap.addAll(peers)
+
         val read = AtomicInt(0)
         withTimeoutOrNull(30 * 1000) {
-            val nott = newNott(nodeId(), peers = peers)
+            val nott = newNott(nodeId(), bootstrap = bootstrap)
             try {
                 val channel = requestGet(nott, target) {
                     5000

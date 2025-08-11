@@ -23,10 +23,10 @@ internal class RoutingTable internal constructor() {
             ?.mergeInTimestamps(peer)
     }
 
-    fun closestPeers(key: ByteArray, take: Int): List<Peer> {
+    fun closestPeers(key: ByteArray, take: Int): Set<Peer> {
         return entries().filter { peer -> peer.eligibleForNodesList() }
             .sortedWith(Peer.DistanceOrder(key))
-            .take(take)
+            .take(take).toSet()
     }
 
 
@@ -37,7 +37,7 @@ internal class RoutingTable internal constructor() {
     fun onTimeout(id: ByteArray) {
         val peer = findPeerById(id)
         if (peer != null) {
-            peer.signalRequestTimeout()
+            peer.signalFailure()
             //only removes the entry if it is bad
             if (peer.needsReplacement()) {
                 entries.remove(peer.hashCode())
@@ -47,11 +47,11 @@ internal class RoutingTable internal constructor() {
 
 
     fun findPeerById(id: ByteArray): Peer? {
-        return entries[id.hashCode()]
+        return entries[id.contentHashCode()]
     }
 
     fun notifyOfResponse(msg: Message) {
-        entries[msg.id.hashCode()]?.signalResponse()
+        entries[msg.id.contentHashCode()]?.signalResponse()
     }
 
 }

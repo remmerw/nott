@@ -1,7 +1,6 @@
 package io.github.remmerw.nott
 
 import java.net.InetSocketAddress
-import kotlin.math.max
 import kotlin.math.min
 import kotlin.random.Random
 
@@ -42,9 +41,6 @@ internal class Candidates internal constructor(
         val peer = node.peer
         if (node.unreachable) return false
 
-        // skip retransmits if we previously got a response but from the wrong socket address
-        if (node.hasSocketMismatchCalls()) return false
-
         val addr = peer.address
 
         if (acceptedInets.contains(addr) || acceptedKeys.contains(peer.id.contentHashCode()))
@@ -54,7 +50,6 @@ internal class Candidates internal constructor(
         // has not given us lots of bogus candidates
         if (node.nonSuccessfulDescendants()) return false
 
-        var dups = 0
 
         // also check other calls based on matching IP instead of strictly matching ip+port+id
         val byIp: Set<Call>? = callsByIp[addr]
@@ -71,16 +66,10 @@ internal class Candidates internal constructor(
                 ) return false
                 // we don't strictly check the presence of IDs in error messages, so we can't compare those here
                 if (c.state() == CallState.ERROR) return false
-                dups++
             }
 
         }
-        // log2 scale
-        val sources =
-            max(1.0, (node.numSources() + (if (node.root) 1 else 0)).toDouble()).toInt()
 
-        val scaledSources = 31 - sources.countLeadingZeroBits()
-        scaledSources >= dups
         return true
     }
 
@@ -144,10 +133,7 @@ internal class Candidates internal constructor(
         return failures[address] ?: 0
     }
 
-    fun addCandidates(source: Peer?, entries: Collection<Peer>) {
-
-
-        val dedup: MutableSet<Any> = HashSet()
+    fun addCandidates(source: Peer?, entries: Set<Peer>) {
 
         val sourceNode = if (source != null) candidates[source] else null
 
@@ -155,21 +141,15 @@ internal class Candidates internal constructor(
 
         for (peer in entries) {
 
-            // no double entries
-            if (!dedup.add(peer.id.contentHashCode())
-                || !dedup.add(peer.address)
-            ) continue
-
-
             val node = candidates.getOrPut(peer) {
-                val root = source == null
+
                 val failures = failures(peer.address)
                 // 0-20
                 val rnd = Random.nextInt(21)
                 // -2 - 19 -> 5% chance to let even the worst stuff still
                 // through to keep the counters going up
                 val unreachable = min((failures - 2).toDouble(), 19.0) > rnd
-                Node(peer, root, unreachable)
+                Node(peer, unreachable)
             }
 
             if (sourceNode != null) node.addSource(sourceNode)
@@ -198,23 +178,24 @@ internal class Candidates internal constructor(
         // this case since findAny reduces the invocations of the filter,
         // and that is more expensive than the sorting
 
-        var node = sortedLookups()
+        val sorted = sortedLookups()
+        var node = sorted
             .filter { node: Node -> node.hasNoCalls() }.firstOrNull { node ->
                 lookup(node)
             }
 
-        var kbe = node?.peer
-        if (kbe != null) {
-            if (postFilter.invoke(kbe)) {
-                return kbe
+        var peer = node?.peer
+        if (peer != null) {
+            if (postFilter.invoke(peer)) {
+                return peer
             }
         }
 
-        node = sortedLookups().firstOrNull { node -> lookup(node) }
-        kbe = node?.peer
-        if (kbe != null) {
-            if (postFilter.invoke(kbe)) {
-                return kbe
+        node = sorted.firstOrNull { node -> lookup(node) }
+        peer = node?.peer
+        if (peer != null) {
+            if (postFilter.invoke(peer)) {
+                return peer
             }
         }
 

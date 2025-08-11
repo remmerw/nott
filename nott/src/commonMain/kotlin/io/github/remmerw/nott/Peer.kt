@@ -4,41 +4,25 @@ import java.net.InetSocketAddress
 import kotlin.time.TimeSource
 import kotlin.time.TimeSource.Monotonic.ValueTimeMark
 
-class Peer(val id: ByteArray, val address: InetSocketAddress) {
+internal class Peer(val id: ByteArray, val address: InetSocketAddress) {
     private var lastSeen: ValueTimeMark = TimeSource.Monotonic.markNow()
     private var failedQueries = 0
-
-
-    override fun equals(other: Any?): Boolean {
-        if (other is Peer) return this.equals(other)
-        return false
-    }
-
-    fun equals(other: Peer?): Boolean {
-        if (other == null) return false
-        return id.contentEquals(other.id) && address == other.address
-    }
-
-    override fun hashCode(): Int {
-        return id.hashCode() // note bucket entry
-    }
 
     fun eligibleForNodesList(): Boolean {
         return failedQueries < 2
     }
 
 
-    // old entries, e.g. from routing table reload
     private fun oldAndStale(): Boolean {
         return lastSeen.elapsedNow().inWholeMilliseconds > OLD_AND_STALE_TIME
     }
 
     fun needsReplacement(): Boolean {
-        return (failedQueries > 2) || oldAndStale()
+        return (failedQueries >= 2) || oldAndStale()
     }
 
     fun mergeInTimestamps(other: Peer) {
-        if (!this.equals(other) || this === other) return
+        if (this != other || this === other) return
         lastSeen = newerTimeMark(lastSeen, other.lastSeen)!!
     }
 
@@ -48,16 +32,31 @@ class Peer(val id: ByteArray, val address: InetSocketAddress) {
         failedQueries = 0
     }
 
-    /**
-     * Should be called to signal that a request to this peer has timed out;
-     */
-    fun signalRequestTimeout() {
+
+    fun signalFailure() {
         failedQueries++
     }
 
     override fun toString(): String {
         return "Peer(address=$address)"
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Peer
+
+        if (!id.contentEquals(other.id)) return false
+        if (address != other.address) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return id.contentHashCode()
+    }
+
 
     class DistanceOrder(val target: ByteArray) : Comparator<Peer> {
         override fun compare(a: Peer, b: Peer): Int {

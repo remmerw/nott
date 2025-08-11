@@ -45,6 +45,7 @@ suspend fun requestPing(
                     if (elapsed > RESPONSE_TIMEOUT) { // 3 sec
                         removed.add(call)
                         nott.timeout(call)
+                        call.injectError()
                     }
                 }
             }

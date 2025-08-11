@@ -36,7 +36,7 @@ internal class ClosestSet(
     fun checkTimeoutOrFailure(call: Call): Boolean {
         val state = call.state()
         if (state != CallState.RESPONDED) {
-            if (state == CallState.ERROR || state == CallState.STALLED) {
+            if (state == CallState.ERROR) {
                 return true
             } else {
                 val sendTime = call.sentTime
@@ -46,6 +46,8 @@ internal class ClosestSet(
                     if (elapsed > RESPONSE_TIMEOUT) {
                         candidates.increaseFailures(call)
                         nott.timeout(call)
+                        call.injectError()
+                        return true
                     }
                 }
             }
@@ -131,9 +133,9 @@ internal class ClosestSet(
 
 
     private fun inStabilization(): Boolean {
-        val suggestedCounts = entries().map { k: Peer ->
+        val suggestedCounts = entries().map { peer: Peer ->
             candidates.nodeForEntry(
-                k
+                peer
             )!!.numSources()
         }
 

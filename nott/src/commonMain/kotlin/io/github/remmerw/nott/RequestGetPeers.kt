@@ -8,7 +8,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import java.net.InetSocketAddress
 
-data class PeerResponse(val peer: Peer, val addresses: List<InetSocketAddress>)
+data class PeerResponse(val peer: InetSocketAddress, val addresses: List<InetSocketAddress>)
 
 @OptIn(ExperimentalCoroutinesApi::class)
 fun CoroutineScope.requestGetPeers(
@@ -72,8 +72,7 @@ fun CoroutineScope.requestGetPeers(
                         }
 
                         if (list.isNotEmpty()) {
-                            val peer = Peer(message.id, message.address)
-                            send(PeerResponse(peer, list))
+                            send(PeerResponse(message.address, list))
                         }
 
                         // if we scrape we don't care about tokens.

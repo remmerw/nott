@@ -25,7 +25,7 @@ import kotlin.time.TimeSource.Monotonic.ValueTimeMark
 class Nott(
     val nodeId: ByteArray, port: Int = 0,
     val readOnlyState: Boolean = true,
-    val bootstrap: List<InetSocketAddress> = bootstrap()
+    val bootstrap: Set<InetSocketAddress> = defaultBootstrap()
 ) {
 
     private val unsolicitedThrottle: MutableMap<InetSocketAddress, Long> =
@@ -41,13 +41,6 @@ class Nott(
 
     fun port(): Int {
         return socket.localPort
-    }
-
-    suspend fun initialize(peers: List<Peer>) {
-        peers.forEach { peer ->
-            routingTable.insertOrRefresh(peer)
-        }
-        bootstrap()
     }
 
     suspend fun bootstrap() {
@@ -93,7 +86,7 @@ class Nott(
         }
     }
 
-    internal fun closestPeers(key: ByteArray, take: Int): List<Peer> {
+    internal fun closestPeers(key: ByteArray, take: Int): Set<Peer> {
         return routingTable.closestPeers(key, take)
     }
 
@@ -116,7 +109,7 @@ class Nott(
                 debug(throwable)
 
                 if (enqueuedSend.associatedCall != null) {
-                    enqueuedSend.associatedCall.injectStall()
+                    enqueuedSend.associatedCall.injectError()
                     timeout(enqueuedSend.associatedCall)
                 }
             }
@@ -590,8 +583,7 @@ class Nott(
             }
 
             // but expect an upcoming timeout if it's really just a misbehaving node
-            call.setSocketMismatch()
-            call.injectStall()
+            call.injectError()
 
             return
         }
@@ -723,12 +715,11 @@ internal fun InetSocketAddress.encoded(): ByteArray {
 suspend fun newNott(
     nodeId: ByteArray,
     port: Int = 0,
-    bootstrap: List<InetSocketAddress> = bootstrap(),
-    peers: List<Peer> = emptyList()
+    bootstrap: Set<InetSocketAddress> = defaultBootstrap()
 ): Nott {
     val nott = Nott(nodeId, port = port, bootstrap = bootstrap)
     nott.startup()
-    nott.initialize(peers)
+    nott.bootstrap()
     return nott
 }
 
@@ -746,8 +737,8 @@ fun nodeId(): ByteArray {
 }
 
 
-fun bootstrap(): List<InetSocketAddress> {
-    return listOf(
+fun defaultBootstrap(): Set<InetSocketAddress> {
+    return setOf(
         InetSocketAddress("dht.transmissionbt.com", 6881),
         InetSocketAddress("router.bittorrent.com", 6881),
         InetSocketAddress("router.utorrent.com", 6881),

@@ -15,22 +15,12 @@ internal class Call(val request: Request, val expectedID: ByteArray?) {
     var response: Message? = null
         private set
 
-    private var socketMismatch = false
-
     fun matchesExpectedID(): Boolean {
         return expectedID!!.contentEquals(response!!.id)
     }
 
-    fun setSocketMismatch() {
-        socketMismatch = true
-    }
-
-    fun hasSocketMismatch(): Boolean {
-        return socketMismatch
-    }
-
-    fun injectStall() {
-        state = CallState.STALLED
+    fun injectError() {
+        state = CallState.ERROR
     }
 
     fun response(rsp: Message) {

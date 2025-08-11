@@ -5,7 +5,6 @@ import kotlin.math.max
 
 internal class Node internal constructor(
     val peer: Peer,
-    val root: Boolean = false,
     val unreachable: Boolean = false
 ) {
     private val sources: MutableSet<Node> = mutableSetOf()
@@ -28,12 +27,6 @@ internal class Node internal constructor(
 
     fun addSource(node: Node) {
         sources.add(node)
-    }
-
-    fun hasSocketMismatchCalls(): Boolean {
-        return calls.isNotEmpty() &&
-                calls.any { call: Call -> call.hasSocketMismatch() }
-
     }
 
     private fun callsNotSuccessful(): Boolean {
@@ -73,7 +66,7 @@ internal class Node internal constructor(
 
     override fun equals(other: Any?): Boolean {
         if (other is Node) {
-            return peer.equals(other.peer)
+            return peer == other.peer
         }
         return false
     }

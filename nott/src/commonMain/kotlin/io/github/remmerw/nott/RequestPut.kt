@@ -7,6 +7,7 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
+import java.net.InetSocketAddress
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -20,8 +21,9 @@ fun CoroutineScope.requestPut(
     seq: Long? = null,
     sig: ByteArray? = null,
     intermediateTimeout: () -> Long
-): ReceiveChannel<Peer> = produce {
+): ReceiveChannel<InetSocketAddress> = produce {
 
+    val announced: MutableSet<Peer> = mutableSetOf()
 
     while (true) {
 
@@ -69,33 +71,34 @@ fun CoroutineScope.requestPut(
                     removed.add(call)
                     val message = call.response
                     if (message is PutResponse) {
-                        send(Peer(message.id, message.address))
+                        send(message.address)
                     } else if (message is GetPeersResponse) {
                         val match = closest.acceptResponse(call)
-
                         if (match != null) {
 
-                            // if we scrape we don't care about tokens.
-                            // otherwise we're only done if we have found the closest
-                            // nodes that also returned tokens
-                            if (message.token != null) {
-                                closest.insert(match)
+                            if (announced.add(match)) {
+                                // if we scrape we don't care about tokens.
+                                // otherwise we're only done if we have found the closest
+                                // nodes that also returned tokens
+                                if (message.token != null) {
+                                    closest.insert(match)
 
-                                val tid = createRandomKey(TID_LENGTH)
-                                val request = PutRequest(
-                                    address = match.address,
-                                    id = nott.nodeId,
-                                    tid = tid,
-                                    ro = nott.readOnlyState,
-                                    token = message.token,
-                                    v = v,
-                                    cas = cas,
-                                    k = k,
-                                    salt = salt,
-                                    seq = seq,
-                                    sig = sig
-                                )
-                                puts.put(match, request)
+                                    val tid = createRandomKey(TID_LENGTH)
+                                    val request = PutRequest(
+                                        address = match.address,
+                                        id = nott.nodeId,
+                                        tid = tid,
+                                        ro = nott.readOnlyState,
+                                        token = message.token,
+                                        v = v,
+                                        cas = cas,
+                                        k = k,
+                                        salt = salt,
+                                        seq = seq,
+                                        sig = sig
+                                    )
+                                    puts.put(match, request)
+                                }
                             }
                         }
                     }
