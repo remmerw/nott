@@ -61,15 +61,17 @@ class PutTest {
                 val channel = requestPut(
                     nott, target, v, cas, k, salt, seq, sig
                 ) {
-                    5000
+                    if(added.load() >= 20){
+                        -1 // done
+                    } else {
+                        5000 // wait 5 sec and put
+                    }
                 }
 
                 for (address in channel) {
                     println("put to $address")
                     peers.add(address)
-                    if (added.incrementAndFetch() > 20) {
-                        coroutineContext.cancelChildren()
-                    }
+                    added.incrementAndFetch()
                 }
             } catch (_: CancellationException) {
 
