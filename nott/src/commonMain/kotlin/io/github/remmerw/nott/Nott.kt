@@ -1,7 +1,9 @@
 package io.github.remmerw.nott
 
+import io.github.remmerw.buri.BEMap
 import io.github.remmerw.buri.BEObject
-import io.github.remmerw.buri.decodeBencodeToMap
+import io.github.remmerw.buri.BEReader
+import io.github.remmerw.buri.decodeBencode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -10,7 +12,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.io.Buffer
-import kotlinx.io.Source
 import kotlinx.io.readByteArray
 import kotlinx.io.writeUShort
 import org.kotlincrypto.hash.sha1.SHA1
@@ -58,7 +59,7 @@ class Nott(
         scope.launch {
             try {
                 val data = ByteArray(1280)
-                val source = Buffer()
+
                 while (isActive) {
                     val packet = DatagramPacket(data, 1280)
 
@@ -74,9 +75,9 @@ class Nott(
                     // buffer for it
                     if (length < 10 || inet.port == 0) continue
 
-                    source.clear()
-                    source.write(packet.data, 0, length)
-                    handlePacket(source, inet)
+
+                    val reader = BEReader(packet.data, length)
+                    handlePacket(reader, inet)
                 }
             } catch (throwable: Throwable) {
                 if (!socket.isClosed) {
@@ -483,11 +484,11 @@ class Nott(
     }
 
 
-    private suspend fun handlePacket(source: Source, address: InetSocketAddress) {
+    private suspend fun handlePacket(reader: BEReader, address: InetSocketAddress) {
 
         val map: Map<String, BEObject>
         try {
-            map = decodeBencodeToMap(source)
+            map = (reader.decodeBencode() as BEMap).toMap()
         } catch (throwable: Throwable) {
             debug(throwable)
             return
