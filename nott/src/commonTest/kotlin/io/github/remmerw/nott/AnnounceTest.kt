@@ -12,7 +12,7 @@ class AnnounceTest {
 
         val key = createRandomKey(SHA1_HASH_LENGTH)
 
-        withTimeoutOrNull(60 * 1000) {
+        withTimeoutOrNull(20 * 1000) {
             val nott = newNott(nodeId())
             try {
                 val channel = requestAnnounce(nott, key, 3443) {
@@ -27,7 +27,7 @@ class AnnounceTest {
             }
         }
 
-        withTimeoutOrNull(30 * 1000) {
+        withTimeoutOrNull(10 * 1000) {
 
             val nott = newNott(nodeId())
             try {

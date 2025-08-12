@@ -75,12 +75,7 @@ fun CoroutineScope.requestGetPeers(
                             send(PeerResponse(message.address, list))
                         }
 
-                        // if we scrape we don't care about tokens.
-                        // otherwise we're only done if we have found the closest
-                        // nodes that also returned tokens
-                        if (message.token != null) {
-                            closest.insert(match)
-                        }
+                        closest.insert(match)
                     }
                 } else {
                     val failure = closest.checkTimeoutOrFailure(call)

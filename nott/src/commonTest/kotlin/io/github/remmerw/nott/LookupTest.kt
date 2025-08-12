@@ -14,7 +14,7 @@ class LookupTest {
 
         val key = createRandomKey(SHA1_HASH_LENGTH) // Note: it is a fake key
 
-        withTimeoutOrNull(60 * 1000) {
+        withTimeoutOrNull(30 * 1000) {
 
             val nott = newNott(nodeId())
             try {
