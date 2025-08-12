@@ -10,7 +10,7 @@ import kotlinx.coroutines.ensureActive
 
 
 @Suppress("ArrayInDataClass")
-data class Data(val data: BEObject, val seq: Long?, val k: ByteArray?, val sig: ByteArray?)
+data class Data(val v: BEObject?, val seq: Long?, val k: ByteArray?, val sig: ByteArray?)
 
 @OptIn(ExperimentalCoroutinesApi::class)
 fun CoroutineScope.requestGet(
@@ -20,6 +20,7 @@ fun CoroutineScope.requestGet(
     intermediateTimeout: () -> Long
 ): ReceiveChannel<Data> = produce {
 
+    val gated: MutableSet<Int> = mutableSetOf()
 
     while (true) {
 
@@ -66,18 +67,17 @@ fun CoroutineScope.requestGet(
                     val match = closest.acceptResponse(call)
 
                     if (match != null) {
-
-                        if (rsp.v != null) {
-                            val data = Data(rsp.v, rsp.seq, rsp.k, rsp.sig)
+                        if (gated.add(match.hashCode())) {
+                            val data = Data(
+                                v = rsp.v,
+                                seq = rsp.seq,
+                                k = rsp.k,
+                                sig = rsp.sig
+                            )
                             send(data)
                         }
 
-                        // if we scrape we don't care about tokens.
-                        // otherwise we're only done if we have found the closest
-                        // nodes that also returned tokens
-                        if (rsp.token != null) {
-                            closest.insert(match)
-                        }
+                        closest.insert(match)
                     }
                 } else {
                     val failure = closest.checkTimeoutOrFailure(call)

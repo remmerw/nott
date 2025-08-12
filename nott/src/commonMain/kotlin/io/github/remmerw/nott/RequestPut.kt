@@ -23,7 +23,7 @@ fun CoroutineScope.requestPut(
     intermediateTimeout: () -> Long
 ): ReceiveChannel<InetSocketAddress> = produce {
 
-    val announced: MutableSet<Peer> = mutableSetOf()
+    val gated: MutableSet<Int> = mutableSetOf()
 
     while (true) {
 
@@ -75,14 +75,10 @@ fun CoroutineScope.requestPut(
                     } else if (message is GetPeersResponse) {
                         val match = closest.acceptResponse(call)
                         if (match != null) {
+                            if (message.token != null) {
+                                closest.insert(match)
 
-                            if (announced.add(match)) {
-                                // if we scrape we don't care about tokens.
-                                // otherwise we're only done if we have found the closest
-                                // nodes that also returned tokens
-                                if (message.token != null) {
-                                    closest.insert(match)
-
+                                if (gated.add(match.hashCode())) {
                                     val tid = createRandomKey(TID_LENGTH)
                                     val request = PutRequest(
                                         address = match.address,

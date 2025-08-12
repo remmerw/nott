@@ -17,7 +17,6 @@ suspend fun requestPing(
 
     val inFlight: MutableSet<Call> = mutableSetOf()
 
-
     val tid = createRandomKey(TID_LENGTH)
     val request = PingRequest(
         address = address,

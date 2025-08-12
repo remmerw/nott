@@ -96,7 +96,7 @@ class PutTest {
 
                 for (data in channel) {
                     println(
-                        "data received " + data.data.toString() + " " +
+                        "data received " + data.v.toString() + " " +
                                 data.k?.decodeToString()
                     )
                     if (read.incrementAndFetch() > 5) {

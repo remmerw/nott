@@ -17,7 +17,7 @@ fun CoroutineScope.requestGetPeers(
     intermediateTimeout: () -> Long
 ): ReceiveChannel<PeerResponse> = produce {
 
-    val peers: MutableSet<Address> = mutableSetOf()
+    val gated: MutableSet<Int> = mutableSetOf()
 
     while (true) {
 
@@ -62,7 +62,7 @@ fun CoroutineScope.requestGetPeers(
 
                         val list = mutableListOf<InetSocketAddress>()
                         for (item in message.values) {
-                            if (peers.add(item)) {
+                            if (gated.add(item.hashCode())) {
                                 try {
                                     list.add(item.toInetSocketAddress())
                                 } catch (throwable: Throwable) {

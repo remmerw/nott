@@ -16,7 +16,8 @@ fun CoroutineScope.requestAnnounce(
     port: Int,
     intermediateTimeout: () -> Long
 ): ReceiveChannel<InetSocketAddress> = produce {
-    val announced: MutableSet<Peer> = mutableSetOf()
+
+    val gated: MutableSet<Int> = mutableSetOf()
 
     while (true) {
 
@@ -71,14 +72,10 @@ fun CoroutineScope.requestAnnounce(
 
                         if (match != null) {
 
-                            // do not announce again to the same peer
-                            if (announced.add(match)) {
-                                // if we scrape we don't care about tokens.
-                                // otherwise we're only done if we have found the closest
-                                // nodes that also returned tokens
-                                if (rsp.token != null) {
-                                    closest.insert(match)
+                            if (rsp.token != null) {
+                                closest.insert(match)
 
+                                if (gated.add(match.hashCode())) {
                                     val tid = createRandomKey(TID_LENGTH)
                                     val request = AnnounceRequest(
                                         address = match.address,
