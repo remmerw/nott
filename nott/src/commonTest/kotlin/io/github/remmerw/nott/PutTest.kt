@@ -61,7 +61,7 @@ class PutTest {
                 val channel = requestPut(
                     nott, target, v, cas, k, salt, seq, sig
                 ) {
-                    if(added.load() >= 20){
+                    if (added.load() >= 20) {
                         -1 // done
                     } else {
                         5000 // wait 5 sec and put
@@ -82,7 +82,7 @@ class PutTest {
 
         delay(5000)
 
-        val bootstrap : MutableSet<InetSocketAddress> = mutableSetOf()
+        val bootstrap: MutableSet<InetSocketAddress> = mutableSetOf()
         bootstrap.addAll(defaultBootstrap())
         bootstrap.addAll(peers)
 

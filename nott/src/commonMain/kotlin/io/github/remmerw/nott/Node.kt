@@ -8,32 +8,35 @@ import kotlin.math.max
 internal class Node internal constructor(val peer: Peer) {
     private val sources: MutableSet<Node> = mutableSetOf()
     private val backingStore: MutableSet<Node> = mutableSetOf()
-    private val calls: MutableList<Call> = mutableListOf()
 
     @OptIn(ExperimentalAtomicApi::class)
     private val unreachable = AtomicBoolean(false)
 
+    @OptIn(ExperimentalAtomicApi::class)
+    private val queried = AtomicBoolean(false)
 
     @OptIn(ExperimentalAtomicApi::class)
-    fun isUnreachable() : Boolean{
+    fun isQueried(): Boolean {
+        return queried.load()
+    }
+
+    @OptIn(ExperimentalAtomicApi::class)
+    fun queried() {
+        queried.store(true)
+    }
+
+    @OptIn(ExperimentalAtomicApi::class)
+    fun isUnreachable(): Boolean {
         return unreachable.load()
     }
 
     @OptIn(ExperimentalAtomicApi::class)
-    fun unreachable(){
+    fun unreachable() {
         unreachable.store(true)
     }
 
-
     private var acceptedResponse: Boolean = false
 
-    fun addCall(call: Call) {
-        calls.add(call)
-    }
-
-    fun hasNoCalls(): Boolean {
-        return calls.isEmpty()
-    }
 
     fun numSources(): Int {
         return sources.size
@@ -44,7 +47,7 @@ internal class Node internal constructor(val peer: Peer) {
     }
 
     private fun callsNotSuccessful(): Boolean {
-        return calls.isNotEmpty() && !acceptedResponse
+        return isQueried() && !acceptedResponse
     }
 
     fun nonSuccessfulDescendants(): Boolean {

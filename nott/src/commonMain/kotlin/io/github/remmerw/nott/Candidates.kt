@@ -1,7 +1,5 @@
 package io.github.remmerw.nott
 
-import java.net.InetSocketAddress
-
 /*
 * Issues:
 *
@@ -28,53 +26,12 @@ internal class Candidates internal constructor(
     private val target: ByteArray
 ) {
     private val calls: MutableMap<Call, Peer> = mutableMapOf()
-    private val callsByIp: MutableMap<InetSocketAddress, MutableSet<Call>> = mutableMapOf()
     private val candidates: MutableMap<Peer, Node> = mutableMapOf()
-
-
-    private fun lookup(node: Node): Boolean {
-
-        if (node.isUnreachable()) return false
-
-        val peer = node.peer
-        val addr = peer.address
-
-
-        // only do requests to nodes which have at least one source where the source
-        // has not given us lots of bogus candidates
-        if (node.nonSuccessfulDescendants()) return false
-
-
-        // also check other calls based on matching IP instead of strictly matching ip+port+id
-        val byIp: Set<Call>? = callsByIp[addr]
-        if (byIp != null) {
-
-            for (c in byIp) {
-                // in flight, not stalled
-                if (c.state() == CallState.SENT || c.state() == CallState.UNSENT) return false
-
-                // already got a response from that addr that does not match what we would expect from this candidate anyway
-                if (c.state() == CallState.RESPONDED && !c.response!!.id.contentEquals(
-                        peer.id
-                    )
-                ) return false
-                // we don't strictly check the presence of IDs in error messages, so we can't compare those here
-                if (c.state() == CallState.ERROR) return false
-            }
-
-        }
-
-        return true
-    }
-
 
     fun addCall(call: Call, peer: Peer) {
         calls[call] = peer
 
-        val byIp = callsByIp.getOrPut(call.request.address) { mutableSetOf() }
-        byIp.add(call)
-
-        checkNotNull(candidates[peer]).addCall(call)
+        checkNotNull(candidates[peer]).queried()
 
     }
 
@@ -96,7 +53,7 @@ internal class Candidates internal constructor(
 
     fun unreachable(call: Call) {
         val peer = calls[call]
-        if(peer != null) {
+        if (peer != null) {
             val node = candidates[peer]
             node?.unreachable()
         }
@@ -142,33 +99,24 @@ internal class Candidates internal constructor(
         // and that is more expensive than the sorting
 
         val sorted = sortedLookups()
-        var node = sorted
-            .filter { node: Node -> node.hasNoCalls() }.firstOrNull { node ->
-                lookup(node)
-            }
+        val node = sorted.firstOrNull { node: Node ->
+            !node.isQueried() &&
+                    !node.isUnreachable() &&
+                    !node.nonSuccessfulDescendants()
+        }
 
-        var peer = node?.peer
+        val peer = node?.peer
         if (peer != null) {
             if (postFilter.invoke(peer)) {
                 return peer
             }
         }
-
-        node = sorted.firstOrNull { node -> lookup(node) }
-        peer = node?.peer
-        if (peer != null) {
-            if (postFilter.invoke(peer)) {
-                return peer
-            }
-        }
-
         return null
 
     }
 
-    fun nodeForEntry(e: Peer): Node? {
-        return candidates[e]
+    fun nodeForEntry(peer: Peer): Node? {
+        return candidates[peer]
     }
-
 
 }
