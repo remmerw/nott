@@ -18,7 +18,7 @@ internal class ClosestSet(
         if (entries.isEmpty()) {
             nott.bootstrap()
         } else {
-            candidates.addCandidates(null, entries)
+            candidates.addCandidates(entries)
         }
     }
 
@@ -71,7 +71,7 @@ internal class ClosestSet(
                     !nott.isLocalId(peer.id)
                 }.forEach { e: Peer -> returnedNodes.add(e) }
 
-                candidates.addCandidates(match, returnedNodes)
+                candidates.addCandidates(returnedNodes)
             }
         }
         return match
@@ -116,10 +116,6 @@ internal class ClosestSet(
         }
     }
 
-    private fun entries(): List<Peer> {
-        return closest.toList()
-    }
-
     private fun tail(): ByteArray {
         if (closest.isEmpty()) return distance(target, Key.MAX_KEY)
         return closest.last().id
@@ -131,23 +127,11 @@ internal class ClosestSet(
     }
 
 
-    private fun inStabilization(): Boolean {
-        val suggestedCounts = entries().map { peer: Peer ->
-            candidates.nodeForEntry(
-                peer
-            )!!.numSources()
-        }
-
-        return suggestedCounts.any { i: Int -> i >= 5 } ||
-                suggestedCounts.count { i: Int -> i >= 4 } >= 2
-    }
-
-
     private fun terminationPrecondition(
         candidate: Peer
     ): Boolean {
         return !candidateAheadOfTail(candidate) && (
-                inStabilization() || maxAttemptsSinceTailModificationFailed())
+                maxAttemptsSinceTailModificationFailed())
     }
 
     /* algo:
@@ -165,7 +149,7 @@ internal class ClosestSet(
 
         var result = candidateAheadOf(candidate)
 
-        if (candidateAheadOfTail(candidate) && inStabilization()) result =
+        if (candidateAheadOfTail(candidate)) result =
             true
         if (!terminationPrecondition(
                 candidate,

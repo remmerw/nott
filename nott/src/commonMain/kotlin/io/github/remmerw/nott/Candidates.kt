@@ -37,7 +37,10 @@ internal class Candidates internal constructor(
 
     fun acceptResponse(call: Call): Peer? {
 
-        if (!call.matchesExpectedID()) return null
+        if (!call.matchesExpectedID()) {
+            unreachable(call)
+            return null
+        }
 
         val peer = calls[call]
         checkNotNull(peer)
@@ -45,8 +48,6 @@ internal class Candidates internal constructor(
         val node = candidates[peer]
         checkNotNull(node)
 
-
-        node.accept()
         return peer
 
     }
@@ -60,49 +61,28 @@ internal class Candidates internal constructor(
     }
 
 
-    fun addCandidates(source: Peer?, entries: Set<Peer>) {
-
-        val sourceNode = if (source != null) candidates[source] else null
-
-        val children: MutableList<Node> = mutableListOf()
-
+    fun addCandidates(entries: Set<Peer>) {
         for (peer in entries) {
 
-            val node = candidates.getOrPut(peer) {
+            candidates.getOrPut(peer) {
                 Node(peer)
             }
-
-            if (sourceNode != null) node.addSource(sourceNode)
-            children.add(node)
         }
-
-        sourceNode?.addChildren(children)
-
     }
 
 
     private fun sortedLookups(): List<Node> {
         return candidates.values.sortedWith { a, b ->
-            val res = threeWayDistance(target, a.peer.id, b.peer.id)
-            if (res == 0) {
-                b.numSources() - a.numSources()
-            } else {
-                res
-            }
+            threeWayDistance(target, a.peer.id, b.peer.id)
         }
     }
 
     fun next(postFilter: (Peer) -> Boolean): Peer? {
 
-        // sort + filter + findAny should be faster than filter + min in
-        // this case since findAny reduces the invocations of the filter,
-        // and that is more expensive than the sorting
-
         val sorted = sortedLookups()
         val node = sorted.firstOrNull { node: Node ->
             !node.isQueried() &&
-                    !node.isUnreachable() &&
-                    !node.nonSuccessfulDescendants()
+                    !node.isUnreachable()
         }
 
         val peer = node?.peer
@@ -113,10 +93,6 @@ internal class Candidates internal constructor(
         }
         return null
 
-    }
-
-    fun nodeForEntry(peer: Peer): Node? {
-        return candidates[peer]
     }
 
 }

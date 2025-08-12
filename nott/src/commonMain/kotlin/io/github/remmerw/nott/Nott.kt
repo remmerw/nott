@@ -58,10 +58,17 @@ class Nott(
 
         scope.launch {
             try {
-                val data = ByteArray(1280)
+
+                // The maximum UDP packet size for the BitTorrent Mainline DHT is typically
+                // limited by the Maximum Transmission Unit (MTU) of the network, and is
+                // often around 1400 bytes. This is smaller than the theoretical maximum
+                // of 65535 bytes for UDP packets.
+                val udpPacketSize = 1400
+
+                val data = ByteArray(udpPacketSize)
 
                 while (isActive) {
-                    val packet = DatagramPacket(data, 1280)
+                    val packet = DatagramPacket(data, udpPacketSize)
 
                     socket.receive(packet)
 
