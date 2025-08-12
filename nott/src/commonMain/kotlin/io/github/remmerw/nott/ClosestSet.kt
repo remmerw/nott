@@ -1,5 +1,7 @@
 package io.github.remmerw.nott
 
+import java.util.concurrent.ConcurrentHashMap
+
 /*
 * We need to detect when the closest set is stable
 *  - in principle we're done as soon as there is no request candidates
@@ -9,27 +11,71 @@ internal class ClosestSet(
     private val target: ByteArray
 ) {
     private val closest: MutableSet<Peer> = mutableSetOf()
-    private val candidates = Candidates(target)
-    private var insertAttemptsSinceTailModification = 0
+    private val calls: MutableMap<Call, Peer> = mutableMapOf()
+    private val unreachable: MutableSet<Peer> = ConcurrentHashMap.newKeySet()
+    private val queried: MutableSet<Peer> = ConcurrentHashMap.newKeySet()
+    private val candidates: MutableSet<Peer> = ConcurrentHashMap.newKeySet()
 
+
+    private fun acceptedResponse(call: Call): Peer? {
+
+        if (!call.matchesExpectedID()) {
+            unreachable(call)
+            return null
+        }
+
+        val peer = calls[call]
+        checkNotNull(peer)
+
+        if (candidates.contains(peer)) {
+            return peer
+        }
+
+        return null
+
+    }
+
+    private fun unreachable(call: Call) {
+        val peer = calls[call]
+        if (peer != null) {
+            unreachable.add(peer)
+        }
+    }
+
+
+    private fun addCandidates(entries: Set<Peer>) {
+        for (peer in entries) {
+            candidates.add(peer)
+        }
+    }
+
+    private fun sortedLookups(): List<Peer> {
+        return candidates.filter { peer ->
+            !queried.contains(peer) && !unreachable.contains(peer)
+        }.sortedWith { a, b ->
+            threeWayDistance(target, a.id, b.id)
+        }
+    }
 
     suspend fun initialize() {
         val entries = nott.closestPeers(target, 32)
         if (entries.isEmpty()) {
             nott.bootstrap()
         } else {
-            candidates.addCandidates(entries)
+            addCandidates(entries)
         }
     }
 
-    fun nextCandidate(inFlight: Set<Call>): Peer? {
-        return candidates.next { peer: Peer ->
-            goodForRequest(peer, inFlight)
+    fun nextCandidate(): Peer? {
+        val sorted = sortedLookups()
+        return sorted.firstOrNull { peer: Peer ->
+            goodForRequest(peer)
         }
     }
 
     suspend fun requestCall(call: Call, peer: Peer) {
-        candidates.addCall(call, peer)
+        calls[call] = peer
+        queried.add(peer)
         nott.doRequestCall(call)
     }
 
@@ -44,7 +90,7 @@ internal class ClosestSet(
                 if (sendTime != null) {
                     val elapsed = sendTime.elapsedNow().inWholeMilliseconds
                     if (elapsed > RESPONSE_TIMEOUT) {
-                        candidates.unreachable(call)
+                        unreachable(call)
                         nott.timeout(call)
                         call.injectError()
                         return true
@@ -57,7 +103,7 @@ internal class ClosestSet(
 
 
     fun acceptResponse(call: Call): Peer? {
-        val match = candidates.acceptResponse(call)
+        val match = acceptedResponse(call)
         if (match != null) {
             val message = call.response
             if (message is NodesResponse) {
@@ -71,28 +117,10 @@ internal class ClosestSet(
                     !nott.isLocalId(peer.id)
                 }.forEach { e: Peer -> returnedNodes.add(e) }
 
-                candidates.addCandidates(returnedNodes)
+                addCandidates(returnedNodes)
             }
         }
         return match
-    }
-
-    private fun candidateAheadOf(
-        candidate: Peer
-    ): Boolean {
-        return !reachedTargetCapacity() ||
-                threeWayDistance(target, head(), candidate.id) > 0
-    }
-
-    private fun candidateAheadOfTail(
-        candidate: Peer
-    ): Boolean {
-        return !reachedTargetCapacity() ||
-                threeWayDistance(target, tail(), candidate.id) > 0
-    }
-
-    private fun maxAttemptsSinceTailModificationFailed(): Boolean {
-        return insertAttemptsSinceTailModification > MAX_ENTRIES_PER_BUCKET
     }
 
     private fun reachedTargetCapacity(): Boolean {
@@ -107,65 +135,31 @@ internal class ClosestSet(
                     Peer.DistanceOrder(target)
                 ).last()
                 closest.remove(last)
-                if (last === peer) {
-                    insertAttemptsSinceTailModification++
-                } else {
-                    insertAttemptsSinceTailModification = 0
-                }
             }
         }
     }
 
     private fun tail(): ByteArray {
-        if (closest.isEmpty()) return distance(target, Key.MAX_KEY)
         return closest.last().id
     }
 
     private fun head(): ByteArray {
-        if (closest.isEmpty()) return distance(target, Key.MAX_KEY)
         return closest.first().id
     }
 
+    private fun goodForRequest(peer: Peer): Boolean {
+        if (!reachedTargetCapacity()) return true
 
-    private fun terminationPrecondition(
-        candidate: Peer
-    ): Boolean {
-        return !candidateAheadOfTail(candidate) && (
-                maxAttemptsSinceTailModificationFailed())
+        if (threeWayDistance(target, h1 = tail(), h2 = peer.id) > 0) {
+            return true
+        }
+
+        if (threeWayDistance(target, h1 = head(), h2 = peer.id) > 0) {
+            return true
+        }
+
+        unreachable.add(peer)
+        return false
     }
-
-    /* algo:
-    * 1. check termination condition
-    * 2. allow if free slot
-    * 3. if stall slot check
-    * a) is candidate better than non-stalled in flight
-    * b) is candidate better than head (homing phase)
-    * c) is candidate better than tail (stabilizing phase)
-    */
-    private fun goodForRequest(
-        candidate: Peer,
-        inFlight: Set<Call>
-    ): Boolean {
-
-        var result = candidateAheadOf(candidate)
-
-        if (candidateAheadOfTail(candidate)) result =
-            true
-        if (!terminationPrecondition(
-                candidate,
-            ) && activeInFlight(inFlight) == 0
-        ) result = true
-
-        return result
-    }
-
-
-    private fun activeInFlight(inFlight: Set<Call>): Int {
-        return inFlight.filter { call: Call ->
-            val state = call.state()
-            state == CallState.UNSENT || state == CallState.SENT
-        }.map { call: Call -> call.expectedID!! }.count()
-    }
-
 
 }

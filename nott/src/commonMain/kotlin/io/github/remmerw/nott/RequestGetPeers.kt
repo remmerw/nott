@@ -30,7 +30,7 @@ fun CoroutineScope.requestGetPeers(
             do {
                 ensureActive()
 
-                val peer = closest.nextCandidate(inFlight)
+                val peer = closest.nextCandidate()
                 if (peer != null) {
                     val tid = createRandomKey(TID_LENGTH)
                     val request = GetPeersRequest(

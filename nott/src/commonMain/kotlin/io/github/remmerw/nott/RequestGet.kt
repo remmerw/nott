@@ -32,7 +32,7 @@ fun CoroutineScope.requestGet(
             do {
                 ensureActive()
 
-                val peer = closest.nextCandidate(inFlight)
+                val peer = closest.nextCandidate()
 
                 if (peer != null) {
                     val tid = createRandomKey(TID_LENGTH)
@@ -64,8 +64,9 @@ fun CoroutineScope.requestGet(
                     if (match != null) {
                         val rsp = call.response as GetResponse
 
-                        if(rsp.v != null && rsp.seq != null
-                            && rsp.k != null && rsp.sig != null) {
+                        if (rsp.v != null && rsp.seq != null
+                            && rsp.k != null && rsp.sig != null
+                        ) {
                             if (gated.add(match.hashCode())) {
                                 val data = Data(
                                     v = rsp.v,
