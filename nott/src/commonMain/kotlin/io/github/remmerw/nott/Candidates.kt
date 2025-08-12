@@ -29,8 +29,6 @@ internal class Candidates internal constructor(
 ) {
     private val calls: MutableMap<Call, Peer> = mutableMapOf()
     private val callsByIp: MutableMap<InetSocketAddress, MutableSet<Call>> = mutableMapOf()
-    private val acceptedInets: MutableCollection<InetSocketAddress> = mutableSetOf()
-    private val acceptedKeys: MutableCollection<Int> = mutableSetOf()
     private val candidates: MutableMap<Peer, Node> = mutableMapOf()
 
 
@@ -41,8 +39,6 @@ internal class Candidates internal constructor(
         val peer = node.peer
         val addr = peer.address
 
-        if (acceptedInets.contains(addr) || acceptedKeys.contains(peer.id.contentHashCode()))
-            return false
 
         // only do requests to nodes which have at least one source where the source
         // has not given us lots of bogus candidates
@@ -91,16 +87,10 @@ internal class Candidates internal constructor(
 
         val node = candidates[peer]
         checkNotNull(node)
-        val insertOk = !acceptedInets.contains(peer.address) && !acceptedKeys.contains(
-            peer.id.contentHashCode()
-        )
-        if (insertOk) {
-            acceptedInets.add(peer.address)
-            acceptedKeys.add(peer.id.contentHashCode())
-            node.accept()
-            return peer
-        }
-        return null
+
+
+        node.accept()
+        return peer
 
     }
 
