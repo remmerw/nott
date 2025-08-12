@@ -10,7 +10,7 @@ import kotlinx.coroutines.ensureActive
 
 
 @Suppress("ArrayInDataClass")
-data class Data(val v: BEObject?, val seq: Long?, val k: ByteArray?, val sig: ByteArray?)
+data class Data(val v: BEObject, val seq: Long, val k: ByteArray, val sig: ByteArray)
 
 @OptIn(ExperimentalCoroutinesApi::class)
 fun CoroutineScope.requestGet(
@@ -60,23 +60,22 @@ fun CoroutineScope.requestGet(
                 if (call.state() == CallState.RESPONDED) {
                     removed.add(call)
 
-                    val rsp = call.response
-
-                    rsp as GetResponse
-
                     val match = closest.acceptResponse(call)
-
                     if (match != null) {
-                        if (gated.add(match.hashCode())) {
-                            val data = Data(
-                                v = rsp.v,
-                                seq = rsp.seq,
-                                k = rsp.k,
-                                sig = rsp.sig
-                            )
-                            send(data)
-                        }
+                        val rsp = call.response as GetResponse
 
+                        if(rsp.v != null && rsp.seq != null
+                            && rsp.k != null && rsp.sig != null) {
+                            if (gated.add(match.hashCode())) {
+                                val data = Data(
+                                    v = rsp.v,
+                                    seq = rsp.seq,
+                                    k = rsp.k,
+                                    sig = rsp.sig
+                                )
+                                send(data)
+                            }
+                        }
                         closest.insert(match)
                     }
                 } else {
