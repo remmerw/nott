@@ -8,6 +8,7 @@ import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import java.net.InetSocketAddress
+import java.util.concurrent.ConcurrentHashMap
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -23,16 +24,15 @@ fun CoroutineScope.requestPut(
     intermediateTimeout: () -> Long
 ): ReceiveChannel<InetSocketAddress> = produce {
 
-    val gated: MutableSet<Int> = mutableSetOf()
+    val gated: MutableSet<Int> = sortedSetOf()
 
     while (true) {
 
         val closest = ClosestSet(nott, target)
         closest.initialize()
 
-        val inFlight: MutableSet<Call> = mutableSetOf()
+        val inFlight: MutableSet<Call> = ConcurrentHashMap.newKeySet()
 
-        val puts: MutableMap<Peer, PutRequest> = mutableMapOf()
         do {
             do {
                 ensureActive()
@@ -55,13 +55,6 @@ fun CoroutineScope.requestPut(
             } while (peer != null)
 
 
-            puts.forEach { entry ->
-                val call = Call(entry.value, entry.key.id)
-                inFlight.add(call)
-                nott.doRequestCall(call)
-            }
-            puts.clear()
-
             ensureActive()
 
             val removed: MutableList<Call> = mutableListOf()
@@ -73,12 +66,16 @@ fun CoroutineScope.requestPut(
                     if (message is PutResponse) {
                         send(message.address)
                     } else if (message is GetPeersResponse) {
+
                         val match = closest.acceptResponse(call)
                         if (match != null) {
+
+                            closest.insert(match)
+
                             if (message.token != null) {
-                                closest.insert(match)
 
                                 if (gated.add(match.hashCode())) {
+
                                     val tid = createRandomKey(TID_LENGTH)
                                     val request = PutRequest(
                                         address = match.address,
@@ -93,7 +90,10 @@ fun CoroutineScope.requestPut(
                                         seq = seq,
                                         sig = sig
                                     )
-                                    puts.put(match, request)
+
+                                    val call = Call(request, match.id)
+                                    inFlight.add(call)
+                                    nott.doRequestCall(call)
                                 }
                             }
                         }

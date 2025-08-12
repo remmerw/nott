@@ -12,11 +12,9 @@ plugins {
 }
 
 group = "io.github.remmerw"
-version = "0.1.3"
+version = "0.1.4"
 
 kotlin {
-
-
     androidTarget {
         instrumentedTestVariant.sourceSetTree.set(KotlinSourceSetTree.test)
         publishLibraryVariants("release")

@@ -7,6 +7,7 @@ import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import java.net.InetSocketAddress
+import java.util.concurrent.ConcurrentHashMap
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -17,16 +18,15 @@ fun CoroutineScope.requestAnnounce(
     intermediateTimeout: () -> Long
 ): ReceiveChannel<InetSocketAddress> = produce {
 
-    val gated: MutableSet<Int> = mutableSetOf()
+    val gated: MutableSet<Int> = sortedSetOf()
 
     while (true) {
 
         val closest = ClosestSet(nott, target)
         closest.initialize()
 
-        val inFlight: MutableSet<Call> = mutableSetOf()
+        val inFlight: MutableSet<Call> = ConcurrentHashMap.newKeySet()
 
-        val announces: MutableMap<Peer, AnnounceRequest> = mutableMapOf()
         do {
             do {
                 ensureActive()
@@ -48,13 +48,6 @@ fun CoroutineScope.requestAnnounce(
                 }
             } while (peer != null)
 
-
-            announces.forEach { entry ->
-                val call = Call(entry.value, entry.key.id)
-                inFlight.add(call)
-                nott.doRequestCall(call)
-            }
-            announces.clear()
 
             ensureActive()
 
@@ -87,7 +80,10 @@ fun CoroutineScope.requestAnnounce(
                                         token = rsp.token,
                                         name = null
                                     )
-                                    announces.put(match, request)
+
+                                    val call = Call(request, match.id)
+                                    inFlight.add(call)
+                                    nott.doRequestCall(call)
                                 }
                             }
                         }

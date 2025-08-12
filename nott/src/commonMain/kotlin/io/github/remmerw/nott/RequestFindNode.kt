@@ -19,7 +19,7 @@ fun CoroutineScope.findNode(
     intermediateTimeout: () -> Long
 ): ReceiveChannel<InetSocketAddress> = produce {
 
-    val gated: MutableSet<Int> = mutableSetOf()
+    val gated: MutableSet<Int> = sortedSetOf()
 
     while (true) {
 

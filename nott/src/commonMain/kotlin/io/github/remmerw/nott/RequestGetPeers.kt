@@ -17,7 +17,7 @@ fun CoroutineScope.requestGetPeers(
     intermediateTimeout: () -> Long
 ): ReceiveChannel<PeerResponse> = produce {
 
-    val gated: MutableSet<Int> = mutableSetOf()
+    val gated: MutableSet<Int> = sortedSetOf()
 
     while (true) {
 

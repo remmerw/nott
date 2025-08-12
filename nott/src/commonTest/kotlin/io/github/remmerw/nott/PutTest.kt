@@ -17,6 +17,7 @@ import java.net.InetSocketAddress
 import kotlin.concurrent.atomics.AtomicInt
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.concurrent.atomics.incrementAndFetch
+import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -30,7 +31,7 @@ class PutTest {
 
         // https://www.bittorrent.org/beps/bep_0044.html
 
-        val data = "moin".encodeToByteArray()
+        val data = Random.nextBytes(50)
 
         val keys = Ed25519Sign.KeyPair.newKeyPair()
 
@@ -97,7 +98,7 @@ class PutTest {
                 for (data in channel) {
                     println(
                         "data received " + data.v.toString() + " " +
-                                data.k?.decodeToString()
+                                data.k.decodeToString()
                     )
                     if (read.incrementAndFetch() > 5) {
                         coroutineContext.cancelChildren()

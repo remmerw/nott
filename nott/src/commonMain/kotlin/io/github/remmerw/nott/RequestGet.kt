@@ -20,7 +20,7 @@ fun CoroutineScope.requestGet(
     intermediateTimeout: () -> Long
 ): ReceiveChannel<Data> = produce {
 
-    val gated: MutableSet<Int> = mutableSetOf()
+    val gated: MutableSet<Int> = sortedSetOf()
 
     while (true) {
 
