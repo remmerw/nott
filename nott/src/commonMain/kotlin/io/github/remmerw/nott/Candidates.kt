@@ -1,5 +1,7 @@
 package io.github.remmerw.nott
 
+import java.util.concurrent.ConcurrentHashMap
+
 /*
 * Issues:
 *
@@ -26,12 +28,14 @@ internal class Candidates internal constructor(
     private val target: ByteArray
 ) {
     private val calls: MutableMap<Call, Peer> = mutableMapOf()
-    private val candidates: MutableMap<Peer, Node> = mutableMapOf()
+    private val unreachable: MutableSet<Peer> = ConcurrentHashMap.newKeySet()
+    private val queried: MutableSet<Peer> = ConcurrentHashMap.newKeySet()
+    private val candidates: MutableSet<Peer> = ConcurrentHashMap.newKeySet()
 
     fun addCall(call: Call, peer: Peer) {
         calls[call] = peer
 
-        checkNotNull(candidates[peer]).queried()
+        queried.add(peer)
 
     }
 
@@ -45,47 +49,42 @@ internal class Candidates internal constructor(
         val peer = calls[call]
         checkNotNull(peer)
 
-        val node = candidates[peer]
-        checkNotNull(node)
+        if (candidates.contains(peer)) {
+            return peer
+        }
 
-        return peer
+        return null
 
     }
 
     fun unreachable(call: Call) {
         val peer = calls[call]
         if (peer != null) {
-            val node = candidates[peer]
-            node?.unreachable()
+            unreachable.add(peer)
         }
     }
 
 
     fun addCandidates(entries: Set<Peer>) {
         for (peer in entries) {
-
-            candidates.getOrPut(peer) {
-                Node(peer)
-            }
+            candidates.add(peer)
         }
     }
 
 
-    private fun sortedLookups(): List<Node> {
-        return candidates.values.sortedWith { a, b ->
-            threeWayDistance(target, a.peer.id, b.peer.id)
+    private fun sortedLookups(): List<Peer> {
+        return candidates.sortedWith { a, b ->
+            threeWayDistance(target, a.id, b.id)
         }
     }
 
     fun next(postFilter: (Peer) -> Boolean): Peer? {
 
         val sorted = sortedLookups()
-        val node = sorted.firstOrNull { node: Node ->
-            !node.isQueried() &&
-                    !node.isUnreachable()
+        val peer = sorted.firstOrNull { peer: Peer ->
+            !queried.contains(peer) && !unreachable.contains(peer)
         }
 
-        val peer = node?.peer
         if (peer != null) {
             if (postFilter.invoke(peer)) {
                 return peer
