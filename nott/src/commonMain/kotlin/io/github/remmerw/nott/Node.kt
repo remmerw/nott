@@ -1,15 +1,29 @@
 package io.github.remmerw.nott
 
+import kotlin.concurrent.atomics.AtomicBoolean
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.math.ceil
 import kotlin.math.max
 
-internal class Node internal constructor(
-    val peer: Peer,
-    val unreachable: Boolean = false
-) {
+internal class Node internal constructor(val peer: Peer) {
     private val sources: MutableSet<Node> = mutableSetOf()
     private val backingStore: MutableSet<Node> = mutableSetOf()
     private val calls: MutableList<Call> = mutableListOf()
+
+    @OptIn(ExperimentalAtomicApi::class)
+    private val unreachable = AtomicBoolean(false)
+
+
+    @OptIn(ExperimentalAtomicApi::class)
+    fun isUnreachable() : Boolean{
+        return unreachable.load()
+    }
+
+    @OptIn(ExperimentalAtomicApi::class)
+    fun unreachable(){
+        unreachable.store(true)
+    }
+
 
     private var acceptedResponse: Boolean = false
 

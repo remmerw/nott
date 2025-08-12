@@ -1,8 +1,6 @@
 package io.github.remmerw.nott
 
 import java.net.InetSocketAddress
-import kotlin.math.min
-import kotlin.random.Random
 
 /*
 * Issues:
@@ -29,7 +27,6 @@ import kotlin.random.Random
 internal class Candidates internal constructor(
     private val target: ByteArray
 ) {
-    private val failures: MutableMap<InetSocketAddress, Int> = mutableMapOf()
     private val calls: MutableMap<Call, Peer> = mutableMapOf()
     private val callsByIp: MutableMap<InetSocketAddress, MutableSet<Call>> = mutableMapOf()
     private val acceptedInets: MutableCollection<InetSocketAddress> = mutableSetOf()
@@ -38,9 +35,10 @@ internal class Candidates internal constructor(
 
 
     private fun lookup(node: Node): Boolean {
-        val peer = node.peer
-        if (node.unreachable) return false
 
+        if (node.isUnreachable()) return false
+
+        val peer = node.peer
         val addr = peer.address
 
         if (acceptedInets.contains(addr) || acceptedKeys.contains(peer.id.contentHashCode()))
@@ -85,8 +83,6 @@ internal class Candidates internal constructor(
     }
 
     fun acceptResponse(call: Call): Peer? {
-        // we ignore on mismatch, node will get a 2nd chance if sourced from multiple
-        // nodes and hasn't sent a successful reply yet
 
         if (!call.matchesExpectedID()) return null
 
@@ -108,30 +104,14 @@ internal class Candidates internal constructor(
 
     }
 
-    fun decreaseFailures(call: Call) {
-        val addr = call.request.address
-        val oldEntry = failures[addr]
-        if (oldEntry != null) {
-            if (oldEntry > 1) {
-                failures[addr] = oldEntry shr 1 // multiplicative decrease
-            } else {
-                failures.remove(addr)
-            }
+    fun unreachable(call: Call) {
+        val peer = calls[call]
+        if(peer != null) {
+            val node = candidates[peer]
+            node?.unreachable()
         }
     }
 
-    fun increaseFailures(call: Call) {
-        val addr = call.request.address
-        val oldValue: Int? = failures[addr]
-        val newValue: Int? = if (oldValue == null) 1 else (oldValue + 1)
-        if (newValue == null) failures.remove(addr)
-        else failures.put(addr, newValue)
-    }
-
-
-    private fun failures(address: InetSocketAddress): Int {
-        return failures[address] ?: 0
-    }
 
     fun addCandidates(source: Peer?, entries: Set<Peer>) {
 
@@ -142,14 +122,7 @@ internal class Candidates internal constructor(
         for (peer in entries) {
 
             val node = candidates.getOrPut(peer) {
-
-                val failures = failures(peer.address)
-                // 0-20
-                val rnd = Random.nextInt(21)
-                // -2 - 19 -> 5% chance to let even the worst stuff still
-                // through to keep the counters going up
-                val unreachable = min((failures - 2).toDouble(), 19.0) > rnd
-                Node(peer, unreachable)
+                Node(peer)
             }
 
             if (sourceNode != null) node.addSource(sourceNode)

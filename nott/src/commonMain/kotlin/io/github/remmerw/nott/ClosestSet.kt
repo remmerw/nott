@@ -44,7 +44,7 @@ internal class ClosestSet(
                 if (sendTime != null) {
                     val elapsed = sendTime.elapsedNow().inWholeMilliseconds
                     if (elapsed > RESPONSE_TIMEOUT) {
-                        candidates.increaseFailures(call)
+                        candidates.unreachable(call)
                         nott.timeout(call)
                         call.injectError()
                         return true
@@ -57,7 +57,6 @@ internal class ClosestSet(
 
 
     fun acceptResponse(call: Call): Peer? {
-        candidates.decreaseFailures(call)
         val match = candidates.acceptResponse(call)
         if (match != null) {
             val message = call.response
