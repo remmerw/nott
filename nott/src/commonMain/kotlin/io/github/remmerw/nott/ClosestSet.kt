@@ -1,7 +1,5 @@
 package io.github.remmerw.nott
 
-import java.util.concurrent.ConcurrentHashMap
-
 /*
 * We need to detect when the closest set is stable
 *  - in principle we're done as soon as there is no request candidates
@@ -11,10 +9,9 @@ internal class ClosestSet(
     private val target: ByteArray
 ) {
     private val closest: MutableSet<Peer> = mutableSetOf()
-    private val calls: MutableMap<Call, Peer> = mutableMapOf()
-    private val unreachable: MutableSet<Peer> = ConcurrentHashMap.newKeySet()
-    private val queried: MutableSet<Peer> = ConcurrentHashMap.newKeySet()
-    private val candidates: MutableSet<Peer> = ConcurrentHashMap.newKeySet()
+    private val unreachable: MutableSet<Int> = sortedSetOf()
+    private val queried: MutableSet<Int> = sortedSetOf()
+    private val candidates: MutableMap<Int, Peer> = sortedMapOf()
 
 
     private fun acceptedResponse(call: Call): Peer? {
@@ -23,35 +20,30 @@ internal class ClosestSet(
             unreachable(call)
             return null
         }
-
-        val peer = calls[call]
-        checkNotNull(peer)
-
-        if (candidates.contains(peer)) {
-            return peer
+        val rsp = call.response
+        if (rsp != null) {
+            return candidates[rsp.id.contentHashCode()]
         }
-
         return null
-
     }
 
     private fun unreachable(call: Call) {
-        val peer = calls[call]
-        if (peer != null) {
-            unreachable.add(peer)
+        val rsp = call.response
+        if (rsp != null) {
+            unreachable.add(rsp.id.contentHashCode())
         }
     }
 
-
     private fun addCandidates(entries: Set<Peer>) {
         for (peer in entries) {
-            candidates.add(peer)
+            candidates.put(peer.hashCode(), peer)
         }
     }
 
     private fun sortedLookups(): List<Peer> {
-        return candidates.filter { peer ->
-            !queried.contains(peer) && !unreachable.contains(peer)
+        return candidates.values.filter { peer ->
+            val hash = peer.hashCode()
+            !queried.contains(hash) && !unreachable.contains(hash)
         }.sortedWith { a, b ->
             threeWayDistance(target, a.id, b.id)
         }
@@ -74,8 +66,7 @@ internal class ClosestSet(
     }
 
     suspend fun requestCall(call: Call, peer: Peer) {
-        calls[call] = peer
-        queried.add(peer)
+        queried.add(peer.hashCode())
         nott.doRequestCall(call)
     }
 
@@ -158,7 +149,7 @@ internal class ClosestSet(
             return true
         }
 
-        unreachable.add(peer)
+        unreachable.add(peer.hashCode())
         return false
     }
 

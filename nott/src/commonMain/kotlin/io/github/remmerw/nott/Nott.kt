@@ -760,6 +760,28 @@ fun sha1(bytes: ByteArray): ByteArray {
     return digest.digest()
 }
 
+
+internal fun createRandomKey(length: Int): ByteArray {
+    return Random.nextBytes(ByteArray(length))
+}
+
+/**
+ * Compares the distance of two keys relative to this one using the XOR metric
+ *
+ * @return -1 if h1 is closer to this key, 0 if h1 and h2 are equidistant, 1 if h2 is closer
+ */
+internal fun threeWayDistance(h0: ByteArray, h1: ByteArray, h2: ByteArray): Int {
+
+    val mmi = mismatch(h1, h2)
+    if (mmi == -1) return 0
+
+    val h = h0[mmi].toUByte()
+    val a = h1[mmi].toUByte()
+    val b = h2[mmi].toUByte()
+
+    return (a xor h).compareTo(b xor h)
+}
+
 @Suppress("SameReturnValue")
 private val isError: Boolean
     get() = true
