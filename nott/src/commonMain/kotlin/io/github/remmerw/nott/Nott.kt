@@ -17,6 +17,7 @@ import kotlinx.io.writeUShort
 import org.kotlincrypto.hash.sha1.SHA1
 import java.net.DatagramPacket
 import java.net.DatagramSocket
+import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.min
@@ -746,12 +747,27 @@ fun nodeId(): ByteArray {
 
 
 fun defaultBootstrap(): Set<InetSocketAddress> {
-    return setOf(
-        InetSocketAddress("dht.transmissionbt.com", 6881),
-        InetSocketAddress("router.bittorrent.com", 6881),
-        InetSocketAddress("router.utorrent.com", 6881),
-        InetSocketAddress("dht.aelitis.com", 6881)
-    )
+    val result = mutableSetOf<InetSocketAddress>()
+
+    result.addAll(allByName("dht.transmissionbt.com", 6881))
+    result.addAll(allByName("router.bittorrent.com", 6881))
+    result.addAll(allByName("router.utorrent.com", 6881))
+    result.addAll(allByName("dht.aelitis.com", 6881))
+
+    return result
+}
+@Suppress("SameParameterValue")
+private fun allByName(hostname:String, port:Int) : Set<InetSocketAddress>{
+    val result = mutableSetOf<InetSocketAddress>()
+    try {
+        val inets = InetAddress.getAllByName(hostname)
+        inets.forEach { address ->
+            result.add(InetSocketAddress(address, port))
+        }
+    } catch (throwable: Throwable){
+        debug(throwable)
+    }
+    return result
 }
 
 fun sha1(bytes: ByteArray): ByteArray {

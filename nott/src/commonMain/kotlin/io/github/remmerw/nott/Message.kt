@@ -8,23 +8,23 @@ import kotlinx.io.Sink
 import java.net.InetSocketAddress
 
 
-internal interface Message {
+internal sealed interface Message {
     val address: InetSocketAddress
     val id: ByteArray
     val tid: ByteArray
     fun encode(sink: Sink)
 }
 
-internal interface Response : Message {
+internal sealed interface Response : Message {
     val ip: ByteArray?
 }
 
-internal interface NodesResponse : Response {
+internal sealed interface NodesResponse : Response {
     val nodes: List<Peer>
     val nodes6: List<Peer>
 }
 
-internal interface Request : Message {
+internal sealed interface Request : Message {
     val ro: Boolean
 }
 
