@@ -1,19 +1,17 @@
 [versions]
 agp = "8.13.0"
-borr = "0.0.4"
-buri = "0.0.2"
 kotlin = "2.2.20"
 runner = "1.7.0"
 
 [libraries]
-borr = { module = "io.github.remmerw:borr", version.ref = "borr" }
-buri = { module = "io.github.remmerw:buri", version.ref = "buri" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlin" }
 kotlinx-io-core = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version = "0.8.0" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version = "1.10.2" }
 runner = { module = "androidx.test:runner", version.ref = "runner" }
 sha1 = { module = "org.kotlincrypto.hash:sha1", version = "0.7.1" }
+borr = { module = "io.github.remmerw:borr", version = "0.0.5" }
+buri = { module = "io.github.remmerw:buri", version= "0.0.3" }
 
 [plugins]
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
