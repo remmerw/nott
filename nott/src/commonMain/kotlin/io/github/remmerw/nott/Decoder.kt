@@ -55,8 +55,7 @@ private fun parseError(
 private fun extractNodes6(
     args: Map<String, BEObject>
 ): List<Peer> {
-    val raw = arrayGet(args[Names.NODES6])
-    if (raw == null) return emptyList()
+    val raw = arrayGet(args[Names.NODES6]) ?: return emptyList()
     require(raw.size % NODE_ENTRY_LENGTH_IPV6 == 0) {
         "expected length to be a multiple of " +
                 NODE_ENTRY_LENGTH_IPV6 + ", received " + raw.size
@@ -68,8 +67,7 @@ private fun extractNodes6(
 private fun extractNodes(
     args: Map<String, BEObject>
 ): List<Peer> {
-    val raw = arrayGet(args[Names.NODES])
-    if (raw == null) return emptyList()
+    val raw = arrayGet(args[Names.NODES]) ?: return emptyList()
     require(raw.size % NODE_ENTRY_LENGTH_IPV4 == 0) {
         "expected length to be a multiple of " +
                 NODE_ENTRY_LENGTH_IPV4 + ", received " + raw.size
@@ -401,7 +399,7 @@ private fun parseResponse(
             var vals: List<ByteArray> = listOf()
             val values = args[Names.VALUES]
             if (values != null) {
-                vals = (values as BEList).toList().map { it ->
+                vals = (values as BEList).toList().map {
                     (it as BEString).toByteArray()
                 }
             }

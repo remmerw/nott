@@ -22,7 +22,6 @@ internal class Peer(val id: ByteArray, val address: InetSocketAddress) {
     }
 
     fun mergeInTimestamps(other: Peer) {
-        if (this != other || this === other) return
         lastSeen = newerTimeMark(lastSeen, other.lastSeen)!!
     }
 

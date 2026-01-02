@@ -36,7 +36,7 @@ internal class ClosestSet(
 
     private fun addCandidates(entries: Set<Peer>) {
         for (peer in entries) {
-            candidates.put(peer.hashCode(), peer)
+            candidates[peer.hashCode()] = peer
         }
     }
 

@@ -57,7 +57,7 @@ fun CoroutineScope.requestPut(
 
             ensureActive()
 
-            val removed: MutableList<Call> = mutableListOf()
+            val removed: MutableSet<Call> = mutableSetOf()
             inFlight.forEach { call ->
                 if (call.state() == CallState.RESPONDED) {
 
@@ -120,6 +120,7 @@ fun CoroutineScope.requestPut(
     }
 
 }
+
 
 
 

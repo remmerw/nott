@@ -232,7 +232,7 @@ internal data class GetPeersResponse(
         if (nodes.isNotEmpty()) inner[Names.NODES] = writeBuckets(nodes)
         if (nodes6.isNotEmpty()) inner[Names.NODES6] = writeBuckets(nodes6)
         if (values.isNotEmpty()) {
-            val values: List<BEObject> = values.map { it -> it.encoded().bencode() }
+            val values: List<BEObject> = values.map { it.encoded().bencode() }
             inner[Names.VALUES] = values.bencode()
         }
         base[Names.R] = inner.bencode()
@@ -323,11 +323,11 @@ internal data class PutRequest(
         inner[Names.ID] = id.bencode()
         inner[Names.V] = v
         inner[Names.TOKEN] = token.bencode()
-        if (cas != null) inner.put(Names.CAS, cas.bencode())
-        if (k != null) inner.put(Names.K, k.bencode())
-        if (salt != null) inner.put(Names.SALT, salt.bencode())
-        if (seq != null) inner.put(Names.SEQ, seq.bencode())
-        if (sig != null) inner.put(Names.SIG, sig.bencode())
+        if (cas != null) inner[Names.CAS] = cas.bencode()
+        if (k != null) inner[Names.K] = k.bencode()
+        if (salt != null) inner[Names.SALT] = salt.bencode()
+        if (seq != null) inner[Names.SEQ] = seq.bencode()
+        if (sig != null) inner[Names.SIG] = sig.bencode()
 
         base[Names.A] = inner.bencode()
 
@@ -386,7 +386,7 @@ internal data class GetRequest(
             Names.ID to id.bencode(),
             Names.TARGET to target.bencode()
         )
-        if (seq != null) inner.put(Names.SEQ, seq.bencode())
+        if (seq != null) inner[Names.SEQ] = seq.bencode()
 
         base[Names.A] = inner.bencode()
 
@@ -426,9 +426,9 @@ internal data class GetResponse(
         if (nodes.isNotEmpty()) inner[Names.NODES] = writeBuckets(nodes)
         if (nodes6.isNotEmpty()) inner[Names.NODES6] = writeBuckets(nodes6)
         if (v != null) inner[Names.V] = v
-        if (k != null) inner.put(Names.K, k.bencode())
-        if (seq != null) inner.put(Names.SEQ, seq.bencode())
-        if (sig != null) inner.put(Names.SIG, sig.bencode())
+        if (k != null) inner[Names.K] = k.bencode()
+        if (seq != null) inner[Names.SEQ] = seq.bencode()
+        if (sig != null) inner[Names.SIG] = sig.bencode()
 
         base[Names.R] = inner.bencode()
 

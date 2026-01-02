@@ -29,7 +29,7 @@ suspend fun requestPing(
     nott.doRequestCall(call)
 
     do {
-        val removed: MutableList<Call> = mutableListOf()
+        val removed: MutableSet<Call> = mutableSetOf()
         inFlight.forEach { call ->
             if (call.state() == CallState.RESPONDED) {
                 removed.add(call)

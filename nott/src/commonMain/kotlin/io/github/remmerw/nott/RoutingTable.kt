@@ -14,7 +14,7 @@ internal class RoutingTable internal constructor() {
         if (entry != null) {
             refresh(peer)
         } else {
-            entries.put(peer.hashCode(), peer)
+            entries[peer.hashCode()] = peer
         }
     }
 

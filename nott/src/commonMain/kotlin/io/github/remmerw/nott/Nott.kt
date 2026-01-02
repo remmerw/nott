@@ -463,7 +463,7 @@ class Nott(
         } else {
             min((oldValue + THROTTLE_INCREMENT), THROTTLE_SATURATION)
         }
-        unsolicitedThrottle.put(addr, newValue)
+        unsolicitedThrottle[addr] = newValue
 
         return (newValue - THROTTLE_INCREMENT) > THROTTLE_THRESHOLD
     }
@@ -475,7 +475,7 @@ class Nott(
 
 
     internal suspend fun doRequestCall(call: Call) {
-        requestCalls.put(call.request.tid.contentHashCode(), call)
+        requestCalls[call.request.tid.contentHashCode()] = call
         send(EnqueuedSend(call.request, call))
     }
 
@@ -756,15 +756,16 @@ fun defaultBootstrap(): Set<InetSocketAddress> {
 
     return result
 }
+
 @Suppress("SameParameterValue")
-private fun allByName(hostname:String, port:Int) : Set<InetSocketAddress>{
+private fun allByName(hostname: String, port: Int): Set<InetSocketAddress> {
     val result = mutableSetOf<InetSocketAddress>()
     try {
         val inets = InetAddress.getAllByName(hostname)
         inets.forEach { address ->
             result.add(InetSocketAddress(address, port))
         }
-    } catch (throwable: Throwable){
+    } catch (throwable: Throwable) {
         debug(throwable)
     }
     return result
