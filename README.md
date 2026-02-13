@@ -40,7 +40,7 @@ flag in the top-level dictionary. In each outgoing query message the read-only D
 'ro' key in the top-level message dictionary and sets its value to 1. This will appear in the
 request as '2:roi1e'. A node that receives DHT messages should inspect incoming queries for the 
 'ro' flag set to 1. If it is found, the node should not add the message sender to its routing table. 
-Instead it should merely service the query as usual. The reason for not adding the read-only 
+Instead, it should merely service the query as usual. The reason for not adding the read-only 
 node to the DHT routing table is that it will both waste time to ping the read-only node, 
 since they will not respond to the ping, and it will cause the read-only node to incur 
 further network traffic.
@@ -57,7 +57,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             ...
-            implementation("io.github.remmerw:nott:0.1.7")
+            implementation("io.github.remmerw:nott:0.1.8")
         }
         ...
     }

@@ -144,7 +144,7 @@ class Nott(
     internal fun timeout(call: Call) {
         requestCalls.remove(call.request.tid.contentHashCode())
 
-        // don't timeout anything if we don't have a connection
+        // don't time out anything if we don't have a connection
         if (call.expectedID != null) {
             routingTable.onTimeout(
                 call.expectedID
@@ -154,7 +154,7 @@ class Nott(
 
     internal suspend fun ping(request: PingRequest) {
 
-        // ignore requests we get from ourself
+        // ignore requests we get from ourselves
         if (isLocalId(request.id)) {
             return
         }
@@ -171,7 +171,7 @@ class Nott(
     }
 
     internal suspend fun findNode(request: FindNodeRequest) {
-        // ignore requests we get from ourself
+        // ignore requests we get from ourselves
         if (isLocalId(request.id)) {
             return
         }
@@ -198,7 +198,7 @@ class Nott(
 
 
     internal suspend fun getPeers(request: GetPeersRequest) {
-        // ignore requests we get from ourself
+        // ignore requests we get from ourselves
         if (isLocalId(request.id)) {
             return
         }
@@ -239,7 +239,7 @@ class Nott(
     }
 
     internal suspend fun get(request: GetRequest) {
-        // ignore requests we get from ourself
+        // ignore requests we get from ourselves
         if (isLocalId(request.id)) {
             return
         }
@@ -278,7 +278,7 @@ class Nott(
     }
 
     internal suspend fun put(request: PutRequest) {
-        // ignore requests we get from ourself
+        // ignore requests we get from ourselves
         if (isLocalId(request.id)) {
             return
         }
@@ -319,7 +319,7 @@ class Nott(
     }
 
     internal suspend fun announce(request: AnnounceRequest) {
-        // ignore requests we get from ourself
+        // ignore requests we get from ourselves
         if (isLocalId(request.id)) {
             return
         }
@@ -442,7 +442,7 @@ class Nott(
         }
 
 
-        // we already should have the bucket. might be an old one by now due to splitting
+        // we already should have the bucket. might be an old one by now due to splitting,
         // but it doesn't matter, we just need to update the entry, which should stay the
         // same object across bucket splits
         if (msg is Response) {
@@ -597,7 +597,9 @@ class Nott(
             return
         }
 
-        // a) it's a response b) didn't find a call c) uptime is high enough that
+        // a) it's a response
+        // b) didn't find a call
+        // c) uptime is high enough that
         // it's not a stray from a restart
         // -> did not expect this response
         if (msg is Response) {

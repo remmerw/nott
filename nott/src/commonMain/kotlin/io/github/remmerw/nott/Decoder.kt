@@ -28,8 +28,8 @@ private fun parseError(
         try {
             errorCode = (errmap[0] as BEInteger).toInt()
             errorMsg = stringGet(errmap[1])
-        } catch (_: Exception) {
-            // do nothing
+        } catch (throwable: Throwable) {
+            debug(throwable)
         }
     }
     if (errorMsg == null) errorMsg = ""
@@ -141,7 +141,7 @@ internal fun parseMessage(
 
         else -> {
             debug("unknown RPC type (y=$msgType)")
-            return null
+            null
         }
     }
 
@@ -320,7 +320,7 @@ private fun parseRequest(address: InetSocketAddress, map: Map<String, BEObject>)
 
         else -> {
             debug("method unknown in request")
-            return null
+            null
         }
     }
 }
@@ -451,10 +451,6 @@ private fun parseResponse(
             )
         }
 
-        else -> {
-            debug("not handled request response")
-            return null
-        }
     }
 
     return msg

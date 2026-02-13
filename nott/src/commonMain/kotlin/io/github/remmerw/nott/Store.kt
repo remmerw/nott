@@ -12,6 +12,7 @@ interface Store {
 }
 
 
+@Suppress("unused")
 class MemoryStore : Store {
     private val peers: MutableSet<InetSocketAddress> = mutableSetOf()
     private val mutex = Mutex()
