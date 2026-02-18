@@ -752,9 +752,8 @@ fun defaultBootstrap(): Set<InetSocketAddress> {
     val result = mutableSetOf<InetSocketAddress>()
 
     result.addAll(allByName("dht.transmissionbt.com", 6881))
-    result.addAll(allByName("router.bittorrent.com", 6881))
-    result.addAll(allByName("router.utorrent.com", 6881))
-    result.addAll(allByName("dht.aelitis.com", 6881))
+    result.addAll(allByName("dht.libtorrent.org", 25401))
+    // result.addAll(allByName("router.bittorrent.com", 6881)) // not responding
 
     return result
 }
