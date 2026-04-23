@@ -7,6 +7,7 @@ import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import java.net.InetSocketAddress
+import kotlin.time.Duration.Companion.milliseconds
 
 data class PeerResponse(val peer: InetSocketAddress, val addresses: List<InetSocketAddress>)
 
@@ -94,7 +95,7 @@ fun CoroutineScope.requestGetPeers(
             break
         } else {
             debug("Timeout lookup for $timeout [ms]")
-            delay(timeout)
+            delay(timeout.milliseconds)
         }
     }
 

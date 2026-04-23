@@ -8,6 +8,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import java.net.InetSocketAddress
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.time.Duration.Companion.milliseconds
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -105,7 +106,7 @@ fun CoroutineScope.requestAnnounce(
             break
         } else {
             debug("Timeout lookup for $timeout [ms]")
-            delay(timeout)
+            delay(timeout.milliseconds)
         }
     }
 

@@ -6,6 +6,7 @@ import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.seconds
 
 class Tests {
     @Test
@@ -31,7 +32,7 @@ class Tests {
     fun defaultBootstrap(): Unit = runBlocking(Dispatchers.IO) {
         val nott = newNott(nodeId())
 
-        delay(5000)
+        delay(5.seconds)
         val peers = nott.closestPeers(createRandomKey(32), 32)
         assertTrue(peers.isNotEmpty())
 

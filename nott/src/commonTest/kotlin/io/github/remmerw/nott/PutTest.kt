@@ -20,6 +20,7 @@ import kotlin.concurrent.atomics.incrementAndFetch
 import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.time.Clock
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 
 class PutTest {
@@ -56,7 +57,7 @@ class PutTest {
 
         val peers = mutableListOf<InetSocketAddress>()
         val added = AtomicInt(0)
-        withTimeout(60 * 1000) {
+        withTimeout(60.seconds) {
             val nott = newNott(nodeId())
             try {
                 val channel = requestPut(
@@ -81,14 +82,14 @@ class PutTest {
             }
         }
 
-        delay(5000)
+        delay(5.seconds)
 
         val bootstrap: MutableSet<InetSocketAddress> = mutableSetOf()
         bootstrap.addAll(defaultBootstrap())
         bootstrap.addAll(peers)
 
         val read = AtomicInt(0)
-        withTimeoutOrNull(30 * 1000) {
+        withTimeoutOrNull(30.seconds) {
             val nott = newNott(nodeId(), bootstrap = bootstrap)
             try {
                 val channel = requestGet(nott, target) {

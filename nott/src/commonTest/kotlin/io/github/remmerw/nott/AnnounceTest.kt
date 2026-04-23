@@ -4,6 +4,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.test.Test
+import kotlin.time.Duration.Companion.seconds
 
 class AnnounceTest {
 
@@ -12,7 +13,7 @@ class AnnounceTest {
 
         val key = createRandomKey(SHA1_HASH_LENGTH)
 
-        withTimeoutOrNull(20 * 1000) {
+        withTimeoutOrNull(20.seconds) {
             val nott = newNott(nodeId())
             try {
                 val channel = requestAnnounce(nott, key, 3443) {
@@ -27,7 +28,7 @@ class AnnounceTest {
             }
         }
 
-        withTimeoutOrNull(10 * 1000) {
+        withTimeoutOrNull(10.seconds) {
 
             val nott = newNott(nodeId())
             try {

@@ -4,6 +4,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.test.Test
+import kotlin.time.Duration.Companion.seconds
 
 
 class LookupTest {
@@ -14,7 +15,7 @@ class LookupTest {
 
         val key = createRandomKey(SHA1_HASH_LENGTH) // Note: it is a fake key
 
-        withTimeoutOrNull(30 * 1000) {
+        withTimeoutOrNull(30.seconds) {
 
             val nott = newNott(nodeId())
             try {

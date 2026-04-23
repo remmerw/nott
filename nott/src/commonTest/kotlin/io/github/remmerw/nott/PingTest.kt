@@ -5,6 +5,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
 import java.net.InetSocketAddress
 import kotlin.test.Test
+import kotlin.time.Duration.Companion.seconds
 
 class PingTest {
 
@@ -16,7 +17,7 @@ class PingTest {
         val nott = newNott(nodeId())
         try {
             val addresses: MutableSet<InetSocketAddress> = mutableSetOf()
-            withTimeoutOrNull(30 * 1000) {
+            withTimeoutOrNull(30.seconds) {
                 val channel = findNode(nott, target) {
                     5000
                 }

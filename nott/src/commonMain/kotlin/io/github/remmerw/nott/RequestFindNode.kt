@@ -7,6 +7,7 @@ import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import java.net.InetSocketAddress
+import kotlin.time.Duration.Companion.milliseconds
 
 
 /**
@@ -87,7 +88,7 @@ fun CoroutineScope.findNode(
             break
         } else {
             debug("Timeout lookup for $timeout [ms]")
-            delay(timeout)
+            delay(timeout.milliseconds)
         }
     }
 

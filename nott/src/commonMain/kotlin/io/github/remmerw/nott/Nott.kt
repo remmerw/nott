@@ -620,7 +620,7 @@ class Nott(
         if (msg is Error) {
             val b = StringBuilder()
             b.append(" [").append(msg.code).append("] from: ").append(msg.address)
-            b.append(" Message: \"").append(msg.message).append("\"")
+            b.append(" Message: \"").append(msg.message.contentToString()).append("\"")
             debug("ErrorMessage $b")
             return
         }

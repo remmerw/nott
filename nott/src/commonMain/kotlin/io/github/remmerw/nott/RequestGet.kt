@@ -7,6 +7,7 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
+import kotlin.time.Duration.Companion.milliseconds
 
 
 @Suppress("ArrayInDataClass")
@@ -96,7 +97,7 @@ fun CoroutineScope.requestGet(
             break
         } else {
             debug("Timeout lookup for $timeout [ms]")
-            delay(timeout)
+            delay(timeout.milliseconds)
         }
     }
 
