@@ -8,8 +8,8 @@ kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", versio
 kotlinx-io-core = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version = "0.9.1" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version = "1.11.0" }
 sha1 = { module = "org.kotlincrypto.hash:sha1", version = "0.8.0" }
-borr = { module = "io.github.remmerw:borr", version = "0.0.8" }
-buri = { module = "io.github.remmerw:buri", version= "0.0.8" }
+borr = { module = "io.github.remmerw:borr", version = "0.1.1" }
+buri = { module = "io.github.remmerw:buri", version= "0.1.1" }
 
 [plugins]
 androidLibrary = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
