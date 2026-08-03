@@ -11,6 +11,8 @@ version = "0.2.0"
 
 kotlin {
 
+    jvmToolchain(21)
+
     android {
         namespace = "io.github.remmerw.nott"
         compileSdk = 37
