@@ -36,7 +36,7 @@ jobs:
       # Execute platform-specific tests to optimize billing minutes
       - name: Run Android & JVM Tests
         if: matrix.os == 'ubuntu-latest'
-        run: ./gradlew jvmTest
+        run: ./gradlew jvmTest testDebugUnitTest
 
       - name: Run iOS Tests
         if: matrix.os == 'macos-latest'
