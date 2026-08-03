@@ -39,7 +39,7 @@ class Nott(
     private val scope = CoroutineScope(Dispatchers.IO)
     private var socket = DatagramSocket(port)
     private val routingTable = RoutingTable()
-
+    private val buffer = Buffer()
 
     fun port(): Int {
         return socket.localPort
@@ -102,7 +102,7 @@ class Nott(
     private suspend fun send(enqueuedSend: EnqueuedSend) {
         mutex.withLock {
             try {
-                val buffer = Buffer()
+                buffer.clear()
                 enqueuedSend.message.encode(buffer)
                 val address = enqueuedSend.message.address
 
@@ -121,7 +121,7 @@ class Nott(
                     enqueuedSend.associatedCall.injectError()
                     timeout(enqueuedSend.associatedCall)
                 }
-            }
+            } 
         }
     }
 
