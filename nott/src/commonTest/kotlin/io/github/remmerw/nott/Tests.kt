@@ -12,7 +12,7 @@ class Tests {
     @Test
     fun testId() {
         val nodeId = nodeId()
-        assertEquals(nodeId.size, 21)
+        assertEquals(nodeId.size, 20)
 
         val name = nodeId.decodeToString()
         println(name)
