@@ -211,7 +211,8 @@ class Nott(
         if (database.insertForKeyAllowed(request.infoHash)) token =
             database.generateToken(
                 request.id,
-                request.address.encoded(),
+                request.address.address.address,
+                request.address.port.toUShort(),
                 request.infoHash
             )
 
@@ -250,7 +251,8 @@ class Nott(
         if (database.insertForKeyAllowed(request.target)) token =
             database.generateToken(
                 request.id,
-                request.address.encoded(),
+                request.address.address.address,
+                request.address.port.toUShort(),
                 request.target
             )
 
@@ -291,7 +293,8 @@ class Nott(
         if (!database.checkToken(
                 request.token,
                 request.id,
-                request.address.encoded(),
+                request.address.address.address,
+                request.address.port.toUShort()
                 sha1(data)
             )
         ) {
@@ -328,7 +331,8 @@ class Nott(
         if (!database.checkToken(
                 request.token,
                 request.id,
-                request.address.encoded(),
+                request.address.address.address,
+                request.address.port.toUShort()
                 request.infoHash
             )
         ) {
