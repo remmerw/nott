@@ -440,8 +440,7 @@ private fun parseResponse(
                         }
 
                         else -> {
-                            debug("not accepted address length")
-                            return null
+                            debug("not accepted address length (just ignore)")
                         }
                     }
                 }
