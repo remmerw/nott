@@ -2,6 +2,7 @@ package io.github.remmerw.nott
 
 import kotlinx.io.Buffer
 import kotlinx.io.readByteArray
+import kotlinx.io.writeUShort
 import kotlin.random.Random
 import kotlin.time.TimeSource
 
@@ -23,17 +24,19 @@ internal class TokenManager {
         token: ByteArray,
         nodeId: ByteArray,
         address: ByteArray,
+        port: UShort,
         lookup: ByteArray
     ): Boolean {
         update()
-        return checkToken(token, nodeId, address, lookup, currentStamp)
-                || checkToken(token, nodeId, address, lookup, previousStamp)
+        return checkToken(token, nodeId, address, port, lookup, currentStamp)
+                || checkToken(token, nodeId, address, port, lookup, previousStamp)
 
     }
 
     fun generateToken(
         nodeId: ByteArray,
         address: ByteArray,
+        port: UShort,
         key: ByteArray
     ): ByteArray {
 
@@ -44,6 +47,7 @@ internal class TokenManager {
         val bb = Buffer()
         bb.write(nodeId)
         bb.write(address)
+        bb.writeUShort(port)
         bb.writeLong(currentStamp)
         bb.write(key)
         bb.write(sessionSecret)
@@ -61,6 +65,7 @@ internal class TokenManager {
         token: ByteArray,
         nodeId: ByteArray,
         address: ByteArray,
+        port: UShort,
         lookup: ByteArray,
         timeStamp: Long
     ): Boolean {
@@ -68,6 +73,7 @@ internal class TokenManager {
         val bb = Buffer()
         bb.write(nodeId)
         bb.write(address)
+        bb.writeUShort(port)
         bb.writeLong(timeStamp)
         bb.write(lookup)
         bb.write(sessionSecret)
