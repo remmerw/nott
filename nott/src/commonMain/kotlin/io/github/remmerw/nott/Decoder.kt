@@ -80,8 +80,8 @@ internal fun writeBuckets(list: List<Peer>): BEString {
     val buffer = Buffer()
     list.forEach { peer: Peer ->
         buffer.write(peer.id)
-        buffer.write(peer.address.address)
-        buffer.writeUShort(peer.address.port)
+        buffer.write(peer.address.address.address)
+        buffer.writeUShort(peer.address.port.toUShort())
     }
     return buffer.readByteArray().bencode()
 }
