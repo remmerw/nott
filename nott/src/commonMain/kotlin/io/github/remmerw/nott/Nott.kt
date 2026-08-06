@@ -811,3 +811,11 @@ internal fun debug(throwable: Throwable) {
         throwable.printStackTrace()
     }
 }
+
+// todo remove
+internal fun InetSocketAddress.encoded(): ByteArray {
+    val buffer = Buffer()
+    buffer.write(address.address)
+    buffer.writeUShort(this.port.toUShort())
+    return buffer.readByteArray()
+}
