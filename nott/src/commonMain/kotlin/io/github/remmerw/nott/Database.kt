@@ -46,9 +46,10 @@ internal class Database internal constructor() {
     fun generateToken(
         nodeId: ByteArray,
         address: ByteArray,
+        port: UShort,
         key: ByteArray
     ): ByteArray {
-        return tokenManager.generateToken(nodeId, address, key)
+        return tokenManager.generateToken(nodeId, address, port, key)
     }
 
 
@@ -56,9 +57,10 @@ internal class Database internal constructor() {
         token: ByteArray,
         nodeId: ByteArray,
         address: ByteArray,
+        port: UShort,
         lookup: ByteArray
     ): Boolean {
-        return tokenManager.checkToken(token, nodeId, address, lookup)
+        return tokenManager.checkToken(token, nodeId, address, port, lookup)
     }
 
     private fun add(items: MutableList<Address>, toAdd: Address) {
