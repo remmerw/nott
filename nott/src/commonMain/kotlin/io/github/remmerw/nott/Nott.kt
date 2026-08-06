@@ -715,14 +715,6 @@ internal fun mismatch(a: ByteArray, b: ByteArray): Int {
 }
 
 
-internal fun InetSocketAddress.encoded(): ByteArray {
-    val buffer = Buffer()
-    buffer.write(address.address)
-    buffer.writeUShort(this.port.toUShort())
-    return buffer.readByteArray()
-}
-
-
 suspend fun newNott(
     nodeId: ByteArray,
     port: Int = 0,
