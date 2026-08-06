@@ -73,7 +73,7 @@ internal class Database internal constructor() {
 
     }
 
-    private fun snapshot(items: MutableList<Address>, maxEntries: Int)
+    private fun snapshot(items: List<Address>, maxEntries: Int)
             : List<Address> {
         return items.asSequence().shuffled().take(maxEntries).toList()
 
