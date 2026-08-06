@@ -12,6 +12,7 @@ import kotlinx.io.readUShort
 import kotlinx.io.writeUShort
 import java.net.InetAddress
 import java.net.InetSocketAddress
+import java.nio.ByteBuffer
 
 private fun parseError(
     address: InetSocketAddress,
@@ -88,14 +89,15 @@ internal fun writeBuckets(list: List<Peer>): BEString {
 }
 
 internal fun readBuckets(src: ByteArray, length: Int): List<Peer> {
-    val buffer = Buffer()
-    buffer.write(src)
+    val buffer = ByteBuffer.wrap(src)
 
     val result = mutableListOf<Peer>()
     while (!buffer.exhausted()) {
-        val rawId = buffer.readByteArray(SHA1_HASH_LENGTH)
-        val raw = buffer.readByteArray(length - 2) // -2 because of port
-        val port = buffer.readUShort()
+        val rawId = ByteArray(SHA1_HASH_LENGTH)
+        buffer.get(rawId)
+        val raw = ByteArray(length - 2) // -2 because of port
+        buffer.get(raw)
+        val port = buffer.getShort().to short()
         if (port > 0.toUShort() && port <= 65535.toUShort()) {
             try {
                 val peer = Peer(
