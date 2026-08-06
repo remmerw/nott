@@ -816,8 +816,8 @@ internal fun debug(throwable: Throwable) {
     }
 }
 
-// todo remove
-internal fun InetSocketAddress.fencoded(): ByteArray {
+
+internal fun InetSocketAddress.encoded(): ByteArray {
     val buffer = Buffer()
     buffer.write(address.address)
     buffer.writeUShort(this.port.toUShort())
