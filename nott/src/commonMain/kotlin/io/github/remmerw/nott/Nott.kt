@@ -294,7 +294,7 @@ class Nott(
                 request.token,
                 request.id,
                 request.address.address.address,
-                request.address.port.toUShort()
+                request.address.port.toUShort(),
                 sha1(data)
             )
         ) {
@@ -332,7 +332,7 @@ class Nott(
                 request.token,
                 request.id,
                 request.address.address.address,
-                request.address.port.toUShort()
+                request.address.port.toUShort(),
                 request.infoHash
             )
         ) {
