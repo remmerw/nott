@@ -5,6 +5,7 @@ import kotlinx.io.readByteArray
 import kotlinx.io.writeUShort
 import kotlin.random.Random
 import kotlin.time.TimeSource
+import java.nio.ByteBuffer
 
 internal class TokenManager {
     private var currentStamp: Long = 0L
@@ -47,8 +48,10 @@ internal class TokenManager {
         val bb = Buffer()
         bb.write(nodeId)
         bb.write(address)
-        bb.writeUShort(port)
-        bb.writeLong(currentStamp)
+        bb.write(ByteBuffer.allocate(2)
+    .putShort(port.toShort())
+    .array())
+        bb.writeLong(ByteBuffer.allocate(8).putLong(timeStamp).array())
         bb.write(key)
         bb.write(sessionSecret)
 
@@ -73,8 +76,10 @@ internal class TokenManager {
         val bb = Buffer()
         bb.write(nodeId)
         bb.write(address)
-        bb.writeUShort(port)
-        bb.writeLong(timeStamp)
+        bb.write(ByteBuffer.allocate(2)
+    .putShort(port.toShort())
+    .array())
+        bb.write(ByteBuffer.allocate(8).putLong(timeStamp).array())
         bb.write(lookup)
         bb.write(sessionSecret)
         val rawToken = sha1(bb.readByteArray()).copyOf(4)
