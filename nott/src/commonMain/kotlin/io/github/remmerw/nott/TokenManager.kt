@@ -6,6 +6,8 @@ import kotlinx.io.writeUShort
 import kotlin.random.Random
 import kotlin.time.TimeSource
 import java.nio.ByteBuffer
+import org.kotlincrypto.hash.sha1.SHA1
+
 
 internal class TokenManager {
     private var currentStamp: Long = 0L
@@ -45,21 +47,21 @@ internal class TokenManager {
 
         // generate a hash of the ip port and the current time
         // should prevent anybody from crapping things up
-        val bb = Buffer()
-        bb.write(nodeId)
-        bb.write(address)
-        bb.write(ByteBuffer.allocate(2)
+        val digest = SHA1()
+        digest.update(nodeId)
+        digest.update(address)
+        digest.update(ByteBuffer.allocate(2)
     .putShort(port.toShort())
     .array())
-        bb.writeLong(ByteBuffer.allocate(8).putLong(timeStamp).array())
-        bb.write(key)
-        bb.write(sessionSecret)
+        digest.update(ByteBuffer.allocate(8).putLong(timeStamp).array())
+        digest.update(key)
+        digest.update(sessionSecret)
 
         // shorten 4bytes to not waste packet size
         // the chance of guessing correctly would be 1 : 4 million
         // and only be valid for a single infohash
 
-        return sha1(bb.readByteArray()).copyOf(4)
+        return digest.digest().copyOf(4)
 
     }
 
@@ -73,16 +75,16 @@ internal class TokenManager {
         timeStamp: Long
     ): Boolean {
 
-        val bb = Buffer()
-        bb.write(nodeId)
-        bb.write(address)
-        bb.write(ByteBuffer.allocate(2)
+        val digest = SHA1()
+        digest.update(nodeId)
+        digest.update(address)
+        digest.update(ByteBuffer.allocate(2)
     .putShort(port.toShort())
     .array())
-        bb.write(ByteBuffer.allocate(8).putLong(timeStamp).array())
-        bb.write(lookup)
-        bb.write(sessionSecret)
-        val rawToken = sha1(bb.readByteArray()).copyOf(4)
+        digest.update(ByteBuffer.allocate(8).putLong(timeStamp).array())
+        digest.update(lookup)
+        digest.update(sessionSecret)
+        val rawToken = digest.digest().copyOf(4)
 
         return token.contentEquals(rawToken)
     }
