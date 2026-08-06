@@ -53,7 +53,7 @@ internal class TokenManager {
         digest.update(ByteBuffer.allocate(2)
     .putShort(port.toShort())
     .array())
-        digest.update(ByteBuffer.allocate(8).putLong(timeStamp).array())
+        digest.update(ByteBuffer.allocate(8).putLong(currentStamp).array())
         digest.update(key)
         digest.update(sessionSecret)
 
