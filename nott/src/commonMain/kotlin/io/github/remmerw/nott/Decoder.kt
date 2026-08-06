@@ -79,10 +79,9 @@ private fun extractNodes(
 internal fun writeBuckets(list: List<Peer>): BEString {
     val buffer = Buffer()
     list.forEach { peer: Peer ->
-        val address = peer.address
         buffer.write(peer.id)
-        buffer.write(address.address)
-        buffer.writeUShort(address.port)
+        buffer.write(peer.address.address)
+        buffer.writeUShort(peer.address.port)
     }
     return buffer.readByteArray().bencode()
 }
