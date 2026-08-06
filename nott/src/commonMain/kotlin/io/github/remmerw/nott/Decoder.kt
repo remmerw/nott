@@ -92,12 +92,12 @@ internal fun readBuckets(src: ByteArray, length: Int): List<Peer> {
     val buffer = ByteBuffer.wrap(src)
 
     val result = mutableListOf<Peer>()
-    while (!buffer.exhausted()) {
+    while (buffer.hasRemaining()) {
         val rawId = ByteArray(SHA1_HASH_LENGTH)
         buffer.get(rawId)
         val raw = ByteArray(length - 2) // -2 because of port
         buffer.get(raw)
-        val port = buffer.getShort().to short()
+        val port = buffer.getShort().toUShort()
         if (port > 0.toUShort() && port <= 65535.toUShort()) {
             try {
                 val peer = Peer(
