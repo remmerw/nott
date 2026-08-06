@@ -9,6 +9,7 @@ import io.github.remmerw.buri.bencode
 import kotlinx.io.Buffer
 import kotlinx.io.readByteArray
 import kotlinx.io.readUShort
+import kotlinx.io.writeUShort
 import java.net.InetAddress
 import java.net.InetSocketAddress
 
@@ -81,7 +82,7 @@ internal fun writeBuckets(list: List<Peer>): BEString {
     list.forEach { peer: Peer ->
         buffer.write(peer.id)
         buffer.write(peer.address.address.address)
-        buffer.writeUShort(peer.address.address.port.toUShort())
+        buffer.writeUShort(peer.address.port.toUShort())
     }
     return buffer.readByteArray().bencode()
 }
