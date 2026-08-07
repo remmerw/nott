@@ -414,29 +414,53 @@ internal data class PutRequest(
     Request {
 
     override fun encode(sink: Sink) {
-        val base: MutableMap<String, BEObject> = mutableMapOf()
-        val inner: MutableMap<String, BEObject> = mutableMapOf()
+        sink.bencodeMap()
+ 
+        sink.bencodeMapKey(Names.A)
+        sink.bencodeMap() // new map
+        sink.bencodeMapKey(Names.ID)
+        sink.bencode(id)
+        sink.bencodeMapKey(Names.V)
+        sink.bencode(v)
+        sink.bencodeMapKey(Names.TOKEN)
+        sink.bencode(token)
+        if (cas != null) {
+            sink.bencodeMapKey(Names.CAS)
+            sink.bencode(cas)
+        }
+        if (k != null) {
+           sink.bencodeMapKey(Names.K)
+           sink.bencode(k)
+        }
+        if (salt != null) {
+            sink.bencodeMapKey(Names.SALT)
+            sink.bencode(salt)
+        }
+        if (seq != null) {
+            sink.bencodeMapKey(Names.SEQ)
+            sink.bencode(seq)
+        }
+        if (sig != null) {
+           sink.bencodeMapKey(Names.SIG)
+           sink.bencode(sig)
+        }
+        sink.bencodeEof() // end map
 
-        inner[Names.ID] = id.bencode()
-        inner[Names.V] = v
-        inner[Names.TOKEN] = token.bencode()
-        if (cas != null) inner[Names.CAS] = cas.bencode()
-        if (k != null) inner[Names.K] = k.bencode()
-        if (salt != null) inner[Names.SALT] = salt.bencode()
-        if (seq != null) inner[Names.SEQ] = seq.bencode()
-        if (sig != null) inner[Names.SIG] = sig.bencode()
+        sink.bencodeMapKey(Names.T)
+        sink.bencode(tid)
+        
+        sink.bencodeMapKey(Names.Y)
+        sink.bencode(Names.Q)
 
-        base[Names.A] = inner.bencode()
+        if(ro){
+            sink.bencodeMapKey(Names.RO)
+            sink.bencode(1)
+        }
 
-        // transaction ID
-        base[Names.T] = tid.bencode()
-        // message type
-        base[Names.Y] = Names.Q.bencode()
-        if (ro) base[Names.RO] = 1.bencode()
-        // message method
-        base[Names.Q] = Names.PUT.bencode()
+        sink.bencodeMapKey(Names.Q)
+        sink.bencode(Names.PUT)
 
-        base.encodeBencodeTo(sink)
+        sink.bencodeEof() // end map
     }
 }
 
