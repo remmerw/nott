@@ -9,6 +9,7 @@ import io.github.remmerw.buri.bencodeEof
 import io.github.remmerw.buri.bencodeMapKey
 import io.github.remmerw.buri.bencodeList
 import kotlinx.io.Sink
+import kotlinx.io.readByteArray
 import java.net.InetSocketAddress
 
 
@@ -404,7 +405,7 @@ internal data class PutRequest(
     override val tid: ByteArray,
     override val ro: Boolean,
     val token: ByteArray,
-    val v: ByteArray,
+    val v: BEObject,
     val cas: Long?,
     val k: ByteArray?,
     val salt: ByteArray?,
@@ -421,7 +422,9 @@ internal data class PutRequest(
         sink.bencodeMapKey(Names.ID)
         sink.bencode(id)
         sink.bencodeMapKey(Names.V)
-        sink.bencode(v)
+        val buffer = Buffer()
+        v.encodeBencodeTo(buffer)
+        sink.bencode(buffer.readByteArray())
         sink.bencodeMapKey(Names.TOKEN)
         sink.bencode(token)
         if (cas != null) {
@@ -552,7 +555,7 @@ internal data class GetResponse(
     val token: ByteArray?,
     override val nodes: List<Peer>,
     override val nodes6: List<Peer>,
-    val v: ByteArray?,
+    val v: BEObject?,
     val k: ByteArray?,
     val seq: Long?,
     val sig: ByteArray?
@@ -580,8 +583,10 @@ internal data class GetResponse(
         }
 
         if (v != null) {
+           val buffer = Buffer()
+           v.encodeBencodeTo(buffer)
            sink.bencodeMapKey(Names.V)
-           sink.bencode(v)
+           sink.bencode(buffer.readByteArray())
         }
         if (k != null) {
            sink.bencodeMapKey(Names.K)
