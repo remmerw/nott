@@ -91,10 +91,10 @@ internal data class AnnounceResponse(
 ) : Response {
 
     override fun encode(sink: Sink) {
-        sink.bencodeMap() // map start
+        sink.bencodeMap() // new map
 
         sink.bencodeMapKey(Names.R)
-        sink.bencodeMap() // map start
+        sink.bencodeMap() // new map
         sink.bencodeMapKey(Names.ID)
         sink.bencode(id)
         sink.bencodeEof() // map end
@@ -151,23 +151,33 @@ internal data class FindNodeRequest(
     Request {
 
     override fun encode(sink: Sink) {
-        val base: MutableMap<String, BEObject> = mutableMapOf()
-        base[Names.A] =
-            mapOf<String, BEObject>(
-                Names.ID to id.bencode(),
-                Names.TARGET to target.bencode()
-            ).bencode()
+        sink.bencodeMap() // new map
+
+        sink.bencodeMapKey(Names.A)
+        sink.bencodeMap() // new map
+        sink.bencodeMapKey(Names.ID)
+        sink.bencode(id)
+        sink.bencodeMapKey(Names.TARGET)
+        sink.bencode(target)
+        sink.bencodeEof() // end map
 
 
-        // transaction ID
-        base[Names.T] = tid.bencode()
-        // message type
-        base[Names.Y] = Names.Q.bencode()
-        if (ro) base[Names.RO] = 1.bencode()
-        // message method
-        base[Names.Q] = Names.FIND_NODE.bencode()
+        sink.bencodeMapKey(Names.T)
+        sink.bencode(tid)
+        
+        sink.bencodeMapKey(Names.Y)
+        sink.bencode(Names.Q)
 
-        base.encodeBencodeTo(sink)
+        if(ro){
+            sink.bencodeMapKey(Names.RO)
+            sink.bencode(1)
+        }
+
+        sink.bencodeMapKey(Names.Q)
+        sink.bencode(Names.FIND_NODE)
+
+        sink.bencodeEof() // end map
+
     }
 
 }
