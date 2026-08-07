@@ -237,23 +237,33 @@ internal data class GetPeersRequest(
     Request {
 
     override fun encode(sink: Sink) {
-        val base: MutableMap<String, BEObject> = mutableMapOf()
-        base[Names.A] =
-            mapOf<String, BEObject>(
-                Names.ID to id.bencode(),
-                Names.INFO_HASH to infoHash.bencode()
-            ).bencode()
 
+        sink.bencodeMap() // new map
 
-        // transaction ID
-        base[Names.T] = tid.bencode()
-        // message type
-        base[Names.Y] = Names.Q.bencode()
-        if (ro) base[Names.RO] = 1.bencode()
-        // message method
-        base[Names.Q] = Names.GET_PEERS.bencode()
+        sink.bencodeMapKey(Names.A)
+        sink.bencodeMap() // new map
+        sink.bencodeMapKey(Names.ID)
+        sink.bencode(id)
+        sink.bencodeMapKey(Names.INFO_HASH)
+        sink.bencode(infoHash)
+        sink.bencodeEof() // end map
 
-        base.encodeBencodeTo(sink)
+        
+        sink.bencodeMapKey(Names.T)
+        sink.bencode(tid)
+        
+        sink.bencodeMapKey(Names.Y)
+        sink.bencode(Names.Q)
+
+        if(ro){
+            sink.bencodeMapKey(Names.RO)
+            sink.bencode(1)
+        }
+
+        sink.bencodeMapKey(Names.Q)
+        sink.bencode(Names.GET_PEERS)
+
+        sink.bencodeEof()
     }
 }
 
