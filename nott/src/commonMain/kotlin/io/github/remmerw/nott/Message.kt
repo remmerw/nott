@@ -99,18 +99,21 @@ internal data class Error(
 ) : Message {
 
     override fun encode(sink: Sink) {
+        sink.bencodeMap()
 
+        sink.bencodeMapKey(Names.E)
+        sink.bencodeList()
+        sink.bencode(code)
+        sink.bencode(message)
+        sink.bencodeEof()
 
-        val base: MutableMap<String, BEObject> = mutableMapOf()
-
-        // transaction ID
-        base[Names.T] = tid.bencode()
-        // message type
-        base[Names.Y] = Names.E.bencode()
-
-        base[Names.E] = listOf(code.bencode(), message.bencode()).bencode()
-
-        base.encodeBencodeTo(sink)
+        sink.bencodeMapKey(Names.T)
+        sink.bencode(tid)
+        
+        sink.bencodeMapKey(Names.Y)
+        sink.bencode(Names.E)
+        
+        sink.bencodeEof()
     }
 
 }
