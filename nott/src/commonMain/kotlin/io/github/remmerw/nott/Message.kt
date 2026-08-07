@@ -275,8 +275,8 @@ internal data class GetPeersResponse(
         val inner: MutableMap<String, BEObject> = mutableMapOf()
         inner[Names.ID] = id.bencode()
         if (token != null) inner[Names.TOKEN] = token.bencode()
-        if (nodes.isNotEmpty()) inner[Names.NODES] = writeBuckets(nodes)
-        if (nodes6.isNotEmpty()) inner[Names.NODES6] = writeBuckets(nodes6)
+        if (nodes.isNotEmpty()) inner[Names.NODES] = writeBuckets(nodes).bencode()
+        if (nodes6.isNotEmpty()) inner[Names.NODES6] = writeBuckets(nodes6).bencode()
         if (values.isNotEmpty()) {
             val values: List<BEObject> = values.map { it.encoded().bencode() }
             inner[Names.VALUES] = values.bencode()
@@ -469,8 +469,8 @@ internal data class GetResponse(
         val inner: MutableMap<String, BEObject> = mutableMapOf()
         inner[Names.ID] = id.bencode()
         if (token != null) inner[Names.TOKEN] = token.bencode()
-        if (nodes.isNotEmpty()) inner[Names.NODES] = writeBuckets(nodes)
-        if (nodes6.isNotEmpty()) inner[Names.NODES6] = writeBuckets(nodes6)
+        if (nodes.isNotEmpty()) inner[Names.NODES] = writeBuckets(nodes).bencode()
+        if (nodes6.isNotEmpty()) inner[Names.NODES6] = writeBuckets(nodes6).bencode()
         if (v != null) inner[Names.V] = v
         if (k != null) inner[Names.K] = k.bencode()
         if (seq != null) inner[Names.SEQ] = seq.bencode()
