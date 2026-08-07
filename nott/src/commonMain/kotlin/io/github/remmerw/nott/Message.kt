@@ -4,6 +4,10 @@ package io.github.remmerw.nott
 import io.github.remmerw.buri.BEObject
 import io.github.remmerw.buri.bencode
 import io.github.remmerw.buri.encodeBencodeTo
+import io.github.remmerw.buri.bencodeMap
+import io.github.remmerw.buri.bencodeEof
+import io.github.remmerw.buri.bencodeMapKey
+import io.github.remmerw.buri.bencodeList
 import kotlinx.io.Sink
 import java.net.InetSocketAddress
 
