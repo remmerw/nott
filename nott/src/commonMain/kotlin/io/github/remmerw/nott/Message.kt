@@ -281,27 +281,48 @@ internal data class GetPeersResponse(
 
 
     override fun encode(sink: Sink) {
-        val base: MutableMap<String, BEObject> = mutableMapOf()
-        val inner: MutableMap<String, BEObject> = mutableMapOf()
-        inner[Names.ID] = id.bencode()
-        if (token != null) inner[Names.TOKEN] = token.bencode()
-        if (nodes.isNotEmpty()) inner[Names.NODES] = writeBuckets(nodes).bencode()
-        if (nodes6.isNotEmpty()) inner[Names.NODES6] = writeBuckets(nodes6).bencode()
-        if (values.isNotEmpty()) {
-            val values: List<BEObject> = values.map { it.encoded().bencode() }
-            inner[Names.VALUES] = values.bencode()
+        sink.bencodeMap() // new map
+
+        sink.bencodeMapKey(Names.R)
+        sink.bencodeMap() // new map
+        sink.bencodeMapKey(Names.ID)
+        sink.bencode(id)
+        if (token != null) {
+           sink.bencodeMapKey(Names.TOKEN)
+           sink.bencode(token)
         }
-        base[Names.R] = inner.bencode()
+        if (nodes.isNotEmpty()) {
+          sink.bencodeMapKey(Names.NODES)
+          sink.bencode(writeBuckets(nodes))
+        }
+        if (nodes6.isNotEmpty()) {
+          sink.bencodeMapKey(Names.NODES6)
+          sink.bencode(writeBuckets(nodes6))
+        }
+        
+        if (values.isNotEmpty()) {
+            sink.bencodeMapKey(Names.VALUES)
+            sink.bencodeList()
+            values.forEach { value ->
+                sink.bencode(value.encoded())
+            }
+            sink.bencodeEof() // end list
+        }
+        sink.bencodeEof() // end map
 
-        // transaction ID
-        base[Names.T] = tid.bencode()
+        sink.bencodeMapKey(Names.T)
+        sink.bencode(tid)
 
-        // message type
-        base[Names.Y] = Names.R.bencode()
+        sink.bencodeMapKey(Names.Y)
+        sink.bencode(Names.R)
 
-        if (ip != null) base[Names.IP] = ip.bencode()
+        if (ip != null) {
+           sink.bencodeMapKey(Names.IP)
+           sink.bencode(ip)
+        }
 
-        base.encodeBencodeTo(sink)
+        sink.bencodeEof() // end map
+       
     }
 }
 
