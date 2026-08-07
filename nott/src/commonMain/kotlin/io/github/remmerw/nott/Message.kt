@@ -46,26 +46,39 @@ internal data class AnnounceRequest(
 ) :
     Request {
 
-    override fun encode(sink: Sink) {
-        val base: MutableMap<String, BEObject> = mutableMapOf()
-        val inner: MutableMap<String, BEObject> = mutableMapOf()
+    override fun encode(sink: Sink) { 
+        sink.bencodeMap() // new map
+        
+        sink.bencodeMapKey(Names.A)
 
-        inner[Names.ID] = id.bencode()
-        inner[Names.INFO_HASH] = infoHash.bencode()
-        inner[Names.PORT] = port.bencode()
-        inner[Names.TOKEN] = token.bencode()
-        if (name != null) inner[Names.NAME] = name.bencode()
-        base[Names.A] = inner.bencode()
+        sink.bencodeMap() // new map
+        sink.bencodeMapKey(Names.ID)
+        sink.bencode(id)
+        sink.bencodeMapKey(Names.INFO_HASH)
+        sink.bencode(infoHash)
+        sink.bencodeMapKey(Names.PORT)
+        sink.bencode(port)
+        sink.bencodeMapKey(Names.TOKEN)
+        sink.bencode(token)
+        if(name!= null){
+             sink.bencodeMapKey(Names.NAME)
+             sink.bencode(name)
+        }
+        sink.bencodeEof() // end map
 
-        // transaction ID
-        base[Names.T] = tid.bencode()
-        // message type
-        base[Names.Y] = Names.Q.bencode()
-        if (ro) base[Names.RO] = 1.bencode()
-        // message method
-        base[Names.Q] = Names.ANNOUNCE_PEER.bencode()
+        sink.bencodeMapKey(Names.T)
+        sink.bencode(tid)
+        if(ro){
+            sink.bencodeMapKey(Names.RO)
+            sink.bencode(1)
+        }
+        sink.bencodeMapKey(Names.Q)
+        sink.bencode(Names.ANNOUNCE_PEER)
+        sink.bencodeMapKey(Names.Y)
+        sink.bencode(Names.Q)
 
-        base.encodeBencodeTo(sink)
+        sink.bencodeEof() // end map
+
     }
 }
 
