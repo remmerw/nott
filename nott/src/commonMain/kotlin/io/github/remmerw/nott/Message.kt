@@ -9,6 +9,7 @@ import io.github.remmerw.buri.bencodeEof
 import io.github.remmerw.buri.bencodeMapKey
 import io.github.remmerw.buri.bencodeList
 import kotlinx.io.Sink
+import kotlinx.io.Buffer
 import kotlinx.io.readByteArray
 import java.net.InetSocketAddress
 
