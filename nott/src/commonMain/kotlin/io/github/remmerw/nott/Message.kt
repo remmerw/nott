@@ -91,17 +91,21 @@ internal data class AnnounceResponse(
 ) : Response {
 
     override fun encode(sink: Sink) {
-        val base: MutableMap<String, BEObject> = mutableMapOf()
-        val inner: MutableMap<String, BEObject> = mutableMapOf()
-        inner[Names.ID] = id.bencode()
-        base[Names.R] = inner.bencode()
+        sink.bencodeMap() // map start
 
-        // transaction ID
-        base[Names.T] = tid.bencode()
-        // message type
-        base[Names.Y] = Names.R.bencode()
+        sink.bencodeMapKey(Names.R)
+        sink.bencodeMap() // map start
+        sink.bencodeMapKey(Names.ID)
+        sink.bencode(id)
+        sink.bencodeEof() // map end
 
-        base.encodeBencodeTo(sink)
+        sink.bencodeMapKey(Names.T)
+        sink.bencode(tid)
+
+        sink.bencodeMapKey(Names.Y)
+        sink.bencode(Names.R)
+        
+        sink.bencodeEof() // map enf
     }
 
 }
