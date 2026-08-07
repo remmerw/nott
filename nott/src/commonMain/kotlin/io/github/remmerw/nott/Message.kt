@@ -560,25 +560,53 @@ internal data class GetResponse(
 
 
     override fun encode(sink: Sink) {
-        val base: MutableMap<String, BEObject> = mutableMapOf()
-        val inner: MutableMap<String, BEObject> = mutableMapOf()
-        inner[Names.ID] = id.bencode()
-        if (token != null) inner[Names.TOKEN] = token.bencode()
-        if (nodes.isNotEmpty()) inner[Names.NODES] = writeBuckets(nodes).bencode()
-        if (nodes6.isNotEmpty()) inner[Names.NODES6] = writeBuckets(nodes6).bencode()
-        if (v != null) inner[Names.V] = v
-        if (k != null) inner[Names.K] = k.bencode()
-        if (seq != null) inner[Names.SEQ] = seq.bencode()
-        if (sig != null) inner[Names.SIG] = sig.bencode()
+        sink.bencodeMap() // new map
 
-        base[Names.R] = inner.bencode()
+        sink.bencodeMapKey(Names.R)
+        sink.bencodeMap() // new map
+        sink.bencodeMapKey(Names.ID)
+        sink.bencode(id)
+        if (token != null) {
+           sink.bencodeMapKey(Names.TOKEN)
+           sink.bencode(token)
+        }
+        if (nodes.isNotEmpty()) {
+          sink.bencodeMapKey(Names.NODES)
+          sink.bencode(writeBuckets(nodes))
+        }
+        if (nodes6.isNotEmpty()) {
+          sink.bencodeMapKey(Names.NODES6)
+          sink.bencode(writeBuckets(nodes6))
+        }
 
-        // transaction ID
-        base[Names.T] = tid.bencode()
+        if (v != null) {
+           sink.bencodeMapKey(Names.V)
+           sink.bencode(v)
+        }
+        if (k != null) {
+           sink.bencodeMapKey(Names.K)
+           sink.bencode(k)
+        }
+        if (seq != null) {
+           sink.bencodeMapKey(Names.SEQ)
+           sink.bencode(seq)
+        }
+        if (sig != null) {
+           sink.bencodeMapKey(Names.SIG)
+           sink.bencode(sig)
+        }
 
-        // message type
-        base[Names.Y] = Names.R.bencode()
+        sink.bencodeEof() // end map
 
-        base.encodeBencodeTo(sink)
+        sink.bencodeMapKey(Names.T)
+        sink.bencode(tid)
+
+        sink.bencodeMapKey(Names.Y)
+        sink.bencode(Names.R)
+
+
+        sink.bencodeEof() // end map
+
+       
     }
 }
