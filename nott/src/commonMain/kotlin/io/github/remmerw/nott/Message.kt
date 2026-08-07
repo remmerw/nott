@@ -422,6 +422,7 @@ internal data class PutRequest(
         sink.bencodeMapKey(Names.ID)
         sink.bencode(id)
         sink.bencodeMapKey(Names.V)
+        // todo this is not correct 
         val buffer = Buffer()
         v.encodeBencodeTo(buffer)
         sink.bencode(buffer.readByteArray())
@@ -583,6 +584,7 @@ internal data class GetResponse(
         }
 
         if (v != null) {
+           // todo this is not correct 
            val buffer = Buffer()
            v.encodeBencodeTo(buffer)
            sink.bencodeMapKey(Names.V)
