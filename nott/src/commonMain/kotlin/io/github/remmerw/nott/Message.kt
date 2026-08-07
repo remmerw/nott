@@ -448,24 +448,36 @@ internal data class GetRequest(
     Request {
 
     override fun encode(sink: Sink) {
-        val base: MutableMap<String, BEObject> = mutableMapOf()
-        val inner = mutableMapOf<String, BEObject>(
-            Names.ID to id.bencode(),
-            Names.TARGET to target.bencode()
-        )
-        if (seq != null) inner[Names.SEQ] = seq.bencode()
+        sink.bencodeMap() // new map
 
-        base[Names.A] = inner.bencode()
+        sink.bencodeMapKey(Names.A)
+        sink.bencodeMap() // new map
+        sink.bencodeMapKey(Names.ID)
+        sink.bencode(id)
+        sink.bencodeMapKey(Names.TARGET)
+        sink.bencode(target)
+        if (seq != null) {
+            sink.bencodeMapKey(Names.SEQ)
+            sink.bencode(seq)
+        }
+        sink.bencodeEof() // end map
 
-        // transaction ID
-        base[Names.T] = tid.bencode()
-        // message type
-        base[Names.Y] = Names.Q.bencode()
-        if (ro) base[Names.RO] = 1.bencode()
-        // message method
-        base[Names.Q] = Names.GET.bencode()
 
-        base.encodeBencodeTo(sink)
+        sink.bencodeMapKey(Names.T)
+        sink.bencode(tid)
+        
+        sink.bencodeMapKey(Names.Y)
+        sink.bencode(Names.Q)
+
+        if(ro){
+            sink.bencodeMapKey(Names.RO)
+            sink.bencode(1)
+        }
+
+        sink.bencodeMapKey(Names.Q)
+        sink.bencode(Names.GET)
+
+        sink.bencodeEof()
     }
 }
 
