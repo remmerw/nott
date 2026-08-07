@@ -78,14 +78,14 @@ private fun extractNodes(
 }
 
 
-internal fun writeBuckets(list: List<Peer>): BEString {
+internal fun writeBuckets(list: List<Peer>): ByteArray {
     val buffer = Buffer()
     list.forEach { peer: Peer ->
         buffer.write(peer.id)
         buffer.write(peer.address.address.address)
         buffer.writeUShort(peer.address.port.toUShort())
     }
-    return buffer.readByteArray().bencode()
+    return buffer.readByteArray()
 }
 
 internal fun readBuckets(src: ByteArray, length: Int): List<Peer> {
