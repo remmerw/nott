@@ -372,18 +372,27 @@ internal data class PingResponse(
 ) : Response {
 
     override fun encode(sink: Sink) {
-        val base: MutableMap<String, BEObject> = mutableMapOf()
-        base[Names.R] = mapOf<String, BEObject>(Names.ID to id.bencode()).bencode()
+               
+        sink.bencodeMap() // new map
 
-        // transaction ID
-        base[Names.T] = tid.bencode()
-        // message type
-        base[Names.Y] = Names.R.bencode()
+        sink.bencodeMapKey(Names.R)
+        sink.bencodeMap() // new map
+        sink.bencodeMapKey(Names.ID)
+        sink.bencode(id)
+        sink.bencodeEof() // end map
 
+        sink.bencodeMapKey(Names.T)
+        sink.bencode(tid)
 
-        if (ip != null) base[Names.IP] = ip.bencode()
+        sink.bencodeMapKey(Names.Y)
+        sink.bencode(Names.R)
 
-        base.encodeBencodeTo(sink)
+        if (ip != null) {
+           sink.bencodeMapKey(Names.IP)
+           sink.bencode(ip)
+        }
+
+        sink.bencodeEof() // end map
     }
 
 }
