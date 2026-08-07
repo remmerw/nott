@@ -97,7 +97,7 @@ internal data class AnnounceResponse(
         sink.bencodeMap() // new map
         sink.bencodeMapKey(Names.ID)
         sink.bencode(id)
-        sink.bencodeEof() // map end
+        sink.bencodeEof() // end map
 
         sink.bencodeMapKey(Names.T)
         sink.bencode(tid)
@@ -105,7 +105,7 @@ internal data class AnnounceResponse(
         sink.bencodeMapKey(Names.Y)
         sink.bencode(Names.R)
         
-        sink.bencodeEof() // map enf
+        sink.bencodeEof() // end map
     }
 
 }
@@ -193,22 +193,34 @@ internal data class FindNodeResponse(
 ) : NodesResponse {
 
     override fun encode(sink: Sink) {
-        val base: MutableMap<String, BEObject> = mutableMapOf()
-        val inner: MutableMap<String, BEObject> = mutableMapOf()
-        inner[Names.ID] = id.bencode()
-        if (nodes.isNotEmpty()) inner[Names.NODES] = writeBuckets(nodes)
-        if (nodes6.isNotEmpty()) inner[Names.NODES6] = writeBuckets(nodes6)
-        base[Names.R] = inner.bencode()
+        sink.bencodeMap() // new map
 
-        // transaction ID
-        base[Names.T] = tid.bencode()
+        sink.bencodeMapKey(Names.R)
+        sink.bencodeMap() // new map
+        sink.bencodeMapKey(Names.ID)
+        sink.bencode(id)
+        if (nodes.isNotEmpty()) {
+          sink.bencodeMapKey(Names.NODES)
+          sink.bencode(writeBuckets(nodes))
+        }
+        if (nodes6.isNotEmpty()) {
+          sink.bencodeMapKey(Names.NODES6)
+          sink.bencode(writeBuckets(nodes6))
+        }
+        sink.bencodeEof() // end map
 
-        // message type
-        base[Names.Y] = Names.R.bencode()
+        sink.bencodeMapKey(Names.T)
+        sink.bencode(tid)
+        
+        sink.bencodeMapKey(Names.Y)
+        sink.bencode(Names.R)
 
-        if (ip != null) base[Names.IP] = ip.bencode()
+        if (ip != null) {
+           sink.bencodeMapKey(Names.IP)
+           sink.bencode(ip)
+        }
 
-        base.encodeBencodeTo(sink)
+        sink.bencodeEof() // end map
     }
 
 
