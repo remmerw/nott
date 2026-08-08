@@ -5,7 +5,6 @@ import java.net.InetSocketAddress
 import kotlin.random.Random
 
 internal class Database internal constructor() {
-    private val tokenManager = TokenManager()
     private val items: MutableMap<Int, MutableSet<InetSocketAddress>> = ConcurrentHashMap()
 
     fun store(key: ByteArray, address: InetSocketAddress) {
@@ -40,27 +39,6 @@ return keyEntry.asSequence().shuffled().take(maxEntries).toList()
 
         return size < Random.nextInt(MAX_DB_ENTRIES_PER_KEY)
 
-    }
-
-
-    fun generateToken(
-        nodeId: ByteArray,
-        address: ByteArray,
-        port: UShort,
-        key: ByteArray
-    ): ByteArray {
-        return tokenManager.generateToken(nodeId, address, port, key)
-    }
-
-
-    fun checkToken(
-        token: ByteArray,
-        nodeId: ByteArray,
-        address: ByteArray,
-        port: UShort,
-        lookup: ByteArray
-    ): Boolean {
-        return tokenManager.checkToken(token, nodeId, address, port, lookup)
     }
 
 }
