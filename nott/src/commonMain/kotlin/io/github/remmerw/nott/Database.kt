@@ -1,13 +1,14 @@
 package io.github.remmerw.nott
 
 import java.util.concurrent.ConcurrentHashMap
+import java.net.InetSocketAddress
 import kotlin.random.Random
 
 internal class Database internal constructor() {
     private val tokenManager = TokenManager()
-    private val items: MutableMap<Int, MutableSet<Address>> = ConcurrentHashMap()
+    private val items: MutableMap<Int, MutableSet<InetSocketAddress>> = ConcurrentHashMap()
 
-    fun store(key: ByteArray, address: Address) {
+    fun store(key: ByteArray, address: InetSocketAddress) {
 
         val keyEntry = items[key.contentHashCode()]
         if (keyEntry != null) {
@@ -18,7 +19,7 @@ internal class Database internal constructor() {
 
     }
 
-    fun sample(key: ByteArray, maxEntries: Int): List<Address> {
+    fun sample(key: ByteArray, maxEntries: Int): List<InetSocketAddress> {
 
         val keyEntry = items[key.contentHashCode()] ?: return emptyList()
 
