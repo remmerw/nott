@@ -397,7 +397,7 @@ private fun parseResponse(
             val token = arrayGet(args[Names.TOKEN])
             val nodes6 = extractNodes6(args)
             val nodes = extractNodes(args)
-            val addresses: MutableList<Address> = mutableListOf()
+            val addresses: MutableList<InetSocketAddress> = mutableListOf()
 
             var vals: List<ByteArray> = listOf()
             val values = args[Names.VALUES]
@@ -422,7 +422,10 @@ private fun parseResponse(
 
                             if (port > 0.toUShort() && port <= 65535.toUShort()) {
                                 addresses.add(
-                                    Address(address, port)
+                                    InetSocketAddress(
+                        InetAddress.getByAddress(address),
+                        port.toInt()
+                    )
                                 )
                             }
                         }
@@ -436,7 +439,10 @@ private fun parseResponse(
 
                             if (port > 0.toUShort() && port <= 65535.toUShort()) {
                                 addresses.add(
-                                    Address(address, port)
+                                    InetSocketAddress(
+                        InetAddress.getByAddress(address),
+                        port.toInt()
+                    )
                                 )
                             }
                         }
