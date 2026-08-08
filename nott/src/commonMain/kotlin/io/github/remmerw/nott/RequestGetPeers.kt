@@ -64,11 +64,9 @@ fun CoroutineScope.requestGetPeers(
                         val list = mutableListOf<InetSocketAddress>()
                         for (item in message.values) {
                             if (gated.add(item.hashCode())) {
-                                try {
-                                    list.add(item.toInetSocketAddress())
-                                } catch (throwable: Throwable) {
-                                    debug(throwable)
-                                }
+                                
+                                list.add(item)
+                              
                             }
                         }
 
