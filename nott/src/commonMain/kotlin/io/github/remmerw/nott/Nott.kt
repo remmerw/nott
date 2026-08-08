@@ -216,7 +216,7 @@ if (enqueuedSend.associatedCall != null) {
         var token: ByteArray? = null
 
         if (database.insertForKeyAllowed(request.infoHash)) token =
-            database.generateToken(
+            tokenManager.generateToken(
                 request.id,
                 request.address.address.address,
                 request.address.port.toUShort(),
@@ -256,7 +256,7 @@ if (enqueuedSend.associatedCall != null) {
         // generate a token
         var token: ByteArray? = null
         if (database.insertForKeyAllowed(request.target)) token =
-            database.generateToken(
+            tokenManager.generateToken(
                 request.id,
                 request.address.address.address,
                 request.address.port.toUShort(),
@@ -297,7 +297,7 @@ if (enqueuedSend.associatedCall != null) {
         val data = buffer.readByteArray()
 
         // first check if the token is OK
-        if (!database.checkToken(
+        if (!tokenManager.checkToken(
                 request.token,
                 request.id,
                 request.address.address.address,
@@ -335,7 +335,7 @@ if (enqueuedSend.associatedCall != null) {
         }
 
         // first check if the token is OK
-        if (!database.checkToken(
+        if (!tokeManager.checkToken(
                 request.token,
                 request.id,
                 request.address.address.address,
@@ -353,12 +353,9 @@ if (enqueuedSend.associatedCall != null) {
         }
 
         // everything OK, so store the value
-        val address = Address(
-            request.address.address.address,
-            request.address.port.toUShort()
-        )
+        
 
-        database.store(request.infoHash, address)
+        database.store(request.infoHash, request.address)
 
 
         // send a proper response to indicate everything is OK
