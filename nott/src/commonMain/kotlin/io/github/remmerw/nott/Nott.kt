@@ -35,6 +35,7 @@ class Nott(
 
     private val requestCalls: MutableMap<Int, Call> = ConcurrentHashMap()
     private val database: Database = Database()
+    private val tokenManager = TokenManager()
     private val mutex = Mutex()
     private val scope = CoroutineScope(Dispatchers.IO)
     private var socket = DatagramSocket(port)
