@@ -95,3 +95,9 @@ mavenPublishing {
         }
     }
 }
+
+tasks.register("testClasses") {
+    doLast {
+        println("Dummy testClasses task to bypass IDE validation")
+    }
+}
