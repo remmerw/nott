@@ -98,31 +98,9 @@ class Nott(
     internal fun closestPeers(key: ByteArray, take: Int): Set<Peer> {
         return routingTable.closestPeers(key, take)
     }
-    private suspend fun sendo(enqueuedSend: EnqueuedSend) {
-        mutex.withLock {
-            try {
-                buffer.clear()
-                enqueuedSend.message.encode(buffer)
-                val address = enqueuedSend.message.address
 
-                val data = buffer.readByteArray()
 
-                val datagram = DatagramPacket(data, data.size, address)
 
-                socket.send(datagram)
-
-                enqueuedSend.associatedCall?.hasSend()
-
-            } catch (throwable: Throwable) {
-                debug(throwable)
-
-                if (enqueuedSend.associatedCall != null) {
-                    enqueuedSend.associatedCall.injectError()
-                    timeout(enqueuedSend.associatedCall)
-                }
-            } 
-        }
-    }
 
     private suspend fun send(enqueuedSend: EnqueuedSend) {
         val datagram = mutex.withLock {
