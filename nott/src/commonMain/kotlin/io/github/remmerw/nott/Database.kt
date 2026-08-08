@@ -5,7 +5,7 @@ import kotlin.random.Random
 
 internal class Database internal constructor() {
     private val tokenManager = TokenManager()
-    private val items: MutableMap<Int, MutableList<Address>> = ConcurrentHashMap()
+    private val items: MutableMap<Int, MutableSet<Address>> = ConcurrentHashMap()
 
     fun store(key: ByteArray, address: Address) {
 
@@ -13,8 +13,10 @@ internal class Database internal constructor() {
         if (keyEntry != null) {
             add(keyEntry, address)
         } else {
-            val peers = mutableListOf<Address>()
-            peers.add(address)
+            val peers = mutableSetOf<Address>()
+            if(!peers.contains(toAdd)){       
+                peers.add(toAdd)
+            }
             items[key.contentHashCode()] = peers
         }
 
@@ -23,7 +25,8 @@ internal class Database internal constructor() {
     fun sample(key: ByteArray, maxEntries: Int): List<Address> {
 
         val keyEntry = items[key.contentHashCode()] ?: return emptyList()
-        return snapshot(keyEntry, maxEntries)
+
+return keyEntry.asSequence().shuffled().take(maxEntries).toList()
 
     }
 
@@ -61,22 +64,6 @@ internal class Database internal constructor() {
         lookup: ByteArray
     ): Boolean {
         return tokenManager.checkToken(token, nodeId, address, port, lookup)
-    }
-
-    private fun add(items: MutableList<Address>, toAdd: Address) {
-
-        val idx = items.indexOf(toAdd)
-        if (idx >= 0) {
-            return
-        }
-        items.add(toAdd)
-
-    }
-
-    private fun snapshot(items: List<Address>, maxEntries: Int)
-            : List<Address> {
-        return items.asSequence().shuffled().take(maxEntries).toList()
-
     }
 
 }
