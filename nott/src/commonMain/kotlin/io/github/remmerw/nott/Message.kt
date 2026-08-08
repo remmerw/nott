@@ -278,7 +278,7 @@ internal data class GetPeersResponse(
     val token: ByteArray?,
     override val nodes: List<Peer>,
     override val nodes6: List<Peer>,
-    val values: List<Address>
+    val values: List<InetSocketAddress>
 ) : NodesResponse {
 
 
