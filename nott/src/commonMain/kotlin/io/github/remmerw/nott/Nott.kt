@@ -335,7 +335,7 @@ if (enqueuedSend.associatedCall != null) {
         }
 
         // first check if the token is OK
-        if (!tokeManager.checkToken(
+        if (!tokenManager.checkToken(
                 request.token,
                 request.id,
                 request.address.address.address,
