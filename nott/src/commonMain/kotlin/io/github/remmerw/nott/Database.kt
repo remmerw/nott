@@ -13,9 +13,7 @@ internal class Database internal constructor() {
         if (keyEntry != null) {
             keyEntry.add(address)
         } else {
-            val peers = mutableSetOf<Address>()
-            peers.add(address)
-            items[key.contentHashCode()] = peers
+            items[key.contentHashCode()] = mutableSetOf<Address>(address)
         }
 
     }
