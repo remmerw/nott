@@ -34,7 +34,6 @@ internal sealed interface Request : Message {
     val ro: Boolean
 }
 
-
 @Suppress("ArrayInDataClass")
 internal data class AnnounceRequest(
     override val address: InetSocketAddress,
