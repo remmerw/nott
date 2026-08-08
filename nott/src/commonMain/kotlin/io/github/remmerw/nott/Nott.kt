@@ -39,8 +39,7 @@ class Nott(
     private val scope = CoroutineScope(Dispatchers.IO)
     private var socket = DatagramSocket(port)
     private val routingTable = RoutingTable()
-    private val buffer = Buffer()
-
+    
     fun port(): Int {
         return socket.localPort
     }
@@ -103,18 +102,17 @@ class Nott(
 
 
     private suspend fun send(enqueuedSend: EnqueuedSend) {
-        val datagram = mutex.withLock {
-            buffer.clear()
+         mutex.withLock {
+            val buffer = Buffer()
+
             enqueuedSend.message.encode(buffer)
             val address = enqueuedSend.message.address
 
             val data = buffer.readByteArray()
 
-            DatagramPacket(data, data.size, address)
-        }
+            val datagram = DatagramPacket(data, data.size, address)
 
-       
-       try {
+            try {
           socket.send(datagram)
 
           enqueuedSend.associatedCall?.hasSend()
@@ -127,6 +125,10 @@ if (enqueuedSend.associatedCall != null) {
                     timeout(enqueuedSend.associatedCall)
                 }
         }
+        }
+
+       
+       
     }
 
     fun shutdown() {
