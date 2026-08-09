@@ -1,23 +1,19 @@
 package io.github.remmerw.nott
 
-
 import io.github.remmerw.buri.BEObject
 import io.github.remmerw.buri.bencode
-import io.github.remmerw.buri.encodeBencodeTo
-import io.github.remmerw.buri.bencodeMap
 import io.github.remmerw.buri.bencodeEof
-import io.github.remmerw.buri.bencodeMapKey
 import io.github.remmerw.buri.bencodeList
+import io.github.remmerw.buri.bencodeMap
+import io.github.remmerw.buri.bencodeMapKey
 import kotlinx.io.Sink
-import kotlinx.io.Buffer
-import kotlinx.io.readByteArray
 import java.net.InetSocketAddress
-
 
 internal sealed interface Message {
     val address: InetSocketAddress
     val id: ByteArray
     val tid: ByteArray
+
     fun encode(sink: Sink)
 }
 
@@ -44,12 +40,10 @@ internal data class AnnounceRequest(
     val port: Int,
     val token: ByteArray,
     val name: ByteArray?,
-) :
-    Request {
-
-    override fun encode(sink: Sink) { 
+) : Request {
+    override fun encode(sink: Sink) {
         sink.bencodeMap() // new map
-        
+
         sink.bencodeMapKey(Names.A)
 
         sink.bencodeMap() // new map
@@ -61,15 +55,15 @@ internal data class AnnounceRequest(
         sink.bencode(port)
         sink.bencodeMapKey(Names.TOKEN)
         sink.bencode(token)
-        if(name!= null){
-             sink.bencodeMapKey(Names.NAME)
-             sink.bencode(name)
+        if (name != null) {
+            sink.bencodeMapKey(Names.NAME)
+            sink.bencode(name)
         }
         sink.bencodeEof() // end map
 
         sink.bencodeMapKey(Names.T)
         sink.bencode(tid)
-        if(ro){
+        if (ro) {
             sink.bencodeMapKey(Names.RO)
             sink.bencode(1)
         }
@@ -79,7 +73,6 @@ internal data class AnnounceRequest(
         sink.bencode(Names.Q)
 
         sink.bencodeEof() // end map
-
     }
 }
 
@@ -88,9 +81,8 @@ internal data class AnnounceResponse(
     override val address: InetSocketAddress,
     override val id: ByteArray,
     override val tid: ByteArray,
-    override val ip: ByteArray?
+    override val ip: ByteArray?,
 ) : Response {
-
     override fun encode(sink: Sink) {
         sink.bencodeMap() // new map
 
@@ -105,10 +97,9 @@ internal data class AnnounceResponse(
 
         sink.bencodeMapKey(Names.Y)
         sink.bencode(Names.R)
-        
+
         sink.bencodeEof() // end map
     }
-
 }
 
 @Suppress("ArrayInDataClass")
@@ -117,9 +108,8 @@ internal data class Error(
     override val id: ByteArray,
     override val tid: ByteArray,
     val code: Int,
-    val message: ByteArray
+    val message: ByteArray,
 ) : Message {
-
     override fun encode(sink: Sink) {
         sink.bencodeMap()
 
@@ -131,15 +121,13 @@ internal data class Error(
 
         sink.bencodeMapKey(Names.T)
         sink.bencode(tid)
-        
+
         sink.bencodeMapKey(Names.Y)
         sink.bencode(Names.E)
-        
+
         sink.bencodeEof()
     }
-
 }
-
 
 @Suppress("ArrayInDataClass")
 internal data class FindNodeRequest(
@@ -147,10 +135,8 @@ internal data class FindNodeRequest(
     override val id: ByteArray,
     override val tid: ByteArray,
     override val ro: Boolean,
-    val target: ByteArray
-) :
-    Request {
-
+    val target: ByteArray,
+) : Request {
     override fun encode(sink: Sink) {
         sink.bencodeMap() // new map
 
@@ -162,14 +148,13 @@ internal data class FindNodeRequest(
         sink.bencode(target)
         sink.bencodeEof() // end map
 
-
         sink.bencodeMapKey(Names.T)
         sink.bencode(tid)
-        
+
         sink.bencodeMapKey(Names.Y)
         sink.bencode(Names.Q)
 
-        if(ro){
+        if (ro) {
             sink.bencodeMapKey(Names.RO)
             sink.bencode(1)
         }
@@ -178,9 +163,7 @@ internal data class FindNodeRequest(
         sink.bencode(Names.FIND_NODE)
 
         sink.bencodeEof() // end map
-
     }
-
 }
 
 @Suppress("ArrayInDataClass")
@@ -190,9 +173,8 @@ internal data class FindNodeResponse(
     override val tid: ByteArray,
     override val ip: ByteArray?,
     override val nodes: List<Peer>,
-    override val nodes6: List<Peer>
+    override val nodes6: List<Peer>,
 ) : NodesResponse {
-
     override fun encode(sink: Sink) {
         sink.bencodeMap() // new map
 
@@ -201,30 +183,28 @@ internal data class FindNodeResponse(
         sink.bencodeMapKey(Names.ID)
         sink.bencode(id)
         if (nodes.isNotEmpty()) {
-          sink.bencodeMapKey(Names.NODES)
-          sink.bencode(writeBuckets(nodes))
+            sink.bencodeMapKey(Names.NODES)
+            sink.bencode(writeBuckets(nodes))
         }
         if (nodes6.isNotEmpty()) {
-          sink.bencodeMapKey(Names.NODES6)
-          sink.bencode(writeBuckets(nodes6))
+            sink.bencodeMapKey(Names.NODES6)
+            sink.bencode(writeBuckets(nodes6))
         }
         sink.bencodeEof() // end map
 
         sink.bencodeMapKey(Names.T)
         sink.bencode(tid)
-        
+
         sink.bencodeMapKey(Names.Y)
         sink.bencode(Names.R)
 
         if (ip != null) {
-           sink.bencodeMapKey(Names.IP)
-           sink.bencode(ip)
+            sink.bencodeMapKey(Names.IP)
+            sink.bencode(ip)
         }
 
         sink.bencodeEof() // end map
     }
-
-
 }
 
 @Suppress("ArrayInDataClass")
@@ -233,12 +213,9 @@ internal data class GetPeersRequest(
     override val id: ByteArray,
     override val tid: ByteArray,
     override val ro: Boolean,
-    val infoHash: ByteArray
-) :
-    Request {
-
+    val infoHash: ByteArray,
+) : Request {
     override fun encode(sink: Sink) {
-
         sink.bencodeMap() // new map
 
         sink.bencodeMapKey(Names.A)
@@ -249,14 +226,13 @@ internal data class GetPeersRequest(
         sink.bencode(infoHash)
         sink.bencodeEof() // end map
 
-        
         sink.bencodeMapKey(Names.T)
         sink.bencode(tid)
-        
+
         sink.bencodeMapKey(Names.Y)
         sink.bencode(Names.Q)
 
-        if(ro){
+        if (ro) {
             sink.bencodeMapKey(Names.RO)
             sink.bencode(1)
         }
@@ -277,10 +253,8 @@ internal data class GetPeersResponse(
     val token: ByteArray?,
     override val nodes: List<Peer>,
     override val nodes6: List<Peer>,
-    val values: List<InetSocketAddress>
+    val values: List<InetSocketAddress>,
 ) : NodesResponse {
-
-
     override fun encode(sink: Sink) {
         sink.bencodeMap() // new map
 
@@ -289,18 +263,18 @@ internal data class GetPeersResponse(
         sink.bencodeMapKey(Names.ID)
         sink.bencode(id)
         if (token != null) {
-           sink.bencodeMapKey(Names.TOKEN)
-           sink.bencode(token)
+            sink.bencodeMapKey(Names.TOKEN)
+            sink.bencode(token)
         }
         if (nodes.isNotEmpty()) {
-          sink.bencodeMapKey(Names.NODES)
-          sink.bencode(writeBuckets(nodes))
+            sink.bencodeMapKey(Names.NODES)
+            sink.bencode(writeBuckets(nodes))
         }
         if (nodes6.isNotEmpty()) {
-          sink.bencodeMapKey(Names.NODES6)
-          sink.bencode(writeBuckets(nodes6))
+            sink.bencodeMapKey(Names.NODES6)
+            sink.bencode(writeBuckets(nodes6))
         }
-        
+
         if (values.isNotEmpty()) {
             sink.bencodeMapKey(Names.VALUES)
             sink.bencodeList()
@@ -318,15 +292,13 @@ internal data class GetPeersResponse(
         sink.bencode(Names.R)
 
         if (ip != null) {
-           sink.bencodeMapKey(Names.IP)
-           sink.bencode(ip)
+            sink.bencodeMapKey(Names.IP)
+            sink.bencode(ip)
         }
 
         sink.bencodeEof() // end map
-       
     }
 }
-
 
 @Suppress("ArrayInDataClass")
 internal data class PingRequest(
@@ -335,7 +307,6 @@ internal data class PingRequest(
     override val tid: ByteArray,
     override val ro: Boolean,
 ) : Request {
-
     override fun encode(sink: Sink) {
         sink.bencodeMap() // new map
 
@@ -347,11 +318,11 @@ internal data class PingRequest(
 
         sink.bencodeMapKey(Names.T)
         sink.bencode(tid)
-        
+
         sink.bencodeMapKey(Names.Y)
         sink.bencode(Names.Q)
 
-        if(ro){
+        if (ro) {
             sink.bencodeMapKey(Names.RO)
             sink.bencode(1)
         }
@@ -361,7 +332,6 @@ internal data class PingRequest(
 
         sink.bencodeEof()
     }
-
 }
 
 @Suppress("ArrayInDataClass")
@@ -369,11 +339,9 @@ internal data class PingResponse(
     override val address: InetSocketAddress,
     override val id: ByteArray,
     override val tid: ByteArray,
-    override val ip: ByteArray?
+    override val ip: ByteArray?,
 ) : Response {
-
     override fun encode(sink: Sink) {
-               
         sink.bencodeMap() // new map
 
         sink.bencodeMapKey(Names.R)
@@ -389,13 +357,12 @@ internal data class PingResponse(
         sink.bencode(Names.R)
 
         if (ip != null) {
-           sink.bencodeMapKey(Names.IP)
-           sink.bencode(ip)
+            sink.bencodeMapKey(Names.IP)
+            sink.bencode(ip)
         }
 
         sink.bencodeEof() // end map
     }
-
 }
 
 @Suppress("ArrayInDataClass")
@@ -410,13 +377,11 @@ internal data class PutRequest(
     val k: ByteArray?,
     val salt: ByteArray?,
     val seq: Long?,
-    val sig: ByteArray?
-) :
-    Request {
-
+    val sig: ByteArray?,
+) : Request {
     override fun encode(sink: Sink) {
         sink.bencodeMap()
- 
+
         sink.bencodeMapKey(Names.A)
         sink.bencodeMap() // new map
         sink.bencodeMapKey(Names.ID)
@@ -430,8 +395,8 @@ internal data class PutRequest(
             sink.bencode(cas)
         }
         if (k != null) {
-           sink.bencodeMapKey(Names.K)
-           sink.bencode(k)
+            sink.bencodeMapKey(Names.K)
+            sink.bencode(k)
         }
         if (salt != null) {
             sink.bencodeMapKey(Names.SALT)
@@ -442,18 +407,18 @@ internal data class PutRequest(
             sink.bencode(seq)
         }
         if (sig != null) {
-           sink.bencodeMapKey(Names.SIG)
-           sink.bencode(sig)
+            sink.bencodeMapKey(Names.SIG)
+            sink.bencode(sig)
         }
         sink.bencodeEof() // end map
 
         sink.bencodeMapKey(Names.T)
         sink.bencode(tid)
-        
+
         sink.bencodeMapKey(Names.Y)
         sink.bencode(Names.Q)
 
-        if(ro){
+        if (ro) {
             sink.bencodeMapKey(Names.RO)
             sink.bencode(1)
         }
@@ -465,15 +430,13 @@ internal data class PutRequest(
     }
 }
 
-
 @Suppress("ArrayInDataClass")
 internal data class PutResponse(
     override val address: InetSocketAddress,
     override val id: ByteArray,
     override val tid: ByteArray,
-    override val ip: ByteArray?
+    override val ip: ByteArray?,
 ) : Response {
-
     override fun encode(sink: Sink) {
         sink.bencodeMap() // new map
 
@@ -490,14 +453,13 @@ internal data class PutResponse(
         sink.bencode(Names.R)
 
         if (ip != null) {
-           sink.bencodeMapKey(Names.IP)
-           sink.bencode(ip)
+            sink.bencodeMapKey(Names.IP)
+            sink.bencode(ip)
         }
 
         sink.bencodeEof() // end map
     }
 }
-
 
 @Suppress("ArrayInDataClass")
 internal data class GetRequest(
@@ -506,10 +468,8 @@ internal data class GetRequest(
     override val tid: ByteArray,
     override val ro: Boolean,
     val target: ByteArray,
-    val seq: Long?
-) :
-    Request {
-
+    val seq: Long?,
+) : Request {
     override fun encode(sink: Sink) {
         sink.bencodeMap() // new map
 
@@ -525,14 +485,13 @@ internal data class GetRequest(
         }
         sink.bencodeEof() // end map
 
-
         sink.bencodeMapKey(Names.T)
         sink.bencode(tid)
-        
+
         sink.bencodeMapKey(Names.Y)
         sink.bencode(Names.Q)
 
-        if(ro){
+        if (ro) {
             sink.bencodeMapKey(Names.RO)
             sink.bencode(1)
         }
@@ -556,10 +515,8 @@ internal data class GetResponse(
     val v: BEObject?,
     val k: ByteArray?,
     val seq: Long?,
-    val sig: ByteArray?
+    val sig: ByteArray?,
 ) : NodesResponse {
-
-
     override fun encode(sink: Sink) {
         sink.bencodeMap() // new map
 
@@ -568,33 +525,33 @@ internal data class GetResponse(
         sink.bencodeMapKey(Names.ID)
         sink.bencode(id)
         if (token != null) {
-           sink.bencodeMapKey(Names.TOKEN)
-           sink.bencode(token)
+            sink.bencodeMapKey(Names.TOKEN)
+            sink.bencode(token)
         }
         if (nodes.isNotEmpty()) {
-          sink.bencodeMapKey(Names.NODES)
-          sink.bencode(writeBuckets(nodes))
+            sink.bencodeMapKey(Names.NODES)
+            sink.bencode(writeBuckets(nodes))
         }
         if (nodes6.isNotEmpty()) {
-          sink.bencodeMapKey(Names.NODES6)
-          sink.bencode(writeBuckets(nodes6))
+            sink.bencodeMapKey(Names.NODES6)
+            sink.bencode(writeBuckets(nodes6))
         }
 
         if (v != null) {
-           sink.bencodeMapKey(Names.V)
-           sink.bencode(v)
+            sink.bencodeMapKey(Names.V)
+            sink.bencode(v)
         }
         if (k != null) {
-           sink.bencodeMapKey(Names.K)
-           sink.bencode(k)
+            sink.bencodeMapKey(Names.K)
+            sink.bencode(k)
         }
         if (seq != null) {
-           sink.bencodeMapKey(Names.SEQ)
-           sink.bencode(seq)
+            sink.bencodeMapKey(Names.SEQ)
+            sink.bencode(seq)
         }
         if (sig != null) {
-           sink.bencodeMapKey(Names.SIG)
-           sink.bencode(sig)
+            sink.bencodeMapKey(Names.SIG)
+            sink.bencode(sig)
         }
 
         sink.bencodeEof() // end map
@@ -605,9 +562,6 @@ internal data class GetResponse(
         sink.bencodeMapKey(Names.Y)
         sink.bencode(Names.R)
 
-
         sink.bencodeEof() // end map
-
-       
     }
 }

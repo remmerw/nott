@@ -8,31 +8,31 @@ import kotlin.test.Test
 import kotlin.time.Duration.Companion.seconds
 
 class PingTest {
-
     @Test
-    fun pingTest(): Unit = runBlocking(Dispatchers.IO) {
+    fun pingTest(): Unit =
+        runBlocking(Dispatchers.IO) {
+            val target = createRandomKey(SHA1_HASH_LENGTH) // random peer id
 
-        val target = createRandomKey(SHA1_HASH_LENGTH) // random peer id
-
-        val nott = newNott(nodeId())
-        try {
-            val addresses: MutableSet<InetSocketAddress> = mutableSetOf()
-            withTimeoutOrNull(30.seconds) {
-                val channel = findNode(nott, target) {
-                    5000
+            val nott = newNott(nodeId())
+            try {
+                val addresses: MutableSet<InetSocketAddress> = mutableSetOf()
+                withTimeoutOrNull(30.seconds) {
+                    val channel =
+                        findNode(nott, target) {
+                            5000
+                        }
+                    for (address in channel) {
+                        addresses.add(address)
+                    }
                 }
-                for (address in channel) {
-                    addresses.add(address)
+                addresses.forEach { peer ->
+                    println(
+                        "Success " + requestPing(nott, peer, target) +
+                            " ping to " + target.toHexString(),
+                    )
                 }
+            } finally {
+                nott.shutdown()
             }
-            addresses.forEach { peer ->
-                println(
-                    "Success " + requestPing(nott, peer, target)
-                            + " ping to " + target.toHexString()
-                )
-            }
-        } finally {
-            nott.shutdown()
         }
-    }
 }

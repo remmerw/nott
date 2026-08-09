@@ -4,13 +4,11 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.net.InetSocketAddress
 
-
 interface Store {
     suspend fun addresses(limit: Int): List<InetSocketAddress>
 
     suspend fun store(address: InetSocketAddress)
 }
-
 
 @Suppress("unused")
 class MemoryStore : Store {

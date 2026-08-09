@@ -5,25 +5,24 @@ import java.net.InetSocketAddress
 import kotlin.concurrent.atomics.AtomicBoolean
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
 
-
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalAtomicApi::class)
 suspend fun requestPing(
     nott: Nott,
     address: InetSocketAddress,
-    id: ByteArray
+    id: ByteArray,
 ): Boolean {
-
     val result = AtomicBoolean(false)
 
     val inFlight: MutableSet<Call> = mutableSetOf()
 
     val tid = createRandomKey(TID_LENGTH)
-    val request = PingRequest(
-        address = address,
-        id = nott.nodeId,
-        tid = tid,
-        ro = nott.readOnlyState,
-    )
+    val request =
+        PingRequest(
+            address = address,
+            id = nott.nodeId,
+            tid = tid,
+            ro = nott.readOnlyState,
+        )
     val call = Call(request, id)
     inFlight.add(call)
     nott.doRequestCall(call)
@@ -50,13 +49,7 @@ suspend fun requestPing(
             }
         }
         inFlight.removeAll(removed)
-
     } while (!inFlight.isEmpty())
 
     return result.load()
 }
-
-
-
-
-
