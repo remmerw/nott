@@ -14,26 +14,25 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v7
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.event.inputs.branch }}
+          persist-credentials: false
 
       - name: Set up JDK
-        uses: actions/setup-java@v5.7.0
+        uses: actions/setup-java@v4
         with:
-          distribution: 'zulu'
-          java-version: '21'
+          distribution: 'temurin'
+          java-version: '17'
 
       - name: Run Ktlint Format
-        run: |
-          # Nutzt den Gradle Wrapper deines Projekts. 
-          # Stelle sicher, dass das Ktlint-Plugin (z.B. id("org.jlleitschuh.gradle.ktlint")) aktiv ist
-          ./gradlew ktlintFormat
+        run: ./gradlew ktlintFormat
 
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: "chore: auto format Kotlin code with ktlint"
@@ -46,3 +45,7 @@ jobs:
             Bitte überprüfe die Änderungen und merge den PR manuell.
           base: ${{ github.event.inputs.branch }}
           delete-branch: true
+          add-paths: |
+            *.kt
+            *.kts
+
