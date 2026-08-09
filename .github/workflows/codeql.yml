@@ -48,7 +48,7 @@ jobs:
     
     # Option B: Wenn Ihr Projekt GRADLE nutzt (Auskomment
     - name: Build with Gradle
-      run: ./gradlew compileJava
+      run: ./gradlew compileJvmMainJava
 
     # 4. Analyse ausführen und Ergebnisse an GitHub übermitteln
     - name: Perform CodeQL Analysis
