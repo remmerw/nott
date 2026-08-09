@@ -6,16 +6,14 @@ package io.github.remmerw.nott
 */
 internal class ClosestSet(
     private val nott: Nott,
-    private val target: ByteArray
+    private val target: ByteArray,
 ) {
     private val closest: MutableSet<Peer> = mutableSetOf()
     private val unreachable: MutableSet<Int> = sortedSetOf()
     private val queried: MutableSet<Int> = sortedSetOf()
     private val candidates: MutableMap<Int, Peer> = sortedMapOf()
 
-
     private fun acceptedResponse(call: Call): Peer? {
-
         if (!call.matchesExpectedID()) {
             unreachable(call)
             return null
@@ -40,14 +38,14 @@ internal class ClosestSet(
         }
     }
 
-    private fun sortedLookups(): List<Peer> {
-        return candidates.values.filter { peer ->
-            val hash = peer.hashCode()
-            !queried.contains(hash) && !unreachable.contains(hash)
-        }.sortedWith { a, b ->
-            threeWayDistance(target, a.id, b.id)
-        }
-    }
+    private fun sortedLookups(): List<Peer> =
+        candidates.values
+            .filter { peer ->
+                val hash = peer.hashCode()
+                !queried.contains(hash) && !unreachable.contains(hash)
+            }.sortedWith { a, b ->
+                threeWayDistance(target, a.id, b.id)
+            }
 
     suspend fun initialize() {
         val entries = nott.closestPeers(target, 32)
@@ -65,7 +63,10 @@ internal class ClosestSet(
         }
     }
 
-    suspend fun requestCall(call: Call, peer: Peer) {
+    suspend fun requestCall(
+        call: Call,
+        peer: Peer,
+    ) {
         queried.add(peer.hashCode())
         nott.doRequestCall(call)
     }
@@ -92,7 +93,6 @@ internal class ClosestSet(
         return false
     }
 
-
     fun acceptResponse(call: Call): Peer? {
         val match = acceptedResponse(call)
         if (match != null) {
@@ -100,13 +100,15 @@ internal class ClosestSet(
             if (message is NodesResponse) {
                 val returnedNodes: MutableSet<Peer> = mutableSetOf()
 
-                message.nodes6.filter { peer: Peer ->
-                    !nott.isLocalId(peer.id)
-                }.forEach { e: Peer -> returnedNodes.add(e) }
+                message.nodes6
+                    .filter { peer: Peer ->
+                        !nott.isLocalId(peer.id)
+                    }.forEach { e: Peer -> returnedNodes.add(e) }
 
-                message.nodes.filter { peer: Peer ->
-                    !nott.isLocalId(peer.id)
-                }.forEach { e: Peer -> returnedNodes.add(e) }
+                message.nodes
+                    .filter { peer: Peer ->
+                        !nott.isLocalId(peer.id)
+                    }.forEach { e: Peer -> returnedNodes.add(e) }
 
                 addCandidates(returnedNodes)
             }
@@ -114,29 +116,24 @@ internal class ClosestSet(
         return match
     }
 
-    private fun reachedTargetCapacity(): Boolean {
-        return closest.size >= MAX_ENTRIES_PER_BUCKET
-    }
-
+    private fun reachedTargetCapacity(): Boolean = closest.size >= MAX_ENTRIES_PER_BUCKET
 
     fun insert(peer: Peer) {
         if (closest.add(peer)) {
             if (closest.size > MAX_ENTRIES_PER_BUCKET) {
-                val last = closest.sortedWith(
-                    Peer.DistanceOrder(target)
-                ).last()
+                val last =
+                    closest
+                        .sortedWith(
+                            Peer.DistanceOrder(target),
+                        ).last()
                 closest.remove(last)
             }
         }
     }
 
-    private fun tail(): ByteArray {
-        return closest.last().id
-    }
+    private fun tail(): ByteArray = closest.last().id
 
-    private fun head(): ByteArray {
-        return closest.first().id
-    }
+    private fun head(): ByteArray = closest.first().id
 
     private fun goodForRequest(peer: Peer): Boolean {
         if (!reachedTargetCapacity()) return true
@@ -152,5 +149,4 @@ internal class ClosestSet(
         unreachable.add(peer.hashCode())
         return false
     }
-
 }

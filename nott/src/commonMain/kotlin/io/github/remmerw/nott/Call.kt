@@ -4,8 +4,10 @@ import kotlin.concurrent.Volatile
 import kotlin.time.TimeSource
 import kotlin.time.TimeSource.Monotonic.ValueTimeMark
 
-internal class Call(val request: Request, val expectedID: ByteArray?) {
-
+internal class Call(
+    val request: Request,
+    val expectedID: ByteArray?,
+) {
     var sentTime: ValueTimeMark? = null
         private set
 
@@ -15,23 +17,21 @@ internal class Call(val request: Request, val expectedID: ByteArray?) {
     var response: Message? = null
         private set
 
-    fun matchesExpectedID(): Boolean {
-        return expectedID!!.contentEquals(response!!.id)
-    }
+    fun matchesExpectedID(): Boolean = expectedID!!.contentEquals(response!!.id)
 
     fun injectError() {
         state = CallState.ERROR
     }
 
     fun response(rsp: Message) {
-
         response = rsp
 
-        state = when (rsp) {
-            is Response -> CallState.RESPONDED
-            is Error -> CallState.ERROR
-            else -> throw IllegalStateException("should not happen")
-        }
+        state =
+            when (rsp) {
+                is Response -> CallState.RESPONDED
+                is Error -> CallState.ERROR
+                else -> throw IllegalStateException("should not happen")
+            }
     }
 
     fun hasSend() {
@@ -40,8 +40,5 @@ internal class Call(val request: Request, val expectedID: ByteArray?) {
         state = CallState.SENT
     }
 
-    fun state(): CallState {
-        return state
-    }
-
+    fun state(): CallState = state
 }

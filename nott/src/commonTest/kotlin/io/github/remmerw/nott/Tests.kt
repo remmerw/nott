@@ -20,22 +20,22 @@ class Tests {
     }
 
     @Test
-    fun testNottPort(): Unit = runBlocking(Dispatchers.IO) {
-        val nott = newNott(nodeId())
-        assertTrue(nott.port() > 0)
-        nott.shutdown()
-    }
-
-
+    fun testNottPort(): Unit =
+        runBlocking(Dispatchers.IO) {
+            val nott = newNott(nodeId())
+            assertTrue(nott.port() > 0)
+            nott.shutdown()
+        }
 
     @Test
-    fun defaultBootstrap(): Unit = runBlocking(Dispatchers.IO) {
-        val nott = newNott(nodeId())
+    fun defaultBootstrap(): Unit =
+        runBlocking(Dispatchers.IO) {
+            val nott = newNott(nodeId())
 
-        delay(5.seconds)
-        val peers = nott.closestPeers(createRandomKey(32), 32)
-        assertTrue(peers.isNotEmpty())
+            delay(5.seconds)
+            val peers = nott.closestPeers(createRandomKey(32), 32)
+            assertTrue(peers.isNotEmpty())
 
-        nott.shutdown()
-    }
+            nott.shutdown()
+        }
 }

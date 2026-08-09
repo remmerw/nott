@@ -25,11 +25,11 @@ import kotlin.random.Random
 import kotlin.time.TimeSource.Monotonic.ValueTimeMark
 
 class Nott(
-    val nodeId: ByteArray, port: Int = 0,
+    val nodeId: ByteArray,
+    port: Int = 0,
     val readOnlyState: Boolean = true,
-    val bootstrap: Set<InetSocketAddress> = defaultBootstrap()
+    val bootstrap: Set<InetSocketAddress> = defaultBootstrap(),
 ) {
-
     private val unsolicitedThrottle: MutableMap<InetSocketAddress, Long> =
         mutableMapOf() // runs in same thread
 
@@ -40,10 +40,8 @@ class Nott(
     private val scope = CoroutineScope(Dispatchers.IO)
     private var socket = DatagramSocket(port)
     private val routingTable = RoutingTable()
-    
-    fun port(): Int {
-        return socket.localPort
-    }
+
+    fun port(): Int = socket.localPort
 
     suspend fun bootstrap() {
         try {
@@ -56,10 +54,8 @@ class Nott(
     }
 
     fun startup() {
-
         scope.launch {
             try {
-
                 // The maximum UDP packet size for the BitTorrent Mainline DHT is typically
                 // limited by the Maximum Transmission Unit (MTU) of the network, and is
                 // often around 1400 bytes. This is smaller than the theoretical maximum
@@ -73,7 +69,6 @@ class Nott(
 
                     socket.receive(packet)
 
-
                     val inet = InetSocketAddress(packet.address, packet.port)
                     val length = packet.length
 
@@ -82,7 +77,6 @@ class Nott(
                     // -> immediately discard junk on the read loop, don't even allocate a
                     // buffer for it
                     if (length < 10 || inet.port == 0) continue
-
 
                     val reader = BEReader(packet.data, length)
                     handlePacket(reader, inet)
@@ -95,15 +89,13 @@ class Nott(
         }
     }
 
-    internal fun closestPeers(key: ByteArray, take: Int): Set<Peer> {
-        return routingTable.closestPeers(key, take)
-    }
-
-
-
+    internal fun closestPeers(
+        key: ByteArray,
+        take: Int,
+    ): Set<Peer> = routingTable.closestPeers(key, take)
 
     private suspend fun send(enqueuedSend: EnqueuedSend) {
-         mutex.withLock {
+        mutex.withLock {
             val buffer = Buffer()
 
             enqueuedSend.message.encode(buffer)
@@ -114,26 +106,21 @@ class Nott(
             val datagram = DatagramPacket(data, data.size, address)
 
             try {
-          socket.send(datagram)
+                socket.send(datagram)
 
-          enqueuedSend.associatedCall?.hasSend()
+                enqueuedSend.associatedCall?.hasSend()
+            } catch (throwable: Throwable) {
+                debug(throwable)
 
-        } catch (throwable: Throwable) {
-          debug(throwable)
-
-if (enqueuedSend.associatedCall != null) {
+                if (enqueuedSend.associatedCall != null) {
                     enqueuedSend.associatedCall.injectError()
                     timeout(enqueuedSend.associatedCall)
                 }
+            }
         }
-        }
-
-       
-       
     }
 
     fun shutdown() {
-
         try {
             scope.cancel()
         } catch (throwable: Throwable) {
@@ -147,34 +134,32 @@ if (enqueuedSend.associatedCall != null) {
         }
     }
 
-
     internal fun timeout(call: Call) {
         requestCalls.remove(call.request.tid.contentHashCode())
 
         // don't time out anything if we don't have a connection
         if (call.expectedID != null) {
             routingTable.onTimeout(
-                call.expectedID
+                call.expectedID,
             )
         }
     }
 
     internal suspend fun ping(request: PingRequest) {
-
         // ignore requests we get from ourselves
         if (isLocalId(request.id)) {
             return
         }
 
-        val rsp = PingResponse(
-            address = request.address,
-            id = nodeId,
-            tid = request.tid,
-            ip = request.address.encoded()
-        )
+        val rsp =
+            PingResponse(
+                address = request.address,
+                id = nodeId,
+                tid = request.tid,
+                ip = request.address.encoded(),
+            )
 
         sendMessage(rsp)
-
     }
 
     internal suspend fun findNode(request: FindNodeRequest) {
@@ -185,24 +170,24 @@ if (enqueuedSend.associatedCall != null) {
 
         val entries = routingTable.closestPeers(request.target, 8)
 
-        val response = FindNodeResponse(
-            address = request.address,
-            id = nodeId,
-            tid = request.tid,
-            ip = request.address.encoded(),
-            nodes = entries.filter { peer: Peer ->
-                peer.address.address.address.size == 4
-            },
-            nodes6 = entries.filter { peer: Peer ->
-                peer.address.address.address.size == 16
-            }
-        )
+        val response =
+            FindNodeResponse(
+                address = request.address,
+                id = nodeId,
+                tid = request.tid,
+                ip = request.address.encoded(),
+                nodes =
+                    entries.filter { peer: Peer ->
+                        peer.address.address.address.size == 4
+                    },
+                nodes6 =
+                    entries.filter { peer: Peer ->
+                        peer.address.address.address.size == 16
+                    },
+            )
 
         sendMessage(response)
-
-
     }
-
 
     internal suspend fun getPeers(request: GetPeersRequest) {
         // ignore requests we get from ourselves
@@ -215,35 +200,37 @@ if (enqueuedSend.associatedCall != null) {
         // generate a token
         var token: ByteArray? = null
 
-        if (database.insertForKeyAllowed(request.infoHash)) token =
-            tokenManager.generateToken(
-                request.id,
-                request.address.address.address,
-                request.address.port.toUShort(),
-                request.infoHash
-            )
-
+        if (database.insertForKeyAllowed(request.infoHash)) {
+            token =
+                tokenManager.generateToken(
+                    request.id,
+                    request.address.address.address,
+                    request.address.port.toUShort(),
+                    request.infoHash,
+                )
+        }
 
         val entries = routingTable.closestPeers(request.infoHash, 8)
 
-
-        val resp = GetPeersResponse(
-            address = request.address,
-            id = nodeId,
-            tid = request.tid,
-            ip = request.address.encoded(),
-            token = token,
-            nodes = entries.filter { peer: Peer ->
-                peer.address.address.address.size == 4
-            },
-            nodes6 = entries.filter { peer: Peer ->
-                peer.address.address.address.size == 16
-            },
-            values = values
-        )
+        val resp =
+            GetPeersResponse(
+                address = request.address,
+                id = nodeId,
+                tid = request.tid,
+                ip = request.address.encoded(),
+                token = token,
+                nodes =
+                    entries.filter { peer: Peer ->
+                        peer.address.address.address.size == 4
+                    },
+                nodes6 =
+                    entries.filter { peer: Peer ->
+                        peer.address.address.address.size == 16
+                    },
+                values = values,
+            )
 
         sendMessage(resp)
-
     }
 
     internal suspend fun get(request: GetRequest) {
@@ -252,38 +239,42 @@ if (enqueuedSend.associatedCall != null) {
             return
         }
 
-
         // generate a token
         var token: ByteArray? = null
-        if (database.insertForKeyAllowed(request.target)) token =
-            tokenManager.generateToken(
-                request.id,
-                request.address.address.address,
-                request.address.port.toUShort(),
-                request.target
-            )
-
+        if (database.insertForKeyAllowed(request.target)) {
+            token =
+                tokenManager.generateToken(
+                    request.id,
+                    request.address.address.address,
+                    request.address.port.toUShort(),
+                    request.target,
+                )
+        }
 
         val entries = routingTable.closestPeers(request.target, 8)
 
-
-        val resp = GetResponse(
-            address = request.address,
-            id = nodeId,
-            tid = request.tid,
-            ip = request.address.encoded(),
-            token = token,
-            nodes = entries.filter { peer: Peer ->
-                peer.address.address.address.size == 4
-            },
-            nodes6 = entries.filter { peer: Peer ->
-                peer.address.address.address.size == 16
-            },
-            null, null, null, null // TODO [Low Priority]
-        )
+        val resp =
+            GetResponse(
+                address = request.address,
+                id = nodeId,
+                tid = request.tid,
+                ip = request.address.encoded(),
+                token = token,
+                nodes =
+                    entries.filter { peer: Peer ->
+                        peer.address.address.address.size == 4
+                    },
+                nodes6 =
+                    entries.filter { peer: Peer ->
+                        peer.address.address.address.size == 16
+                    },
+                null,
+                null,
+                null,
+                null, // TODO [Low Priority]
+            )
 
         sendMessage(resp)
-
     }
 
     internal suspend fun put(request: PutRequest) {
@@ -302,30 +293,30 @@ if (enqueuedSend.associatedCall != null) {
                 request.id,
                 request.address.address.address,
                 request.address.port.toUShort(),
-                sha1(data)
+                sha1(data),
             )
         ) {
             sendError(
-                request, PROTOCOL_ERROR,
+                request,
+                PROTOCOL_ERROR,
                 "Invalid Token; tokens expire after " + TOKEN_TIMEOUT + "ms; " +
-                        "only valid for the IP/port to which it was issued;" +
-                        " only valid for the info hash for which it was issued"
+                    "only valid for the IP/port to which it was issued;" +
+                    " only valid for the info hash for which it was issued",
             )
             return
         }
 
         // Note: right now no data is stored (someday in the future, when server is supported)
 
-
         // send a proper response to indicate everything is OK
-        val rsp = PutResponse(
-            address = request.address,
-            id = nodeId,
-            tid = request.tid,
-            ip = request.address.encoded()
-        )
+        val rsp =
+            PutResponse(
+                address = request.address,
+                id = nodeId,
+                tid = request.tid,
+                ip = request.address.encoded(),
+            )
         sendMessage(rsp)
-
     }
 
     internal suspend fun announce(request: AnnounceRequest) {
@@ -340,50 +331,54 @@ if (enqueuedSend.associatedCall != null) {
                 request.id,
                 request.address.address.address,
                 request.address.port.toUShort(),
-                request.infoHash
+                request.infoHash,
             )
         ) {
             sendError(
-                request, PROTOCOL_ERROR,
+                request,
+                PROTOCOL_ERROR,
                 "Invalid Token; tokens expire after " + TOKEN_TIMEOUT + "ms; " +
-                        "only valid for the IP/port to which it was issued;" +
-                        " only valid for the info hash for which it was issued"
+                    "only valid for the IP/port to which it was issued;" +
+                    " only valid for the info hash for which it was issued",
             )
             return
         }
 
         // everything OK, so store the value
-        
 
         database.store(request.infoHash, request.address)
 
-
         // send a proper response to indicate everything is OK
-        val rsp = AnnounceResponse(
-            address = request.address,
-            id = nodeId,
-            tid = request.tid,
-            ip = request.address.encoded()
-        )
+        val rsp =
+            AnnounceResponse(
+                address = request.address,
+                id = nodeId,
+                tid = request.tid,
+                ip = request.address.encoded(),
+            )
         sendMessage(rsp)
-
     }
 
-
-    internal suspend fun sendError(origMsg: Message, code: Int, msg: String) {
+    internal suspend fun sendError(
+        origMsg: Message,
+        code: Int,
+        msg: String,
+    ) {
         sendMessage(
             Error(
                 address = origMsg.address,
                 id = nodeId,
                 tid = origMsg.tid,
                 code = code,
-                message = msg.encodeToByteArray()
-            )
+                message = msg.encodeToByteArray(),
+            ),
         )
     }
 
-
-    internal fun recieved(msg: Message, associatedCall: Call?) {
+    internal fun recieved(
+        msg: Message,
+        associatedCall: Call?,
+    ) {
         val ip = msg.address
         val id = msg.id
 
@@ -421,7 +416,6 @@ if (enqueuedSend.associatedCall != null) {
             return
         }
 
-
         val entryById = routingTable.findPeerById(id)
 
         // entry is claiming the same ID as entry with different IP in our routing table -> ignore
@@ -435,7 +429,6 @@ if (enqueuedSend.associatedCall != null) {
         // throttle the insert-attempts for unsolicited requests, update-only once they exceed the threshold
         // does not apply to responses
         if (associatedCall == null && updateAndCheckThrottle(newEntry.address)) {
-
             routingTable.refresh(newEntry)
             return
         }
@@ -444,11 +437,9 @@ if (enqueuedSend.associatedCall != null) {
             newEntry.signalResponse()
         }
 
-
         if (!nodeId.contentEquals(newEntry.id)) {
             routingTable.insertOrRefresh(newEntry)
         }
-
 
         // we already should have the bucket. might be an old one by now due to splitting,
         // but it doesn't matter, we just need to update the entry, which should stay the
@@ -464,44 +455,44 @@ if (enqueuedSend.associatedCall != null) {
      * @return true if it should be throttled
      */
     private fun updateAndCheckThrottle(addr: InetSocketAddress): Boolean {
-
         val oldValue: Long? = unsolicitedThrottle[addr]
-        val newValue: Long = if (oldValue == null) {
-            THROTTLE_INCREMENT
-        } else {
-            min((oldValue + THROTTLE_INCREMENT), THROTTLE_SATURATION)
-        }
+        val newValue: Long =
+            if (oldValue == null) {
+                THROTTLE_INCREMENT
+            } else {
+                min((oldValue + THROTTLE_INCREMENT), THROTTLE_SATURATION)
+            }
         unsolicitedThrottle[addr] = newValue
 
         return (newValue - THROTTLE_INCREMENT) > THROTTLE_THRESHOLD
     }
 
-
-    internal fun isLocalId(id: ByteArray): Boolean {
-        return nodeId.contentEquals(id)
-    }
-
+    internal fun isLocalId(id: ByteArray): Boolean = nodeId.contentEquals(id)
 
     internal suspend fun doRequestCall(call: Call) {
         requestCalls[call.request.tid.contentHashCode()] = call
         send(EnqueuedSend(call.request, call))
     }
 
-
-    internal suspend fun ping(address: InetSocketAddress, id: ByteArray?) {
+    internal suspend fun ping(
+        address: InetSocketAddress,
+        id: ByteArray?,
+    ) {
         val tid = createRandomKey(TID_LENGTH)
-        val pr = PingRequest(
-            address = address,
-            id = nodeId,
-            tid = tid,
-            ro = readOnlyState
-        )
+        val pr =
+            PingRequest(
+                address = address,
+                id = nodeId,
+                tid = tid,
+                ro = readOnlyState,
+            )
         doRequestCall(Call(pr, id)) // expectedId can not be available (only address is known)
     }
 
-
-    private suspend fun handlePacket(reader: BEReader, address: InetSocketAddress) {
-
+    private suspend fun handlePacket(
+        reader: BEReader,
+        address: InetSocketAddress,
+    ) {
         val map: Map<String, BEObject>
         try {
             map = (reader.decodeBencode() as BEMap).toMap()
@@ -522,7 +513,6 @@ if (enqueuedSend.associatedCall != null) {
 
         // just respond to incoming requests, no need to match them to pending requests
         if (msg is Request) {
-
             // if readOnlyState is true we are in "Read-Only State"
             // It no longer responds to 'query' messages that it receives,
             // that is messages containing a 'q' flag in the top-level dictionary.
@@ -543,7 +533,6 @@ if (enqueuedSend.associatedCall != null) {
         // check if this is a response to an outstanding request
         val call = requestCalls[msg.tid.contentHashCode()]
 
-
         // message matches transaction ID and origin == destination
         if (call != null) {
             // we only check the IP address here. the routing table applies more strict
@@ -553,13 +542,10 @@ if (enqueuedSend.associatedCall != null) {
 
                 requestCalls.remove(msg.tid.contentHashCode())
 
-
                 call.response(msg)
-
 
                 // apply after checking for a proper response
                 if (msg is Response) {
-
                     recieved(msg, call)
                 }
                 return
@@ -576,25 +562,28 @@ if (enqueuedSend.associatedCall != null) {
             // -> ignore response
 
             debug(
-                "tid matched, socket address did not, ignoring message, request: "
-                        + call.request.address + " -> response: " + msg.address
+                "tid matched, socket address did not, ignoring message, request: " +
+                    call.request.address + " -> response: " + msg.address,
             )
-
 
             if (msg !is Error) {
                 // this is more likely due to incorrect binding implementation in ipv6. notify peers about that
                 // don't bother with ipv4, there are too many complications
-                val err: Message = Error(
-                    address = call.request.address,
-                    id = nodeId,
-                    tid = msg.tid,
-                    code = GENERIC_ERROR,
-                    message = ("A request was sent to " + call.request.address +
-                            " and a response with matching transaction id was received from "
-                            + msg.address + " . Multihomed nodes should ensure that sockets are " +
-                            "properly bound and responses are sent with the " +
-                            "correct source socket address. See BEPs 32 and 45.").encodeToByteArray()
-                )
+                val err: Message =
+                    Error(
+                        address = call.request.address,
+                        id = nodeId,
+                        tid = msg.tid,
+                        code = GENERIC_ERROR,
+                        message =
+                            (
+                                "A request was sent to " + call.request.address +
+                                    " and a response with matching transaction id was received from " +
+                                    msg.address + " . Multihomed nodes should ensure that sockets are " +
+                                    "properly bound and responses are sent with the " +
+                                    "correct source socket address. See BEPs 32 and 45."
+                            ).encodeToByteArray(),
+                    )
 
                 sendMessage(err)
             }
@@ -611,23 +600,29 @@ if (enqueuedSend.associatedCall != null) {
         // it's not a stray from a restart
         // -> did not expect this response
         if (msg is Response) {
-
-            val err = Error(
-                address = msg.address,
-                id = nodeId,
-                tid = msg.tid,
-                code = SERVER_ERROR,
-                message = ("received a response message whose transaction ID did not " +
-                        "match a pending request or transaction expired").encodeToByteArray()
-            )
+            val err =
+                Error(
+                    address = msg.address,
+                    id = nodeId,
+                    tid = msg.tid,
+                    code = SERVER_ERROR,
+                    message =
+                        (
+                            "received a response message whose transaction ID did not " +
+                                "match a pending request or transaction expired"
+                        ).encodeToByteArray(),
+                )
             sendMessage(err)
             return
         }
 
-
         if (msg is Error) {
             val b = StringBuilder()
-            b.append(" [").append(msg.code).append("] from: ").append(msg.address)
+            b
+                .append(" [")
+                .append(msg.code)
+                .append("] from: ")
+                .append(msg.address)
             b.append(" Message: \"").append(msg.message.contentToString()).append("\"")
             debug("ErrorMessage $b")
             return
@@ -636,7 +631,6 @@ if (enqueuedSend.associatedCall != null) {
         debug("not sure how to handle message $msg")
     }
 
-
     internal suspend fun sendMessage(msg: Message) {
         requireNotNull(msg.address) { "message destination must not be null" }
 
@@ -644,10 +638,12 @@ if (enqueuedSend.associatedCall != null) {
     }
 }
 
-internal data class EnqueuedSend(val message: Message, val associatedCall: Call?)
+internal data class EnqueuedSend(
+    val message: Message,
+    val associatedCall: Call?,
+)
 
 internal const val TID_LENGTH = 6
-
 
 // haven't seen it for a long time + timeout == evict sooner than pure timeout
 // based threshold. e.g. for old entries that we haven't touched for a long time
@@ -698,9 +694,11 @@ internal const val THROTTLE_INCREMENT: Long = 10
 internal const val THROTTLE_SATURATION: Long = 60
 internal const val THROTTLE_THRESHOLD: Long = 30
 
-
 // returns the newer timestamp
-internal fun newerTimeMark(mark: ValueTimeMark?, cmp: ValueTimeMark?): ValueTimeMark? {
+internal fun newerTimeMark(
+    mark: ValueTimeMark?,
+    cmp: ValueTimeMark?,
+): ValueTimeMark? {
     if (mark == null) {
         return cmp
     }
@@ -712,8 +710,10 @@ internal fun newerTimeMark(mark: ValueTimeMark?, cmp: ValueTimeMark?): ValueTime
     return if (markElapsed < cmpElapsed) mark else cmp
 }
 
-
-internal fun mismatch(a: ByteArray, b: ByteArray): Int {
+internal fun mismatch(
+    a: ByteArray,
+    b: ByteArray,
+): Int {
     val min = min(a.size, b.size)
     for (i in 0 until min) {
         if (a[i] != b[i]) return i
@@ -722,11 +722,10 @@ internal fun mismatch(a: ByteArray, b: ByteArray): Int {
     return if (a.size == b.size) -1 else min
 }
 
-
 suspend fun newNott(
     nodeId: ByteArray,
     port: Int = 0,
-    bootstrap: Set<InetSocketAddress> = defaultBootstrap()
+    bootstrap: Set<InetSocketAddress> = defaultBootstrap(),
 ): Nott {
     val nott = Nott(nodeId, port = port, bootstrap = bootstrap)
     nott.startup()
@@ -747,7 +746,6 @@ fun nodeId(): ByteArray {
     return Random.nextBytes(id, 8)
 }
 
-
 fun defaultBootstrap(): Set<InetSocketAddress> {
     val result = mutableSetOf<InetSocketAddress>()
 
@@ -759,7 +757,10 @@ fun defaultBootstrap(): Set<InetSocketAddress> {
 }
 
 @Suppress("SameParameterValue")
-private fun allByName(hostname: String, port: Int): Set<InetSocketAddress> {
+private fun allByName(
+    hostname: String,
+    port: Int,
+): Set<InetSocketAddress> {
     val result = mutableSetOf<InetSocketAddress>()
     try {
         val inets = InetAddress.getAllByName(hostname)
@@ -778,18 +779,18 @@ fun sha1(bytes: ByteArray): ByteArray {
     return digest.digest()
 }
 
-
-internal fun createRandomKey(length: Int): ByteArray {
-    return Random.nextBytes(ByteArray(length))
-}
+internal fun createRandomKey(length: Int): ByteArray = Random.nextBytes(ByteArray(length))
 
 /**
  * Compares the distance of two keys relative to this one using the XOR metric
  *
  * @return -1 if h1 is closer to this key, 0 if h1 and h2 are equidistant, 1 if h2 is closer
  */
-internal fun threeWayDistance(h0: ByteArray, h1: ByteArray, h2: ByteArray): Int {
-
+internal fun threeWayDistance(
+    h0: ByteArray,
+    h1: ByteArray,
+    h2: ByteArray,
+): Int {
     val mmi = mismatch(h1, h2)
     if (mmi == -1) return 0
 
@@ -819,7 +820,6 @@ internal fun debug(throwable: Throwable) {
         throwable.printStackTrace()
     }
 }
-
 
 internal fun InetSocketAddress.encoded(): ByteArray {
     val buffer = Buffer()

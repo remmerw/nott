@@ -5,10 +5,8 @@ import io.github.remmerw.buri.BEList
 import io.github.remmerw.buri.BEMap
 import io.github.remmerw.buri.BEObject
 import io.github.remmerw.buri.BEString
-import io.github.remmerw.buri.bencode
 import kotlinx.io.Buffer
 import kotlinx.io.readByteArray
-import kotlinx.io.readUShort
 import kotlinx.io.writeUShort
 import java.net.InetAddress
 import java.net.InetSocketAddress
@@ -16,16 +14,16 @@ import java.nio.ByteBuffer
 
 private fun parseError(
     address: InetSocketAddress,
-    map: Map<String, BEObject>
+    map: Map<String, BEObject>,
 ): Message {
     val error = map[Names.E]
-
 
     var errorCode = 0
     var errorMsg: String? = null
 
-    if (error is BEString) errorMsg = stringGet(error)
-    else if (error is BEList) {
+    if (error is BEString) {
+        errorMsg = stringGet(error)
+    } else if (error is BEList) {
         val errmap = error.toList()
         try {
             errorCode = (errmap[0] as BEInteger).toInt()
@@ -50,33 +48,27 @@ private fun parseError(
         id = id,
         tid = tid,
         code = errorCode,
-        message = errorMsg.encodeToByteArray()
+        message = errorMsg.encodeToByteArray(),
     )
 }
 
-private fun extractNodes6(
-    args: Map<String, BEObject>
-): List<Peer> {
+private fun extractNodes6(args: Map<String, BEObject>): List<Peer> {
     val raw = arrayGet(args[Names.NODES6]) ?: return emptyList()
     require(raw.size % NODE_ENTRY_LENGTH_IPV6 == 0) {
         "expected length to be a multiple of " +
-                NODE_ENTRY_LENGTH_IPV6 + ", received " + raw.size
+            NODE_ENTRY_LENGTH_IPV6 + ", received " + raw.size
     }
     return readBuckets(raw, ADDRESS_LENGTH_IPV6)
 }
 
-
-private fun extractNodes(
-    args: Map<String, BEObject>
-): List<Peer> {
+private fun extractNodes(args: Map<String, BEObject>): List<Peer> {
     val raw = arrayGet(args[Names.NODES]) ?: return emptyList()
     require(raw.size % NODE_ENTRY_LENGTH_IPV4 == 0) {
         "expected length to be a multiple of " +
-                NODE_ENTRY_LENGTH_IPV4 + ", received " + raw.size
+            NODE_ENTRY_LENGTH_IPV4 + ", received " + raw.size
     }
     return readBuckets(raw, ADDRESS_LENGTH_IPV4)
 }
-
 
 internal fun writeBuckets(list: List<Peer>): ByteArray {
     val buffer = Buffer()
@@ -88,7 +80,10 @@ internal fun writeBuckets(list: List<Peer>): ByteArray {
     return buffer.readByteArray()
 }
 
-internal fun readBuckets(src: ByteArray, length: Int): List<Peer> {
+internal fun readBuckets(
+    src: ByteArray,
+    length: Int,
+): List<Peer> {
     val buffer = ByteBuffer.wrap(src)
 
     val result = mutableListOf<Peer>()
@@ -100,13 +95,14 @@ internal fun readBuckets(src: ByteArray, length: Int): List<Peer> {
         val port = buffer.getShort().toUShort()
         if (port > 0.toUShort() && port <= 65535.toUShort()) {
             try {
-                val peer = Peer(
-                    rawId,
-                    InetSocketAddress(
-                        InetAddress.getByAddress(raw),
-                        port.toInt()
+                val peer =
+                    Peer(
+                        rawId,
+                        InetSocketAddress(
+                            InetAddress.getByAddress(raw),
+                            port.toInt(),
+                        ),
                     )
-                )
                 result.add(peer)
             } catch (throwable: Throwable) {
                 debug(throwable)
@@ -115,7 +111,6 @@ internal fun readBuckets(src: ByteArray, length: Int): List<Peer> {
     }
     return result
 }
-
 
 internal fun parseMessage(
     address: InetSocketAddress,
@@ -147,11 +142,12 @@ internal fun parseMessage(
             null
         }
     }
-
 }
 
-private fun parseRequest(address: InetSocketAddress, map: Map<String, BEObject>): Message? {
-
+private fun parseRequest(
+    address: InetSocketAddress,
+    map: Map<String, BEObject>,
+): Message? {
     val ro = roGet(map[Names.RO])
     val tid = arrayGet(map[Names.T])
     checkNotNull(tid) { "missing transaction ID in request" }
@@ -168,12 +164,13 @@ private fun parseRequest(address: InetSocketAddress, map: Map<String, BEObject>)
     val requestMethod = stringGet(map[Names.Q])
 
     return when (requestMethod) {
-        Names.PING -> PingRequest(
-            address = address,
-            id = id,
-            tid = tid,
-            ro = ro
-        )
+        Names.PING ->
+            PingRequest(
+                address = address,
+                id = id,
+                tid = tid,
+                ro = ro,
+            )
 
         Names.FIND_NODE -> {
             val target = arrayGet(args[Names.TARGET])
@@ -193,13 +190,12 @@ private fun parseRequest(address: InetSocketAddress, map: Map<String, BEObject>)
                 id = id,
                 tid = tid,
                 ro = ro,
-                target = target
+                target = target,
             )
         }
 
         Names.GET_PEERS -> {
             val infoHash = arrayGet(args[Names.INFO_HASH])
-
 
             if (infoHash == null) {
                 debug("missing/invalid target key in request")
@@ -215,7 +211,7 @@ private fun parseRequest(address: InetSocketAddress, map: Map<String, BEObject>)
                 id = id,
                 tid = tid,
                 ro = ro,
-                infoHash = infoHash
+                infoHash = infoHash,
             )
         }
 
@@ -240,7 +236,7 @@ private fun parseRequest(address: InetSocketAddress, map: Map<String, BEObject>)
                 tid = tid,
                 ro = ro,
                 target = target,
-                seq = seq
+                seq = seq,
             )
         }
 
@@ -253,7 +249,7 @@ private fun parseRequest(address: InetSocketAddress, map: Map<String, BEObject>)
 
             require(!token.isEmpty()) {
                 "zero-length token in announce_peer request. see BEP33 for reasons why " +
-                        "tokens might not have been issued by get_peers response"
+                    "tokens might not have been issued by get_peers response"
             }
 
             val v = args[Names.V]
@@ -279,7 +275,7 @@ private fun parseRequest(address: InetSocketAddress, map: Map<String, BEObject>)
                 k = k,
                 salt = salt,
                 seq = seq,
-                sig = sig
+                sig = sig,
             )
         }
 
@@ -290,11 +286,9 @@ private fun parseRequest(address: InetSocketAddress, map: Map<String, BEObject>)
             }
             require(infoHash.size == SHA1_HASH_LENGTH) { "invalid info_hash" }
 
-
             val port = longGet(args[Names.PORT])
             checkNotNull(port) { "missing port for announce" }
             require(port in 1..65535) { "invalid port" }
-
 
             val token = arrayGet(args[Names.TOKEN])
 
@@ -304,7 +298,7 @@ private fun parseRequest(address: InetSocketAddress, map: Map<String, BEObject>)
 
             require(!token.isEmpty()) {
                 "zero-length token in announce_peer request. see BEP33 for reasons why " +
-                        "tokens might not have been issued by get_peers response"
+                    "tokens might not have been issued by get_peers response"
             }
 
             val name = arrayGet(args[Names.NAME])
@@ -316,9 +310,8 @@ private fun parseRequest(address: InetSocketAddress, map: Map<String, BEObject>)
                 infoHash = infoHash,
                 port = port.toInt(),
                 token = token,
-                name = name
+                name = name,
             )
-
         }
 
         else -> {
@@ -331,7 +324,7 @@ private fun parseRequest(address: InetSocketAddress, map: Map<String, BEObject>)
 private fun parseResponse(
     address: InetSocketAddress,
     map: Map<String, BEObject>,
-    tidMapper: (ByteArray) -> (Request?)
+    tidMapper: (ByteArray) -> (Request?),
 ): Message? {
     val tid = arrayGet(map[Names.T])
 
@@ -348,12 +341,11 @@ private fun parseResponse(
     return parseResponse(address, map, request, tid)
 }
 
-
 private fun parseResponse(
     address: InetSocketAddress,
     map: Map<String, BEObject>,
     request: Request,
-    tid: ByteArray
+    tid: ByteArray,
 ): Message? {
     val inner = map[Names.R]
     if (inner !is BEMap) {
@@ -381,8 +373,17 @@ private fun parseResponse(
             val sec = longGet(args[Names.SEQ])
             val sig = arrayGet(args[Names.SIG])
             return GetResponse(
-                address, id, tid, token, ip,
-                nodes, nodes6, data, k, sec, sig
+                address,
+                id,
+                tid,
+                token,
+                ip,
+                nodes,
+                nodes6,
+                data,
+                k,
+                sec,
+                sig,
             )
         }
 
@@ -402,11 +403,11 @@ private fun parseResponse(
             var vals: List<ByteArray> = listOf()
             val values = args[Names.VALUES]
             if (values != null) {
-                vals = (values as BEList).toList().map {
-                    (it as BEString).toByteArray()
-                }
+                vals =
+                    (values as BEList).toList().map {
+                        (it as BEString).toByteArray()
+                    }
             }
-
 
             if (vals.isNotEmpty()) {
                 for (i in vals.indices) {
@@ -417,15 +418,20 @@ private fun parseResponse(
                             val buffer = vals[i]
 
                             val address: ByteArray = buffer.copyOfRange(0, 4)
-                            val port: UShort = ((buffer[4]
-                                .toInt() and 0xFF) shl 8 or (buffer[5].toInt() and 0xFF)).toUShort()
+                            val port: UShort =
+                                (
+                                    (
+                                        buffer[4]
+                                            .toInt() and 0xFF
+                                    ) shl 8 or (buffer[5].toInt() and 0xFF)
+                                ).toUShort()
 
                             if (port > 0.toUShort() && port <= 65535.toUShort()) {
                                 addresses.add(
                                     InetSocketAddress(
-                        InetAddress.getByAddress(address),
-                        port.toInt()
-                    )
+                                        InetAddress.getByAddress(address),
+                                        port.toInt(),
+                                    ),
                                 )
                             }
                         }
@@ -434,15 +440,20 @@ private fun parseResponse(
                             val buffer = vals[i]
 
                             val address: ByteArray = buffer.copyOfRange(0, 16)
-                            val port: UShort = ((buffer[16]
-                                .toInt() and 0xFF) shl 8 or (buffer[17].toInt() and 0xFF)).toUShort()
+                            val port: UShort =
+                                (
+                                    (
+                                        buffer[16]
+                                            .toInt() and 0xFF
+                                    ) shl 8 or (buffer[17].toInt() and 0xFF)
+                                ).toUShort()
 
                             if (port > 0.toUShort() && port <= 65535.toUShort()) {
                                 addresses.add(
                                     InetSocketAddress(
-                        InetAddress.getByAddress(address),
-                        port.toInt()
-                    )
+                                        InetAddress.getByAddress(address),
+                                        port.toInt(),
+                                    ),
                                 )
                             }
                         }
@@ -455,16 +466,20 @@ private fun parseResponse(
                 }
             }
             return GetPeersResponse(
-                address, id, tid, ip,
-                token, nodes, nodes6, addresses
+                address,
+                id,
+                tid,
+                ip,
+                token,
+                nodes,
+                nodes6,
+                addresses,
             )
         }
-
     }
 
     return msg
 }
-
 
 fun stringGet(beObject: BEObject?): String? {
     if (beObject == null) {

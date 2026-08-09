@@ -6,30 +6,26 @@ import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.test.Test
 import kotlin.time.Duration.Companion.seconds
 
-
 class LookupTest {
-
-
     @Test
-    fun lookupTest(): Unit = runBlocking(Dispatchers.IO) {
+    fun lookupTest(): Unit =
+        runBlocking(Dispatchers.IO) {
+            val key = createRandomKey(SHA1_HASH_LENGTH) // Note: it is a fake key
 
-        val key = createRandomKey(SHA1_HASH_LENGTH) // Note: it is a fake key
+            withTimeoutOrNull(30.seconds) {
+                val nott = newNott(nodeId())
+                try {
+                    val channel =
+                        requestGetPeers(nott, key) {
+                            5000
+                        }
 
-        withTimeoutOrNull(30.seconds) {
-
-            val nott = newNott(nodeId())
-            try {
-                val channel = requestGetPeers(nott, key) {
-                    5000
+                    for (response in channel) {
+                        println("Fake from ${response.peer} " + response.addresses)
+                    }
+                } finally {
+                    nott.shutdown()
                 }
-
-                for (response in channel) {
-                    println("Fake from ${response.peer} " + response.addresses)
-                }
-            } finally {
-                nott.shutdown()
             }
         }
-
-    }
 }

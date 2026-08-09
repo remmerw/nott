@@ -19,7 +19,7 @@ kotlin {
         compileSdk = 37
         minSdk = 27
 
-        withHostTest {  }
+        withHostTest { }
 
         // Opt-in to enable and configure device-side (instrumented) tests
         withDeviceTest {
@@ -27,7 +27,6 @@ kotlin {
             execution = "ANDROIDX_TEST_ORCHESTRATOR"
         }
     }
-
 
     jvm()
     // iosX64()
@@ -59,9 +58,6 @@ kotlin {
         }
     }
 }
-
-
-
 
 mavenPublishing {
     publishToMavenCentral()
@@ -96,4 +92,3 @@ mavenPublishing {
         }
     }
 }
-

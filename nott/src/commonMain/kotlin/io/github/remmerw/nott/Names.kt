@@ -1,6 +1,5 @@
 package io.github.remmerw.nott
 
-
 internal object Names {
     const val ID: String = "id"
     const val A: String = "a"
@@ -31,5 +30,4 @@ internal object Names {
     const val SIG: String = "sig"
     const val K: String = "k"
     const val SALT: String = "salt"
-
 }
