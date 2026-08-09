@@ -32,7 +32,7 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
-        cache: 'maven' # Nutzt 'gradle', falls Ihr Projekt Gradle verwendet
+        cache: 'gradle' # Nutzt 'gradle', falls Ihr Projekt Gradle verwendet
 
     # 2. CodeQL Werkzeuge initialisieren
     - name: Initialize CodeQL
