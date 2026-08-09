@@ -1,6 +1,7 @@
 [versions]
 agp = "9.3.1"
 kotlin = "2.4.10"
+ktlint = "14.2.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -14,4 +15,5 @@ buri = { module = "io.github.remmerw:buri", version = "0.1.5" }
 [plugins]
 androidLibrary = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
 vanniktech-mavenPublish = { id = "com.vanniktech.maven.publish", version = "0.37.0" }
