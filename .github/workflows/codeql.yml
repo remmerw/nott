@@ -45,13 +45,10 @@ jobs:
     # 3. Manueller Build (Ersetzt das fehlerhafte Autobuild)
     # WÄHLEN SIE HIER IHR PASSENDES SYSTEM:
     
-    # Option A: Wenn Ihr Projekt MAVEN nutzt
-    - name: Build with Maven
-      run: mvn clean compile -DskipTests
-
-    # Option B: Wenn Ihr Projekt GRADLE nutzt (Auskommentieren falls nötig)
-    # - name: Build with Gradle
-    #   run: ./gradlew compileJava -x test
+    
+    # Option B: Wenn Ihr Projekt GRADLE nutzt (Auskomment
+    - name: Build with Gradle
+      run: ./gradlew compileJava -x test
 
     # 4. Analyse ausführen und Ergebnisse an GitHub übermitteln
     - name: Perform CodeQL Analysis
