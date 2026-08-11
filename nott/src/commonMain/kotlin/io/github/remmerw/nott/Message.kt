@@ -1,6 +1,7 @@
 package io.github.remmerw.nott
 
 import io.github.remmerw.buri.BEObject
+import io.github.remmerw.buri.Buffer
 import io.github.remmerw.buri.bencode
 import io.github.remmerw.buri.bencodeEof
 import io.github.remmerw.buri.bencodeList
