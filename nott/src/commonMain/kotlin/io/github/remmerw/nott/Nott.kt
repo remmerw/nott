@@ -90,16 +90,17 @@ class Nott(
         take: Int,
     ): Set<Peer> = routingTable.closestPeers(key, take)
 
+    private val buffer = io.github.remmerw.buri.Buffer(UDP_PACKET)
     private suspend fun send(enqueuedSend: EnqueuedSend) {
         mutex.withLock {
-            val buffer = Buffer()
+            buffer.reset()
 
             enqueuedSend.message.encode(buffer)
             val address = enqueuedSend.message.address
 
-            val data = buffer.readByteArray()
+            val data = buffer.data
 
-            val datagram = DatagramPacket(data, data.size, address)
+            val datagram = DatagramPacket(data, data.length, address)
 
             try {
                 socket.send(datagram)
@@ -112,7 +113,7 @@ class Nott(
                     enqueuedSend.associatedCall.injectError()
                     timeout(enqueuedSend.associatedCall)
                 }
-            }
+            } 
         }
     }
 
