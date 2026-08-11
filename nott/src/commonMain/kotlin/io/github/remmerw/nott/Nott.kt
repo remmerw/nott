@@ -56,13 +56,9 @@ class Nott(
     fun startup() {
         scope.launch {
             try {
-                val udpPacketSize = UDP_PACKET
-
-                val data = ByteArray(udpPacketSize)
-
+                val data = ByteArray(UDP_PACKET)
+                val packet = DatagramPacket(data, UDP_PACKET)
                 while (isActive) {
-                    val packet = DatagramPacket(data, udpPacketSize)
-
                     socket.receive(packet)
 
                     val inet = InetSocketAddress(packet.address, packet.port)
