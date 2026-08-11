@@ -90,14 +90,16 @@ class Nott(
         take: Int,
     ): Set<Peer> = routingTable.closestPeers(key, take)
 
-    private val buffer = io.github.remmerw.buri.Buffer(UDP_PACKET)
+    private val buffer =
+        io.github.remmerw.buri
+            .Buffer(UDP_PACKET)
+
     private suspend fun send(enqueuedSend: EnqueuedSend) {
         mutex.withLock {
             buffer.reset()
 
             enqueuedSend.message.encode(buffer)
             val address = enqueuedSend.message.address
-
 
             val datagram = DatagramPacket(buffer.data, buffer.length, address)
 
@@ -112,7 +114,7 @@ class Nott(
                     enqueuedSend.associatedCall.injectError()
                     timeout(enqueuedSend.associatedCall)
                 }
-            } 
+            }
         }
     }
 
@@ -643,7 +645,7 @@ internal data class EnqueuedSend(
 // limited by the Maximum Transmission Unit (MTU) of the network, and is
 // often around 1400 bytes. This is smaller than the theoretical maximum
 // of 65535 bytes for UDP packets.
-             
+
 internal const val UDP_PACKET = 1400
 
 internal const val TID_LENGTH = 6
