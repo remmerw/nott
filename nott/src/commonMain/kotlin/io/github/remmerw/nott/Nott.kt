@@ -56,11 +56,7 @@ class Nott(
     fun startup() {
         scope.launch {
             try {
-                // The maximum UDP packet size for the BitTorrent Mainline DHT is typically
-                // limited by the Maximum Transmission Unit (MTU) of the network, and is
-                // often around 1400 bytes. This is smaller than the theoretical maximum
-                // of 65535 bytes for UDP packets.
-                val udpPacketSize = 1400
+                val udpPacketSize = UDP_PACKET
 
                 val data = ByteArray(udpPacketSize)
 
@@ -642,6 +638,13 @@ internal data class EnqueuedSend(
     val message: Message,
     val associatedCall: Call?,
 )
+
+// The maximum UDP packet size for the BitTorrent Mainline DHT is typically
+// limited by the Maximum Transmission Unit (MTU) of the network, and is
+// often around 1400 bytes. This is smaller than the theoretical maximum
+// of 65535 bytes for UDP packets.
+             
+internal const val UDP_PACKET = 1400
 
 internal const val TID_LENGTH = 6
 
