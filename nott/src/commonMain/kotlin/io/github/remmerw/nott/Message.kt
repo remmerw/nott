@@ -7,7 +7,6 @@ import io.github.remmerw.buri.bencodeEof
 import io.github.remmerw.buri.bencodeList
 import io.github.remmerw.buri.bencodeMap
 import io.github.remmerw.buri.bencodeMapKey
-import kotlinx.io.Sink
 import java.net.InetSocketAddress
 
 internal sealed interface Message {
@@ -15,7 +14,7 @@ internal sealed interface Message {
     val id: ByteArray
     val tid: ByteArray
 
-    fun encode(sink: Sink)
+    fun encode(sink: Buffer)
 }
 
 internal sealed interface Response : Message {
@@ -42,7 +41,7 @@ internal data class AnnounceRequest(
     val token: ByteArray,
     val name: ByteArray?,
 ) : Request {
-    override fun encode(sink: Sink) {
+    override fun encode(sink: Buffer) {
         sink.bencodeMap() // new map
 
         sink.bencodeMapKey(Names.A)
@@ -84,7 +83,7 @@ internal data class AnnounceResponse(
     override val tid: ByteArray,
     override val ip: ByteArray?,
 ) : Response {
-    override fun encode(sink: Sink) {
+    override fun encode(sink: Buffer) {
         sink.bencodeMap() // new map
 
         sink.bencodeMapKey(Names.R)
@@ -111,7 +110,7 @@ internal data class Error(
     val code: Int,
     val message: ByteArray,
 ) : Message {
-    override fun encode(sink: Sink) {
+    override fun encode(sink: Buffer) {
         sink.bencodeMap()
 
         sink.bencodeMapKey(Names.E)
@@ -138,7 +137,7 @@ internal data class FindNodeRequest(
     override val ro: Boolean,
     val target: ByteArray,
 ) : Request {
-    override fun encode(sink: Sink) {
+    override fun encode(sink: Buffer) {
         sink.bencodeMap() // new map
 
         sink.bencodeMapKey(Names.A)
@@ -176,7 +175,7 @@ internal data class FindNodeResponse(
     override val nodes: List<Peer>,
     override val nodes6: List<Peer>,
 ) : NodesResponse {
-    override fun encode(sink: Sink) {
+    override fun encode(sink: Buffer) {
         sink.bencodeMap() // new map
 
         sink.bencodeMapKey(Names.R)
@@ -216,7 +215,7 @@ internal data class GetPeersRequest(
     override val ro: Boolean,
     val infoHash: ByteArray,
 ) : Request {
-    override fun encode(sink: Sink) {
+    override fun encode(sink: Buffer) {
         sink.bencodeMap() // new map
 
         sink.bencodeMapKey(Names.A)
@@ -256,7 +255,7 @@ internal data class GetPeersResponse(
     override val nodes6: List<Peer>,
     val values: List<InetSocketAddress>,
 ) : NodesResponse {
-    override fun encode(sink: Sink) {
+    override fun encode(sink: Buffer) {
         sink.bencodeMap() // new map
 
         sink.bencodeMapKey(Names.R)
@@ -308,7 +307,7 @@ internal data class PingRequest(
     override val tid: ByteArray,
     override val ro: Boolean,
 ) : Request {
-    override fun encode(sink: Sink) {
+    override fun encode(sink: Buffer) {
         sink.bencodeMap() // new map
 
         sink.bencodeMapKey(Names.A)
@@ -342,7 +341,7 @@ internal data class PingResponse(
     override val tid: ByteArray,
     override val ip: ByteArray?,
 ) : Response {
-    override fun encode(sink: Sink) {
+    override fun encode(sink: Buffer) {
         sink.bencodeMap() // new map
 
         sink.bencodeMapKey(Names.R)
@@ -380,7 +379,7 @@ internal data class PutRequest(
     val seq: Long?,
     val sig: ByteArray?,
 ) : Request {
-    override fun encode(sink: Sink) {
+    override fun encode(sink: Buffer) {
         sink.bencodeMap()
 
         sink.bencodeMapKey(Names.A)
@@ -438,7 +437,7 @@ internal data class PutResponse(
     override val tid: ByteArray,
     override val ip: ByteArray?,
 ) : Response {
-    override fun encode(sink: Sink) {
+    override fun encode(sink: Buffer) {
         sink.bencodeMap() // new map
 
         sink.bencodeMapKey(Names.R)
@@ -471,7 +470,7 @@ internal data class GetRequest(
     val target: ByteArray,
     val seq: Long?,
 ) : Request {
-    override fun encode(sink: Sink) {
+    override fun encode(sink: Buffer) {
         sink.bencodeMap() // new map
 
         sink.bencodeMapKey(Names.A)
@@ -518,7 +517,7 @@ internal data class GetResponse(
     val seq: Long?,
     val sig: ByteArray?,
 ) : NodesResponse {
-    override fun encode(sink: Sink) {
+    override fun encode(sink: Buffer) {
         sink.bencodeMap() // new map
 
         sink.bencodeMapKey(Names.R)
