@@ -98,9 +98,8 @@ class Nott(
             enqueuedSend.message.encode(buffer)
             val address = enqueuedSend.message.address
 
-            val data = buffer.data
 
-            val datagram = DatagramPacket(data, data.length, address)
+            val datagram = DatagramPacket(buffer.data, buffer.length, address)
 
             try {
                 socket.send(datagram)
