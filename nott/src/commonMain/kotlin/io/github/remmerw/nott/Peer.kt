@@ -58,7 +58,7 @@ internal class Peer(
 }
 
 internal fun InetSocketAddress.encoded(): ByteArray {
-    val data = this.address.addres
+    val data = this.address.address
     
     return ByteBuffer
                 .allocate(data.size + 2)
