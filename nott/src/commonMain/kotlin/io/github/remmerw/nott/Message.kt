@@ -186,11 +186,11 @@ internal data class FindNodeResponse(
         sink.bencode(id)
         if (nodes.isNotEmpty()) {
             sink.bencodeMapKey(Names.NODES)
-            sink.bencode(writeBuckets(nodes))
+            sink.bencodePeers(nodes, NODES_ENTRY_LENGTH_IPV4)
         }
         if (nodes6.isNotEmpty()) {
             sink.bencodeMapKey(Names.NODES6)
-            sink.bencode(writeBuckets(nodes6))
+            sink.bencodePeers(nodes6, NODES_ENTRY_LENGTH_IPV6)
         }
         sink.bencodeEof() // end map
 
