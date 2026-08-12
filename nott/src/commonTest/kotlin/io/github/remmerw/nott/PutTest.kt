@@ -1,7 +1,6 @@
 package io.github.remmerw.nott
 
 import io.github.remmerw.borr.Ed25519Sign
-import io.github.remmerw.buri.BEString
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
