@@ -186,11 +186,11 @@ internal data class FindNodeResponse(
         sink.bencode(id)
         if (nodes.isNotEmpty()) {
             sink.bencodeMapKey(Names.NODES)
-            sink.bencodePeers(nodes, NODES_ENTRY_LENGTH_IPV4)
+            sink.bencodePeers(nodes, NODE_ENTRY_LENGTH_IPV4)
         }
         if (nodes6.isNotEmpty()) {
             sink.bencodeMapKey(Names.NODES6)
-            sink.bencodePeers(nodes6, NODES_ENTRY_LENGTH_IPV6)
+            sink.bencodePeers(nodes6, NODE_ENTRY_LENGTH_IPV6)
         }
         sink.bencodeEof() // end map
 
@@ -270,13 +270,12 @@ internal data class GetPeersResponse(
         }
         if (nodes.isNotEmpty()) {
             sink.bencodeMapKey(Names.NODES)
-            sink.bencode(writeBuckets(nodes))
+            sink.bencodePeers(nodes, NODE_ENTRY_LENGTH_IPV4)
         }
         if (nodes6.isNotEmpty()) {
             sink.bencodeMapKey(Names.NODES6)
-            sink.bencode(writeBuckets(nodes6))
+            sink.bencodePeers(nodes6, NODE_ENTRY_LENGTH_IPV6)
         }
-
         if (values.isNotEmpty()) {
             sink.bencodeMapKey(Names.VALUES)
             sink.bencodeList()
@@ -532,13 +531,12 @@ internal data class GetResponse(
         }
         if (nodes.isNotEmpty()) {
             sink.bencodeMapKey(Names.NODES)
-            sink.bencode(writeBuckets(nodes))
+            sink.bencodePeers(nodes, NODE_ENTRY_LENGTH_IPV4)
         }
         if (nodes6.isNotEmpty()) {
             sink.bencodeMapKey(Names.NODES6)
-            sink.bencode(writeBuckets(nodes6))
+            sink.bencodePeers(nodes6, NODE_ENTRY_LENGTH_IPV6)
         }
-
         if (v != null) {
             sink.bencodeMapKey(Names.V)
             sink.bencode(v)
