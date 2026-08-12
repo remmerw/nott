@@ -239,7 +239,7 @@ private fun parseRequest(
                     "tokens might not have been issued by get_peers response"
             }
 
-            val v = args[Names.V]
+            val v = arrayGet(args[Names.V])
 
             require(v != null) {
                 "missing or invalid mandatory arguments (v) for put"
@@ -355,7 +355,7 @@ private fun parseResponse(
             val token = arrayGet(args[Names.TOKEN])
             val nodes6 = extractNodes6(args)
             val nodes = extractNodes(args)
-            val data = args[Names.V]
+            val v = arrayGet(args[Names.V])
             val k = arrayGet(args[Names.K])
             val sec = longGet(args[Names.SEQ])
             val sig = arrayGet(args[Names.SIG])
@@ -367,7 +367,7 @@ private fun parseResponse(
                 ip,
                 nodes,
                 nodes6,
-                data,
+                v,
                 k,
                 sec,
                 sig,
