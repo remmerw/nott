@@ -11,7 +11,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @Suppress("ArrayInDataClass")
 data class Data(
-    val v: BEObject,
+    val v: ByteArray,
     val seq: Long,
     val k: ByteArray,
     val sig: ByteArray,
