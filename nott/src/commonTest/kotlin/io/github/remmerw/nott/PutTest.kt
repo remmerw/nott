@@ -33,7 +33,7 @@ class PutTest {
 
             val keys = Ed25519Sign.KeyPair.newKeyPair()
 
-            val v = BEString(data)
+            val v = data
             val cas: Long? = null
             val k: ByteArray = keys.getPublicKey()
             val salt: ByteArray? = null
