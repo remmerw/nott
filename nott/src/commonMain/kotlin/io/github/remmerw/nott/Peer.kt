@@ -1,13 +1,11 @@
 package io.github.remmerw.nott
 
-import java.net.InetSocketAddress
-import kotlin.time.TimeSource
-import kotlin.time.TimeSource.Monotonic.ValueTimeMark
-
 import kotlinx.io.Buffer
 import kotlinx.io.readByteArray
 import kotlinx.io.writeUShort
-
+import java.net.InetSocketAddress
+import kotlin.time.TimeSource
+import kotlin.time.TimeSource.Monotonic.ValueTimeMark
 
 internal class Peer(
     val id: ByteArray,

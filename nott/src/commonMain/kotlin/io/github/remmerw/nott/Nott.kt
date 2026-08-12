@@ -85,7 +85,6 @@ class Nott(
         take: Int,
     ): Set<Peer> = routingTable.closestPeers(key, take)
 
-
     private suspend fun send(enqueuedSend: EnqueuedSend) {
         mutex.withLock {
             buffer.reset()
@@ -813,4 +812,3 @@ internal fun debug(throwable: Throwable) {
         throwable.printStackTrace()
     }
 }
-
