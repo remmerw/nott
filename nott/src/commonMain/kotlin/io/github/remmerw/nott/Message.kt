@@ -565,3 +565,13 @@ internal data class GetResponse(
         sink.bencodeEof() // end map
     }
 }
+
+internal fun Buffer.bencodePeers(list: List<Peer>) {
+    
+    list.forEach { peer: Peer ->
+        //buffer.write(peer.id)
+        //buffer.write(peer.address.address.address)
+        //buffer.writeUShort(peer.address.port.toUShort())
+    }
+    
+}
