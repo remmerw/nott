@@ -12,6 +12,7 @@ interface Store {
 
 @Suppress("unused")
 class MemoryStore(private val maxSize: Int = 10000) : Store {
+    private val mutex = Mutex()
     private val peers: MutableSet<InetSocketAddress> = LinkedHashSet(maxSize)
     override suspend fun addresses(limit: Int): List<InetSocketAddress> {
         mutex.withLock {
