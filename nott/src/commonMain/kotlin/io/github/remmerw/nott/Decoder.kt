@@ -70,16 +70,6 @@ private fun extractNodes(args: Map<String, BEObject>): List<Peer> {
     return readBuckets(raw, ADDRESS_LENGTH_IPV4)
 }
 
-internal fun writeBuckets(list: List<Peer>): ByteArray {
-    val buffer = Buffer()
-    list.forEach { peer: Peer ->
-        buffer.write(peer.id)
-        buffer.write(peer.address.address.address)
-        buffer.writeUShort(peer.address.port.toUShort())
-    }
-    return buffer.readByteArray()
-}
-
 internal fun readBuckets(
     src: ByteArray,
     length: Int,
