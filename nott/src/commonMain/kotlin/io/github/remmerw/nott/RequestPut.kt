@@ -15,7 +15,7 @@ import kotlin.time.Duration.Companion.milliseconds
 fun CoroutineScope.requestPut(
     nott: Nott,
     target: ByteArray,
-    v: BEObject,
+    v: ByteArray,
     cas: Long? = null,
     k: ByteArray? = null,
     salt: ByteArray? = null,
