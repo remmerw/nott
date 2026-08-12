@@ -7,6 +7,8 @@ import io.github.remmerw.buri.bencodeEof
 import io.github.remmerw.buri.bencodeList
 import io.github.remmerw.buri.bencodeMap
 import io.github.remmerw.buri.bencodeMapKey
+import io.github.remmerw.buri.bencodeArray
+import io.github.remmerw.buri.bencodeArrayData
 import java.net.InetSocketAddress
 
 internal sealed interface Message {
@@ -567,11 +569,11 @@ internal data class GetResponse(
 }
 
 internal fun Buffer.bencodePeers(list: List<Peer>, size: Int) {
-    
+    this.bencodeArray(list.size*size)
     list.forEach { peer: Peer ->
-        //buffer.write(peer.id)
-        //buffer.write(peer.address.address.address)
-        //buffer.writeUShort(peer.address.port.toUShort())
+        this.bencodeArrayData(peer.id)
+        this.bencodeArrayData(peer.address.address.address)
+        this.bencodeArrayData(peer.address.port.toUShort())
     }
     
 }
