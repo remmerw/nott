@@ -566,7 +566,7 @@ internal data class GetResponse(
     }
 }
 
-internal fun Buffer.bencodePeers(list: List<Peer>) {
+internal fun Buffer.bencodePeers(list: List<Peer>, size: Int) {
     
     list.forEach { peer: Peer ->
         //buffer.write(peer.id)
