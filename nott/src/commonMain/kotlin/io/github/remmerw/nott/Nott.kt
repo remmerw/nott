@@ -12,9 +12,6 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlinx.io.Buffer
-import kotlinx.io.readByteArray
-import kotlinx.io.writeUShort
 import org.kotlincrypto.hash.sha1.SHA1
 import java.net.DatagramPacket
 import java.net.DatagramSocket
@@ -817,9 +814,3 @@ internal fun debug(throwable: Throwable) {
     }
 }
 
-internal fun InetSocketAddress.encoded(): ByteArray {
-    val buffer = Buffer()
-    buffer.write(address.address)
-    buffer.writeUShort(this.port.toUShort())
-    return buffer.readByteArray()
-}
