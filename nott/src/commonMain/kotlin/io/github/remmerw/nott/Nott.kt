@@ -3,6 +3,7 @@ package io.github.remmerw.nott
 import io.github.remmerw.buri.BEMap
 import io.github.remmerw.buri.BEObject
 import io.github.remmerw.buri.BEReader
+import io.github.remmerw.buri.Buffer
 import io.github.remmerw.buri.decodeBencode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -40,6 +41,7 @@ class Nott(
     private val scope = CoroutineScope(Dispatchers.IO)
     private var socket = DatagramSocket(port)
     private val routingTable = RoutingTable()
+    private val buffer = Buffer(UDP_PACKET)
 
     fun port(): Int = socket.localPort
 
@@ -86,9 +88,6 @@ class Nott(
         take: Int,
     ): Set<Peer> = routingTable.closestPeers(key, take)
 
-    private val buffer =
-        io.github.remmerw.buri
-            .Buffer(UDP_PACKET)
 
     private suspend fun send(enqueuedSend: EnqueuedSend) {
         mutex.withLock {
