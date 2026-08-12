@@ -4,6 +4,11 @@ import java.net.InetSocketAddress
 import kotlin.time.TimeSource
 import kotlin.time.TimeSource.Monotonic.ValueTimeMark
 
+import kotlinx.io.Buffer
+import kotlinx.io.readByteArray
+import kotlinx.io.writeUShort
+
+
 internal class Peer(
     val id: ByteArray,
     val address: InetSocketAddress,
@@ -54,4 +59,11 @@ internal class Peer(
             b: Peer,
         ): Int = threeWayDistance(target, a.id, b.id)
     }
+}
+
+internal fun InetSocketAddress.encoded(): ByteArray {
+    val buffer = Buffer()
+    buffer.write(address.address)
+    buffer.writeUShort(this.port.toUShort())
+    return buffer.readByteArray()
 }
