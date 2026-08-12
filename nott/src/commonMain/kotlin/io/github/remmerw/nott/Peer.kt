@@ -1,9 +1,7 @@
 package io.github.remmerw.nott
 
-import kotlinx.io.Buffer
-import kotlinx.io.readByteArray
-import kotlinx.io.writeUShort
 import java.net.InetSocketAddress
+import java.nio.ByteBuffer
 import kotlin.time.TimeSource
 import kotlin.time.TimeSource.Monotonic.ValueTimeMark
 
@@ -60,8 +58,12 @@ internal class Peer(
 }
 
 internal fun InetSocketAddress.encoded(): ByteArray {
-    val buffer = Buffer()
-    buffer.write(address.address)
-    buffer.writeUShort(this.port.toUShort())
-    return buffer.readByteArray()
+    val data = this.address.addres
+    
+    return ByteBuffer
+                .allocate(data.size + 2)
+                .put(data)
+                .putShort(this.port.toShort())
+                .array()
+    
 }
