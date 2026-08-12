@@ -5,9 +5,6 @@ import io.github.remmerw.buri.BEList
 import io.github.remmerw.buri.BEMap
 import io.github.remmerw.buri.BEObject
 import io.github.remmerw.buri.BEString
-import kotlinx.io.Buffer
-import kotlinx.io.readByteArray
-import kotlinx.io.writeUShort
 import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.nio.ByteBuffer
