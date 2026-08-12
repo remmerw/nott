@@ -277,17 +277,13 @@ class Nott(
             return
         }
 
-        val buffer = Buffer()
-        request.v.encodeTo(buffer)
-        val data = buffer.readByteArray()
-
         // first check if the token is OK
         if (!tokenManager.checkToken(
                 request.token,
                 request.id,
                 request.address.address.address,
                 request.address.port.toUShort(),
-                sha1(data),
+                sha1(request.v),
             )
         ) {
             sendError(
