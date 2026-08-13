@@ -145,7 +145,7 @@ class Nott(
                 address = request.address,
                 id = nodeId,
                 tid = request.tid,
-                ip = request.address.encoded(),
+                ip = request.address,
             )
 
         sendMessage(rsp)
@@ -164,7 +164,7 @@ class Nott(
                 address = request.address,
                 id = nodeId,
                 tid = request.tid,
-                ip = request.address.encoded(),
+                ip = request.address,
                 nodes =
                     entries.filter { peer: Peer ->
                         peer.address.address.address.size == 4
@@ -206,7 +206,7 @@ class Nott(
                 address = request.address,
                 id = nodeId,
                 tid = request.tid,
-                ip = request.address.encoded(),
+                ip = request.address,
                 token = token,
                 nodes =
                     entries.filter { peer: Peer ->
@@ -247,7 +247,7 @@ class Nott(
                 address = request.address,
                 id = nodeId,
                 tid = request.tid,
-                ip = request.address.encoded(),
+                ip = request.address,
                 token = token,
                 nodes =
                     entries.filter { peer: Peer ->
@@ -299,7 +299,7 @@ class Nott(
                 address = request.address,
                 id = nodeId,
                 tid = request.tid,
-                ip = request.address.encoded(),
+                ip = request.address,
             )
         sendMessage(rsp)
     }
@@ -339,7 +339,7 @@ class Nott(
                 address = request.address,
                 id = nodeId,
                 tid = request.tid,
-                ip = request.address.encoded(),
+                ip = request.address,
             )
         sendMessage(rsp)
     }
