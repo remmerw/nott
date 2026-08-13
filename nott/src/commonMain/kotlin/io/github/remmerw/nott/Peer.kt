@@ -1,7 +1,6 @@
 package io.github.remmerw.nott
 
 import java.net.InetSocketAddress
-import java.nio.ByteBuffer
 import kotlin.time.TimeSource
 import kotlin.time.TimeSource.Monotonic.ValueTimeMark
 
@@ -55,14 +54,4 @@ internal class Peer(
             b: Peer,
         ): Int = threeWayDistance(target, a.id, b.id)
     }
-}
-
-internal fun InetSocketAddress.encoded2(): ByteArray {
-    val data = this.address.address
-
-    return ByteBuffer
-        .allocate(data.size + 2)
-        .put(data)
-        .putShort(this.port.toShort())
-        .array()
 }
