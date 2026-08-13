@@ -576,3 +576,13 @@ internal fun Buffer.bencodePeers(
         this.bencodeArrayData(peer.address.port.toUShort())
     }
 }
+
+internal fun Buffer.bencode(isa: InetSocketAddress) {
+   val data = isa.address.address
+        
+   this.bencodeArray((data.size + 2))
+        
+   this.bencodeArrayData(dara)
+            this.bencodeArrayData(isa.port.toUShort())
+        
+    }
