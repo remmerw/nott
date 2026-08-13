@@ -6,7 +6,6 @@ ktlint = "14.2.0"
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlin" }
-kotlinx-io-core = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version = "0.9.1" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version = "1.11.0" }
 sha1 = { module = "org.kotlincrypto.hash:sha1", version = "0.8.0" }
 borr = { module = "io.github.remmerw:borr", version = "0.0.8" }
