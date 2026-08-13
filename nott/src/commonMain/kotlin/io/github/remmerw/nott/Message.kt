@@ -582,7 +582,7 @@ internal fun Buffer.bencode(isa: InetSocketAddress) {
         
    this.bencodeArray((data.size + 2))
         
-   this.bencodeArrayData(dara)
+   this.bencodeArrayData(data)
             this.bencodeArrayData(isa.port.toUShort())
         
     }
