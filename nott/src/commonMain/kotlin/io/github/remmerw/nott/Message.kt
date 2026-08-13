@@ -82,7 +82,7 @@ internal data class AnnounceResponse(
     override val address: InetSocketAddress,
     override val id: ByteArray,
     override val tid: ByteArray,
-    override val ip: ByteArray?,
+    override val ip: InetSocketAddress?,
 ) : Response {
     override fun encode(sink: Buffer) {
         sink.bencodeMap() // new map
@@ -172,7 +172,7 @@ internal data class FindNodeResponse(
     override val address: InetSocketAddress,
     override val id: ByteArray,
     override val tid: ByteArray,
-    override val ip: ByteArray?,
+    override val ip: InetSocketAddress?,
     override val nodes: List<Peer>,
     override val nodes6: List<Peer>,
 ) : NodesResponse {
@@ -250,7 +250,7 @@ internal data class GetPeersResponse(
     override val address: InetSocketAddress,
     override val id: ByteArray,
     override val tid: ByteArray,
-    override val ip: ByteArray?,
+    override val ip: InetSocketAddress?,
     val token: ByteArray?,
     override val nodes: List<Peer>,
     override val nodes6: List<Peer>,
@@ -339,7 +339,7 @@ internal data class PingResponse(
     override val address: InetSocketAddress,
     override val id: ByteArray,
     override val tid: ByteArray,
-    override val ip: ByteArray?,
+    override val ip: InetSocketAddress?,
 ) : Response {
     override fun encode(sink: Buffer) {
         sink.bencodeMap() // new map
@@ -435,7 +435,7 @@ internal data class PutResponse(
     override val address: InetSocketAddress,
     override val id: ByteArray,
     override val tid: ByteArray,
-    override val ip: ByteArray?,
+    override val ip: InetSocketAddress?,
 ) : Response {
     override fun encode(sink: Buffer) {
         sink.bencodeMap() // new map
@@ -508,7 +508,7 @@ internal data class GetResponse(
     override val address: InetSocketAddress,
     override val id: ByteArray,
     override val tid: ByteArray,
-    override val ip: ByteArray?,
+    override val ip: InetSocketAddress?,
     val token: ByteArray?,
     override val nodes: List<Peer>,
     override val nodes6: List<Peer>,
