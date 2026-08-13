@@ -344,7 +344,7 @@ private fun parseResponse(
     require(id != null) { "mandatory parameter 'id' missing" }
     require(id.size == SHA1_HASH_LENGTH) { "invalid or missing origin ID" }
 
-    val ip = inetGet(map[Names.IP])
+    val ip = null // not yet supported  inetGet(map[Names.IP])
 
     val msg: Message
 
