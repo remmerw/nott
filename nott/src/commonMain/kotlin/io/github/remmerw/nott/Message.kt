@@ -578,11 +578,10 @@ internal fun Buffer.bencodePeers(
 }
 
 internal fun Buffer.bencode(isa: InetSocketAddress) {
-   val data = isa.address.address
-        
-   this.bencodeArray((data.size + 2))
-        
-   this.bencodeArrayData(data)
-            this.bencodeArrayData(isa.port.toUShort())
-        
-    }
+    val data = isa.address.address
+
+    this.bencodeArray((data.size + 2))
+
+    this.bencodeArrayData(data)
+    this.bencodeArrayData(isa.port.toUShort())
+}

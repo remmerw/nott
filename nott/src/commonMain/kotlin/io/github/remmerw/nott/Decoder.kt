@@ -363,7 +363,7 @@ private fun parseResponse(
                 address,
                 id,
                 tid,
-                ip, 
+                ip,
                 token,
                 nodes,
                 nodes6,
@@ -497,23 +497,23 @@ fun inetGet(beObject: BEObject?): InetSocketAddress? {
 
     if (beObject is BEString) {
         val data = beObject.toByteArray()
-        val length = data.size-2
-        val address = data.copyOfRange(0,length)
+        val length = data.size - 2
+        val address = data.copyOfRange(0, length)
         val port: UShort =
-                                (
-                                    (
-                                        data[length]
-                                            .toInt() and 0xFF
-                                    ) shl 8 or (data[length+1].toInt() and 0xFF)
-                                ).toUShort()
-       
-       return InetSocketAddress(
-                               InetAddress.getByAddress(address),
-                                        port.toInt() )
+            (
+                (
+                    data[length]
+                        .toInt() and 0xFF
+                ) shl 8 or (data[length + 1].toInt() and 0xFF)
+            ).toUShort()
+
+        return InetSocketAddress(
+            InetAddress.getByAddress(address),
+            port.toInt(),
+        )
     }
     return null
 }
-
 
 fun longGet(beObject: BEObject?): Long? {
     if (beObject == null) {
