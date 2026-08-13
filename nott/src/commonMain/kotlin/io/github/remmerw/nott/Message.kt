@@ -19,7 +19,7 @@ internal sealed interface Message {
 }
 
 internal sealed interface Response : Message {
-    val ip: ByteArray?
+    val ip: InetSocketAddress?
 }
 
 internal sealed interface NodesResponse : Response {
