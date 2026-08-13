@@ -380,14 +380,7 @@ class Nott(
         if (msg is Response) {
            val ip = msg.ip
            if (ip != null) {
-
-               val buffer = Buffer()
-               buffer.write(ip)
-               val rawIP = buffer.readByteArray(ip.size - 2)
-               val port = buffer.readUShort()
-               val addr = createInetSocketAddress(rawIP, port.toInt())
-
-                debug("My IP " + addr)
+                debug("My IP " + ip)
             }
         }*/
 
