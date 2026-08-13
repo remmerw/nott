@@ -502,15 +502,14 @@ fun inetGet(beObject: BEObject?): InetSocketAddress? {
         val port: UShort =
                                 (
                                     (
-                                        dara[length]
+                                        data[length]
                                             .toInt() and 0xFF
                                     ) shl 8 or (data[length+1].toInt() and 0xFF)
                                 ).toUShort()
        
        return InetSocketAddress(
-                                        InetAddress.getByAddress(address),
-                                        port.toInt(),
-                                    ),
+                               InetAddress.getByAddress(address),
+                                        port.toInt() )
     }
     return null
 }
