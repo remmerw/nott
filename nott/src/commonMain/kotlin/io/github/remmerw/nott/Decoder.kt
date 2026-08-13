@@ -344,7 +344,7 @@ private fun parseResponse(
     require(id != null) { "mandatory parameter 'id' missing" }
     require(id.size == SHA1_HASH_LENGTH) { "invalid or missing origin ID" }
 
-    val ip = arrayGet(map[Names.IP])
+    val ip = inetGet(map[Names.IP])
 
     val msg: Message
 
@@ -489,6 +489,32 @@ fun arrayGet(beObject: BEObject?): ByteArray? {
     }
     return null
 }
+
+fun inetGet(beObject: BEObject?): InetSocketAddress? {
+    if (beObject == null) {
+        return null
+    }
+
+    if (beObject is BEString) {
+        val data = beObject.toByteArray()
+        val length = data.size-2
+        val address = data.copyOf(0,length)
+        val port: UShort =
+                                (
+                                    (
+                                        dara[length]
+                                            .toInt() and 0xFF
+                                    ) shl 8 or (data[length+1].toInt() and 0xFF)
+                                ).toUShort()
+       
+       return InetSocketAddress(
+                                        InetAddress.getByAddress(address),
+                                        port.toInt(),
+                                    ),
+    }
+    return null
+}
+
 
 fun longGet(beObject: BEObject?): Long? {
     if (beObject == null) {
