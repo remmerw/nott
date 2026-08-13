@@ -498,7 +498,7 @@ fun inetGet(beObject: BEObject?): InetSocketAddress? {
     if (beObject is BEString) {
         val data = beObject.toByteArray()
         val length = data.size-2
-        val address = data.copyOf(0,length)
+        val address = data.copyOfRange(0,length)
         val port: UShort =
                                 (
                                     (
