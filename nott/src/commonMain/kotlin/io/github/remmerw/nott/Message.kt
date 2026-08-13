@@ -279,7 +279,7 @@ internal data class GetPeersResponse(
             sink.bencodeMapKey(Names.VALUES)
             sink.bencodeList()
             values.forEach { value ->
-                sink.bencode(value.encoded())
+                sink.bencode(value)
             }
             sink.bencodeEof() // end list
         }
