@@ -1,7 +1,7 @@
 package io.github.remmerw.nott
 
 import kotlin.math.min
-import java.utils.Arrays
+import java.util.Arrays
 
 
 internal fun ByteArray.toLongKey(length: Int): Long {
