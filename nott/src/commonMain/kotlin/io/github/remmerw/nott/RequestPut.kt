@@ -23,7 +23,7 @@ fun CoroutineScope.requestPut(
     intermediateTimeout: () -> Long,
 ): ReceiveChannel<InetSocketAddress> =
     produce {
-        val gated: MutableSet<Int> = sortedSetOf()
+        val gated: MutableSet<Long> = sortedSetOf()
 
         while (true) {
             val closest = ClosestSet(nott, target)
@@ -68,7 +68,7 @@ fun CoroutineScope.requestPut(
                                 closest.insert(match)
 
                                 if (message.token != null) {
-                                    if (gated.add(match.hashCode())) {
+                                    if (gated.add(match.id.toLongKey())) {
                                         val tid = createRandomKey(TID_LENGTH)
                                         val request =
                                             PutRequest(
