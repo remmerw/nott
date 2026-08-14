@@ -402,7 +402,7 @@ class Nott(
         // server only verifies IP equality for responses.
         // we only want remote nodes with stable ports in our routing table, so appley a stricter check here
         if (associatedCall != null &&
-            associatedCall.request.address != associatedCall.response!!.address
+            associatedCall.address != associatedCall.response!!.address
         ) {
             return
         }
