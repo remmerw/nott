@@ -1,5 +1,7 @@
 package io.github.remmerw.nott
 
+import kotlin.math.min
+import java.utils.Arrays
 
 
 internal fun ByteArray.toLongKey(length: Int): Long {
@@ -37,7 +39,7 @@ internal fun threeWayDistance(
     h1: ByteArray,
     h2: ByteArray,
 ): Int {
-    val mmi = mismatch(h1, h2)
+    val mmi = Arrays.mismatch(h1, h2)
     if (mmi == -1) return 0
 
     val h = h0[mmi].toUByte()
