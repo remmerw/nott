@@ -18,7 +18,7 @@ fun CoroutineScope.requestAnnounce(
     intermediateTimeout: () -> Long,
 ): ReceiveChannel<InetSocketAddress> =
     produce {
-        val gated: MutableSet<Int> = sortedSetOf()
+        val gated: MutableSet<Long> = sortedSetOf()
 
         while (true) {
             val closest = ClosestSet(nott, target)
@@ -66,7 +66,7 @@ fun CoroutineScope.requestAnnounce(
                                 if (rsp.token != null) {
                                     closest.insert(match)
 
-                                    if (gated.add(match.hashCode())) {
+                                    if (gated.add(match.id.toLongKey())) {
                                         val tid = createRandomKey(TID_LENGTH)
                                         val request =
                                             AnnounceRequest(
