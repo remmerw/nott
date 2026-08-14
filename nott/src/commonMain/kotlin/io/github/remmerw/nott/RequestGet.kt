@@ -50,8 +50,7 @@ fun CoroutineScope.requestGet(
                                 seq = seq,
                             )
 
-                        val call = Call(request, peer.id)
-                        closest.requestCall(call, peer)
+                        val call = closest.requestCall(request, peer)
                         inFlight.add(call)
                     }
                 } while (peer != null)
