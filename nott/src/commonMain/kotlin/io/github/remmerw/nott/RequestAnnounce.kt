@@ -24,7 +24,6 @@ fun CoroutineScope.requestAnnounce(
             val closest = ClosestSet(nott, target)
             closest.initialize()
 
-            
             val inFlight: MutableSet<Call> = ConcurrentHashMap.newKeySet()
 
             do {
@@ -82,7 +81,6 @@ fun CoroutineScope.requestAnnounce(
 
                                         val call = nott.doRequestCall(request, match.id)
                                         inFlight.add(call)
-                                        
                                     }
                                 }
                             }

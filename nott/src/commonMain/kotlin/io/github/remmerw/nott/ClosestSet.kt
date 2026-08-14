@@ -66,7 +66,7 @@ internal class ClosestSet(
     suspend fun requestCall(
         request: Request,
         peer: Peer,
-    ) : Call {
+    ): Call {
         queried.add(peer.id.toLongKey())
         return nott.doRequestCall(request, peer.id)
     }

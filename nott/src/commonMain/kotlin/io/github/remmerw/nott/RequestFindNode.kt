@@ -44,7 +44,7 @@ fun CoroutineScope.findNode(
                                 target = target,
                             )
                         val call = closest.requestCall(request, peer)
-                        
+
                         inFlight.add(call)
                     }
                 } while (peer != null)
