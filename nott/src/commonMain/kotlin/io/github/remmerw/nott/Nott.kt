@@ -80,9 +80,12 @@ class Nott(
         }
     }
 
-    internal suspend fun doRequestCall(request: Request, expectedId: ByteArray? ): Call {
-       val call = Call(request, expectedId)
- requestCalls[request.tid.toLongKey(TID_LENGTH)] = call
+    internal suspend fun doRequestCall(
+        request: Request,
+        expectedId: ByteArray?,
+    ): Call {
+        val call = Call(request, expectedId)
+        requestCalls[request.tid.toLongKey(TID_LENGTH)] = call
         send(request, call)
         return call
     }
@@ -92,7 +95,10 @@ class Nott(
         take: Int,
     ): Set<Peer> = routingTable.closestPeers(key, take)
 
-    private suspend fun send(message: Message,  associatedCall: Call?) {
+    private suspend fun send(
+        message: Message,
+        associatedCall: Call?,
+    ) {
         mutex.withLock {
             buffer.reset()
 
@@ -453,8 +459,6 @@ class Nott(
     }
 
     internal fun isLocalId(id: ByteArray): Boolean = nodeId.contentEquals(id)
-
-    
 
     internal suspend fun ping(
         address: InetSocketAddress,

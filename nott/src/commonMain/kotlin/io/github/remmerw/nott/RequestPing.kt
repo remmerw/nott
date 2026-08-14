@@ -23,9 +23,8 @@ suspend fun requestPing(
             tid = tid,
             ro = nott.readOnlyState,
         )
-    val call =    nott.doRequestCall(request, id)
+    val call = nott.doRequestCall(request, id)
     inFlight.add(call)
-
 
     do {
         val removed: MutableSet<Call> = mutableSetOf()

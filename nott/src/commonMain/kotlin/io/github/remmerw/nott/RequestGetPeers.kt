@@ -45,7 +45,7 @@ fun CoroutineScope.requestGetPeers(
                                 infoHash = target,
                             )
                         val call = closest.requestCall(request, peer)
- 
+
                         inFlight.add(call)
                     }
                 } while (peer != null)
