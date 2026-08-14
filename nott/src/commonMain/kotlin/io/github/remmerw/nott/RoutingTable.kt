@@ -26,8 +26,10 @@ internal class RoutingTable internal constructor() {
         take: Int,
     ): Set<Peer> =
         entries()
-            .filter { peer -> peer.eligibleForNodesList() }
-            .sortedWith(Peer.DistanceOrder(key))
+            .filter { peer -> peer.eligibleForNodesList()             }.sortedWith { a, b ->
+                threeWayDistance(key, a.id, b.id)
+            }
+            
             .take(take)
             .toSet()
 
