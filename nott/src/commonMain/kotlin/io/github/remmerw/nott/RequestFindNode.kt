@@ -19,7 +19,7 @@ fun CoroutineScope.findNode(
     intermediateTimeout: () -> Long,
 ): ReceiveChannel<InetSocketAddress> =
     produce {
-        val gated: MutableSet<Int> = sortedSetOf()
+        val gated: MutableSet<Long> = sortedSetOf()
 
         while (true) {
             val closest = ClosestSet(nott, target)
@@ -62,7 +62,7 @@ fun CoroutineScope.findNode(
 
                         if (match != null) {
                             if (target.contentEquals(match.id)) {
-                                if (gated.add(match.hashCode())) {
+                                if (gated.add(match.id.toLongKey())) {
                                     send(match.address)
                                 }
                             }
