@@ -23,7 +23,7 @@ internal class Database internal constructor() {
         key: ByteArray,
         maxEntries: Int,
     ): List<InetSocketAddress> {
-        val keyEntry = items[key.contentHashCode()] ?: return emptyList()
+        val keyEntry = items[key.toLongKey()] ?: return emptyList()
 
         return keyEntry
             .asSequence()
