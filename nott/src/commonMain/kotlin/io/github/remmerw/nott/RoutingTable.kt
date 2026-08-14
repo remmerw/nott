@@ -3,12 +3,12 @@ package io.github.remmerw.nott
 import java.util.concurrent.ConcurrentHashMap
 
 internal class RoutingTable internal constructor() {
-    // note int key is not perfect (better would be long value or best the peer id)
+    // note long key is not perfect (better would  the peer id)
     // but it is not yet really necessary (not enough peers in the routing table)
     private val entries: MutableMap<Long, Peer> = ConcurrentHashMap()
 
     fun insertOrRefresh(peer: Peer) {
-        val entry = findPeerById(peer.id)
+        val entry = entries[peer.id.toLongKey()]
         if (entry != null) {
             refresh(peer)
         } else {
@@ -34,7 +34,7 @@ internal class RoutingTable internal constructor() {
     fun entries(): List<Peer> = entries.values.toList()
 
     fun onTimeout(id: ByteArray) {
-        val peer = findPeerById(id)
+        val peer = entries[id.toLongKey()]
         if (peer != null) {
             peer.signalFailure()
             // only removes the entry if it is bad
