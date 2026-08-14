@@ -44,7 +44,7 @@ internal class Peer(
         return true
     }
 
-    override fun hashCode(): Int = id.contentHashCode()
+    
 
     class DistanceOrder(
         val target: ByteArray,
