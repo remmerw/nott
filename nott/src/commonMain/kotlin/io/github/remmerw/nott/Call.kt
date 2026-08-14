@@ -5,7 +5,6 @@ import kotlin.time.TimeSource
 import kotlin.time.TimeSource.Monotonic.ValueTimeMark
 
 internal class Call(
-    val request: Request,
     val expectedID: ByteArray?,
 ) {
     var sentTime: ValueTimeMark? = null
