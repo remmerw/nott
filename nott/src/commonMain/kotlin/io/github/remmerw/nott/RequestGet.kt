@@ -24,7 +24,7 @@ fun CoroutineScope.requestGet(
     intermediateTimeout: () -> Long,
 ): ReceiveChannel<Data> =
     produce {
-        val gated: MutableSet<Int> = sortedSetOf()
+        val gated: MutableSet<Long> = sortedSetOf()
 
         while (true) {
             val closest = ClosestSet(nott, key)
@@ -72,7 +72,7 @@ fun CoroutineScope.requestGet(
                                 rsp.k != null &&
                                 rsp.sig != null
                             ) {
-                                if (gated.add(match.hashCode())) {
+                                if (gated.add(match.id.toLongKey())) {
                                     val data =
                                         Data(
                                             v = rsp.v,
