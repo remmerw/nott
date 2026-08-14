@@ -26,11 +26,10 @@ internal class RoutingTable internal constructor() {
         take: Int,
     ): Set<Peer> =
         entries()
-            .filter { peer -> peer.eligibleForNodesList()             }.sortedWith { a, b ->
+            .filter { peer -> peer.eligibleForNodesList() }
+            .sortedWith { a, b ->
                 threeWayDistance(key, a.id, b.id)
-            }
-            
-            .take(take)
+            }.take(take)
             .toSet()
 
     fun entries(): List<Peer> = entries.values.toList()
