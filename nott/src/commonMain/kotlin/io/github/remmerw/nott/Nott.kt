@@ -124,7 +124,7 @@ class Nott(
     }
 
     internal fun timeout(call: Call) {
-        requestCalls.remove(call.request.tid.contentHashCode())
+        requestCalls.remove(call.request.tid.toLongKey(TID_LENGTH))
 
         // don't time out anything if we don't have a connection
         if (call.expectedID != null) {
@@ -448,7 +448,7 @@ class Nott(
     internal fun isLocalId(id: ByteArray): Boolean = nodeId.contentEquals(id)
 
     internal suspend fun doRequestCall(call: Call) {
-        requestCalls[call.request.tid.getLongKey(TID_LENGTH)] = call
+        requestCalls[call.request.tid.toLongKey(TID_LENGTH)] = call
         send(EnqueuedSend(call.request, call))
     }
 
