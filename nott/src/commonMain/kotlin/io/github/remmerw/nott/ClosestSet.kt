@@ -9,9 +9,9 @@ internal class ClosestSet(
     private val target: ByteArray,
 ) {
     private val closest: MutableSet<Peer> = mutableSetOf()
-    private val unreachable: MutableSet<Int> = sortedSetOf()
-    private val queried: MutableSet<Int> = sortedSetOf()
-    private val candidates: MutableMap<Int, Peer> = sortedMapOf()
+    private val unreachable: MutableSet<Long> = sortedSetOf()
+    private val queried: MutableSet<Long> = sortedSetOf()
+    private val candidates: MutableMap<Long, Peer> = sortedMapOf()
 
     private fun acceptedResponse(call: Call): Peer? {
         if (!call.matchesExpectedID()) {
@@ -20,7 +20,7 @@ internal class ClosestSet(
         }
         val rsp = call.response
         if (rsp != null) {
-            return candidates[rsp.id.contentHashCode()]
+            return candidates[rsp.id.toLongKey()]
         }
         return null
     }
@@ -28,20 +28,20 @@ internal class ClosestSet(
     private fun unreachable(call: Call) {
         val rsp = call.response
         if (rsp != null) {
-            unreachable.add(rsp.id.contentHashCode())
+            unreachable.add(rsp.id.toLongKey())
         }
     }
 
     private fun addCandidates(entries: Set<Peer>) {
         for (peer in entries) {
-            candidates[peer.hashCode()] = peer
+            candidates[peer.id.toLongKey()] = peer
         }
     }
 
     private fun sortedLookups(): List<Peer> =
         candidates.values
             .filter { peer ->
-                val hash = peer.hashCode()
+                val hash = peer.id.toLongKey()
                 !queried.contains(hash) && !unreachable.contains(hash)
             }.sortedWith { a, b ->
                 threeWayDistance(target, a.id, b.id)
@@ -67,7 +67,7 @@ internal class ClosestSet(
         call: Call,
         peer: Peer,
     ) {
-        queried.add(peer.hashCode())
+        queried.add(peer.id.toLongKey())
         nott.doRequestCall(call)
     }
 
@@ -146,7 +146,7 @@ internal class ClosestSet(
             return true
         }
 
-        unreachable.add(peer.hashCode())
+        unreachable.add(peer.id.toLongKey())
         return false
     }
 }
