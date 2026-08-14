@@ -47,8 +47,8 @@ fun CoroutineScope.requestPut(
                                 ro = nott.readOnlyState,
                                 infoHash = target,
                             )
-                        val call = Call(request, peer.id)
-                        closest.requestCall(call, peer)
+                        val call = closest.requestCall(request, peer)
+                        
                         inFlight.add(call)
                     }
                 } while (peer != null)
