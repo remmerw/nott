@@ -124,7 +124,7 @@ internal class ClosestSet(
                 val last =
                     closest
                         .sortedWith { a, b ->
-                threeWayDistance(target, a.id, b.id).last()
+                threeWayDistance(target, a.id, b.id)}.last()
                 closest.remove(last)
             }
         }
