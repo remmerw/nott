@@ -80,6 +80,13 @@ class Nott(
         }
     }
 
+    internal suspend fun doRequestCall(request: Request, expectedId: ByteArray ): Call {
+       val call = Call(request, expectedId)
+ requestCalls[call.request.tid.toLongKey(TID_LENGTH)] = call
+        send(request, call)
+        return call
+    }
+
     internal fun closestPeers(
         key: ByteArray,
         take: Int,
