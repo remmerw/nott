@@ -79,9 +79,9 @@ fun CoroutineScope.requestAnnounce(
                                                 name = null,
                                             )
 
-                                        val call = Call(request, match.id)
+                                        val call = nott.doRequestCall(request, match.id)
                                         inFlight.add(call)
-                                        nott.doRequestCall(call)
+                                        
                                     }
                                 }
                             }
