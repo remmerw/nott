@@ -448,7 +448,7 @@ class Nott(
     internal fun isLocalId(id: ByteArray): Boolean = nodeId.contentEquals(id)
 
     internal suspend fun doRequestCall(call: Call) {
-        requestCalls[call.request.tid.contentHashCode()] = call
+        requestCalls[call.request.tid.getLongKey(TID_LENGTH)] = call
         send(EnqueuedSend(call.request, call))
     }
 
@@ -695,19 +695,6 @@ internal fun newerTimeMark(
     return if (markElapsed < cmpElapsed) mark else cmp
 }
 
-
-
-internal fun mismatch(
-    a: ByteArray,
-    b: ByteArray,
-): Int {
-    val min = min(a.size, b.size)
-    for (i in 0 until min) {
-        if (a[i] != b[i]) return i
-    }
-
-    return if (a.size == b.size) -1 else min
-}
 
 suspend fun newNott(
     nodeId: ByteArray,
