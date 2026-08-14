@@ -7,7 +7,6 @@ import io.github.remmerw.buri.BEObject
 import io.github.remmerw.buri.BEString
 import java.net.InetAddress
 import java.net.InetSocketAddress
-import java.nio.ByteBuffer
 
 private fun parseError(
     address: InetSocketAddress,
@@ -67,38 +66,39 @@ private fun extractNodes(args: Map<String, BEObject>): List<Peer> {
     return readBuckets(raw, ADDRESS_LENGTH_IPV4)
 }
 
-
 internal fun readBuckets(
     src: ByteArray,
     length: Int,
 ): List<Peer> {
     val capacity: Int = (src.size / (length + SHA1_HASH_LENGTH))
     val result = ArrayList<Peer>(capacity)
-    
+
     var offset = 0
     while (offset < src.size) {
         val rawId = src.copyOfRange(offset, offset + SHA1_HASH_LENGTH)
         offset += SHA1_HASH_LENGTH
-        
+
         val raw = src.copyOfRange(offset, offset + (length - 2))
         offset += (length - 2)
-        
+
         // Port auslesen (Big-Endian)
-        val port = (
-            ((src[offset].toInt() and 0xFF) shl 8) or 
-            (src[offset + 1].toInt() and 0xFF)
-        ).toUShort()
+        val port =
+            (
+                ((src[offset].toInt() and 0xFF) shl 8) or
+                    (src[offset + 1].toInt() and 0xFF)
+            ).toUShort()
         offset += 2
-        
+
         if (port > 0.toUShort() && port <= 65535.toUShort()) {
             try {
-                val peer = Peer(
-                    rawId,
-                    InetSocketAddress(
-                        InetAddress.getByAddress(raw),
-                        port.toInt(),
-                    ),
-                )
+                val peer =
+                    Peer(
+                        rawId,
+                        InetSocketAddress(
+                            InetAddress.getByAddress(raw),
+                            port.toInt(),
+                        ),
+                    )
                 result.add(peer)
             } catch (throwable: Throwable) {
                 debug(throwable)
