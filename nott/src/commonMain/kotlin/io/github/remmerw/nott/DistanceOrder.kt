@@ -1,4 +1,4 @@
-    
+package io.github.remmerw.nott    
 
 internal data class DistanceOrder(
         val target: ByteArray,
