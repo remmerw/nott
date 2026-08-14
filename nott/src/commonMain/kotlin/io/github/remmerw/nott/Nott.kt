@@ -84,7 +84,7 @@ class Nott(
         request: Request,
         expectedId: ByteArray?,
     ): Call {
-        val call = Call(request, expectedId)
+        val call = Call(request.tid, request.address, expectedId)
         requestCalls[request.tid.toLongKey(TID_LENGTH)] = call
         send(request, call)
         return call
@@ -137,7 +137,7 @@ class Nott(
     }
 
     internal fun timeout(call: Call) {
-        requestCalls.remove(call.request.tid.toLongKey(TID_LENGTH))
+        requestCalls.remove(call.tid.toLongKey(TID_LENGTH))
 
         // don't time out anything if we don't have a connection
         if (call.expectedID != null) {
@@ -523,7 +523,7 @@ class Nott(
         if (call != null) {
             // we only check the IP address here. the routing table applies more strict
             // checks to also verify a stable port
-            if (call.request.address == msg.address) {
+            if (call.address == msg.address) {
                 // remove call first in case of exception
 
                 requestCalls.remove(msg.tid.toLongKey(TID_LENGTH))
@@ -563,7 +563,7 @@ class Nott(
                         code = GENERIC_ERROR,
                         message =
                             (
-                                "A request was sent to " + call.request.address +
+                                "A request was sent to " + call.address +
                                     " and a response with matching transaction id was received from " +
                                     msg.address + " . Multihomed nodes should ensure that sockets are " +
                                     "properly bound and responses are sent with the " +
