@@ -696,14 +696,12 @@ internal fun newerTimeMark(
 }
 
 internal fun ByteArray.hashCode(length: Int): Long {
-    require(length in 1..8) { "length should be between 1 und 8 Bytes bytes" }
+    require(length in 1..8) { "length should be between 1 und 8 bytes for the long value" }
     require(this.size.toInt() >=  length) { "array ist too small." }
     
     var result = 0L
     for (i in 0 until length) {
-        // Byte in ein positives Int/Long umwandeln, um Vorzeichenfehler zu vermeiden
         val byteValue = this[i].toLong() and 0xFFL
-        // Bit-Shifting nach links basierend auf der Position
         result = (result shl 8) or byteValue
     }
     return result
