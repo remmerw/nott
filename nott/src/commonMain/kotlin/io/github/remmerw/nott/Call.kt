@@ -2,12 +2,10 @@ package io.github.remmerw.nott
 
 import kotlin.concurrent.Volatile
 import kotlin.time.TimeSource
-import java.net.InetSocketAddress
 import kotlin.time.TimeSource.Monotonic.ValueTimeMark
 
 internal class Call(
-    val tid: ByteArray,
-    val address: InetSocketAddress,
+    val request: Request,
     val expectedID: ByteArray?,
 ) {
     var sentTime: ValueTimeMark? = null
