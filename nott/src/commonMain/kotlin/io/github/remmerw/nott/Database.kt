@@ -11,7 +11,7 @@ internal class Database internal constructor() {
         key: ByteArray,
         address: InetSocketAddress,
     ) {
-        val keyEntry = items[key.toLongyKey()]
+        val keyEntry = items[key.toLongKey()]
         if (keyEntry != null) {
             keyEntry.add(address)
         } else {
