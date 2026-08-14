@@ -24,7 +24,8 @@ fun CoroutineScope.requestAnnounce(
             val closest = ClosestSet(nott, target)
             closest.initialize()
 
-            val inFlight: MutableList<Call> = mutableListOf()
+            
+            val inFlight: MutableSet<Call> = ConcurrentHashMap.newKeySet()
 
             do {
                 do {
