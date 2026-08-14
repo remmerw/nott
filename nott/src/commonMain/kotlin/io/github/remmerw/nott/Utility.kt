@@ -13,3 +13,16 @@ internal fun ByteArray.toLongKey(length: Int): Long {
     }
     return result
 }
+
+
+internal fun mismatch(
+    a: ByteArray,
+    b: ByteArray,
+): Int {
+    val min = min(a.size, b.size)
+    for (i in 0 until min) {
+        if (a[i] != b[i]) return i
+    }
+
+    return if (a.size == b.size) -1 else min
+}
