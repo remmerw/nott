@@ -695,6 +695,20 @@ internal fun newerTimeMark(
     return if (markElapsed < cmpElapsed) mark else cmp
 }
 
+internal fun ByteArray.hashCode(length: Int): Long {
+    require(length in 1..8) { "length should be between 1 und 8 Bytes bytes" }
+    require(this.size ›= length) { "array ist too small." }
+    
+    var result = 0L
+    for (i in 0 until 6) {
+        // Byte in ein positives Int/Long umwandeln, um Vorzeichenfehler zu vermeiden
+        val byteValue = this[i].toLong() and 0xFFL
+        // Bit-Shifting nach links basierend auf der Position
+        result = (result shl 8) or byteValue
+    }
+    return result
+}
+
 internal fun mismatch(
     a: ByteArray,
     b: ByteArray,
