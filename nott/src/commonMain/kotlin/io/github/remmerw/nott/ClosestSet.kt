@@ -124,7 +124,7 @@ internal class ClosestSet(
                 val last =
                     closest
                         .sortedWith(
-                            Peer.DistanceOrder(target),
+                            DistanceOrder(target),
                         ).last()
                 closest.remove(last)
             }
