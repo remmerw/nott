@@ -31,7 +31,7 @@ class Nott(
     private val unsolicitedThrottle: MutableMap<InetSocketAddress, Long> =
         mutableMapOf() // runs in same thread
 
-    private val requestCalls: MutableMap<Int, Call> = ConcurrentHashMap()
+    private val requestCalls: MutableMap<Long, Call> = ConcurrentHashMap()
     private val database: Database = Database()
     private val tokenManager = TokenManager()
     private val mutex = Mutex()
@@ -482,7 +482,7 @@ class Nott(
         val msg: Message
         try {
             msg = parseMessage(address, map) { tid: ByteArray ->
-                requestCalls[tid.contentHashCode()]?.request
+                requestCalls[tid.toLongKey(TID_LENGTH)]?.request
             } ?: return
         } catch (throwable: Throwable) {
             debug(throwable)
@@ -695,17 +695,7 @@ internal fun newerTimeMark(
     return if (markElapsed < cmpElapsed) mark else cmp
 }
 
-internal fun ByteArray.hashCode(length: Int): Long {
-    require(length in 1..8) { "length should be between 1 und 8 bytes for the long value" }
-    require(this.size.toInt() >=  length) { "array ist too small." }
-    
-    var result = 0L
-    for (i in 0 until length) {
-        val byteValue = this[i].toLong() and 0xFFL
-        result = (result shl 8) or byteValue
-    }
-    return result
-}
+
 
 internal fun mismatch(
     a: ByteArray,
