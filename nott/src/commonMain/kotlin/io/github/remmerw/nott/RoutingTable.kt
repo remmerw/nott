@@ -39,7 +39,7 @@ internal class RoutingTable internal constructor() {
             peer.signalFailure()
             // only removes the entry if it is bad
             if (peer.needsReplacement()) {
-                entries.remove(peer.hashCode())
+                entries.remove(peer.id.toLongKey()())
             }
         }
     }
