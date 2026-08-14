@@ -123,9 +123,8 @@ internal class ClosestSet(
             if (closest.size > MAX_ENTRIES_PER_BUCKET) {
                 val last =
                     closest
-                        .sortedWith(
-                            DistanceOrder(target),
-                        ).last()
+                        .sortedWith { a, b ->
+                threeWayDistance(target, a.id, b.id).last()
                 closest.remove(last)
             }
         }
