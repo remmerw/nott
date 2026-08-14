@@ -80,7 +80,7 @@ class Nott(
         }
     }
 
-    internal suspend fun doRequestCall(request: Request, expectedId: ByteArray ): Call {
+    internal suspend fun doRequestCall(request: Request, expectedId: ByteArray? ): Call {
        val call = Call(request, expectedId)
  requestCalls[call.request.tid.toLongKey(TID_LENGTH)] = call
         send(request, call)
@@ -454,10 +454,7 @@ class Nott(
 
     internal fun isLocalId(id: ByteArray): Boolean = nodeId.contentEquals(id)
 
-    internal suspend fun doRequestCall(call: Call) {
-        requestCalls[call.request.tid.toLongKey(TID_LENGTH)] = call
-        send(call.request, call)
-    }
+    
 
     internal suspend fun ping(
         address: InetSocketAddress,
@@ -471,7 +468,7 @@ class Nott(
                 tid = tid,
                 ro = readOnlyState,
             )
-        doRequestCall(Call(pr, id)) // expectedId can not be available (only address is known)
+        doRequestCall(pr, id) // expectedId can not be available (only address is known)
     }
 
     private suspend fun handlePacket(
