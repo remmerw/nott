@@ -5,19 +5,19 @@ import java.util.concurrent.ConcurrentHashMap
 internal class RoutingTable internal constructor() {
     // note int key is not perfect (better would be long value or best the peer id)
     // but it is not yet really necessary (not enough peers in the routing table)
-    private val entries: MutableMap<Int, Peer> = ConcurrentHashMap()
+    private val entries: MutableMap<Long, Peer> = ConcurrentHashMap()
 
     fun insertOrRefresh(peer: Peer) {
         val entry = findPeerById(peer.id)
         if (entry != null) {
             refresh(peer)
         } else {
-            entries[peer.hashCode()] = peer
+            entries[peer.id.toLongKey()] = peer
         }
     }
 
     fun refresh(peer: Peer) {
-        entries[peer.hashCode()]
+        entries[peer.id.toLongKey()]
             ?.mergeInTimestamps(peer)
     }
 
@@ -44,9 +44,9 @@ internal class RoutingTable internal constructor() {
         }
     }
 
-    fun findPeerById(id: ByteArray): Peer? = entries[id.contentHashCode()]
+    fun findPeerById(id: ByteArray): Peer? = entries[id.toLongKey()]
 
     fun notifyOfResponse(msg: Message) {
-        entries[msg.id.contentHashCode()]?.signalResponse()
+        entries[msg.id.toLongKey()]?.signalResponse()
     }
 }
