@@ -85,25 +85,25 @@ class Nott(
         take: Int,
     ): Set<Peer> = routingTable.closestPeers(key, take)
 
-    private suspend fun send(enqueuedSend: EnqueuedSend) {
+    private suspend fun send(message: Message,  associatedCall: Call?) {
         mutex.withLock {
             buffer.reset()
 
-            enqueuedSend.message.encode(buffer)
-            val address = enqueuedSend.message.address
+            message.encode(buffer)
+            val address = message.address
 
             val datagram = DatagramPacket(buffer.data, buffer.length, address)
 
             try {
                 socket.send(datagram)
 
-                enqueuedSend.associatedCall?.hasSend()
+                associatedCall?.hasSend()
             } catch (throwable: Throwable) {
                 debug(throwable)
 
-                if (enqueuedSend.associatedCall != null) {
-                    enqueuedSend.associatedCall.injectError()
-                    timeout(enqueuedSend.associatedCall)
+                if (associatedCall != null) {
+                    associatedCall.injectError()
+                    timeout(associatedCall)
                 }
             }
         }
@@ -449,7 +449,7 @@ class Nott(
 
     internal suspend fun doRequestCall(call: Call) {
         requestCalls[call.request.tid.toLongKey(TID_LENGTH)] = call
-        send(EnqueuedSend(call.request, call))
+        send(call.request, call)
     }
 
     internal suspend fun ping(
@@ -612,14 +612,9 @@ class Nott(
     internal suspend fun sendMessage(msg: Message) {
         requireNotNull(msg.address) { "message destination must not be null" }
 
-        send(EnqueuedSend(msg, null))
+        send(msg, null)
     }
 }
-
-internal data class EnqueuedSend(
-    val message: Message,
-    val associatedCall: Call?,
-)
 
 // The maximum UDP packet size for the BitTorrent Mainline DHT is typically
 // limited by the Maximum Transmission Unit (MTU) of the network, and is
