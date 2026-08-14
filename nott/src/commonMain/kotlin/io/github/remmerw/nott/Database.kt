@@ -5,17 +5,17 @@ import java.util.concurrent.ConcurrentHashMap
 import kotlin.random.Random
 
 internal class Database internal constructor() {
-    private val items: MutableMap<Int, MutableSet<InetSocketAddress>> = ConcurrentHashMap()
+    private val items: MutableMap<Long, MutableSet<InetSocketAddress>> = ConcurrentHashMap()
 
     fun store(
         key: ByteArray,
         address: InetSocketAddress,
     ) {
-        val keyEntry = items[key.contentHashCode()]
+        val keyEntry = items[key.toKeyLong()]
         if (keyEntry != null) {
             keyEntry.add(address)
         } else {
-            items[key.contentHashCode()] = mutableSetOf<InetSocketAddress>(address)
+            items[key.toKeyLong()] = mutableSetOf<InetSocketAddress>(address)
         }
     }
 
@@ -33,7 +33,7 @@ internal class Database internal constructor() {
     }
 
     fun insertForKeyAllowed(key: ByteArray): Boolean {
-        val entries = items[key.contentHashCode()] ?: return true
+        val entries = items[key.toKeyLong()] ?: return true
 
         val size = entries.size
 
