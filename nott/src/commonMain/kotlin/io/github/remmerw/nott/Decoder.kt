@@ -72,8 +72,8 @@ internal fun readBuckets(
     length: Int,
 ): List<Peer> {
     val buffer = ByteBuffer.wrap(src)
-
-    val result = mutableListOf<Peer>()
+    val capacity: Int = (src.size / (length + SHA1_HASH_LENGTH))
+    val result = ArrayList<Peer>(capacity)
     while (buffer.hasRemaining()) {
         val rawId = ByteArray(SHA1_HASH_LENGTH)
         buffer.get(rawId)
