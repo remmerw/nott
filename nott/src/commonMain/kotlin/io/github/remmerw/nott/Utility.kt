@@ -3,9 +3,7 @@ package io.github.remmerw.nott
 import java.util.Arrays
 import kotlin.math.min
 
-internal fun ByteArray.toLongKey(): Long = this.toLongKey(8)
-
-internal fun ByteArray.toLongKey(length: Int): Long {
+internal fun ByteArray.toLongKey(length: Int = 8): Long {
     require(length in 1..8) { "Length must be between 1 and 8 bytes for a Long value." }
     require(this.size >= length) { "Array is too small for the requested length." }
 
