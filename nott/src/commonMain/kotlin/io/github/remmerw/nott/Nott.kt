@@ -509,7 +509,7 @@ class Nott(
         }
 
         // check if this is a response to an outstanding request
-        val call = requestCalls[msg.tid.contentHashCode()]
+        val call = requestCalls[msg.tid.toLongKey(TID_LENGTH)]
 
         // message matches transaction ID and origin == destination
         if (call != null) {
@@ -518,7 +518,7 @@ class Nott(
             if (call.request.address == msg.address) {
                 // remove call first in case of exception
 
-                requestCalls.remove(msg.tid.contentHashCode())
+                requestCalls.remove(msg.tid.toLongKey(TID_LENGTH))
 
                 call.response(msg)
 
