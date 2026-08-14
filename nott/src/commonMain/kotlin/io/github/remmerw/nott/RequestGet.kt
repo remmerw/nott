@@ -30,7 +30,7 @@ fun CoroutineScope.requestGet(
             val closest = ClosestSet(nott, key)
             closest.initialize()
 
-            val inFlight: MutableSet<Call> = mutableSetOf()
+            val inFlight: MutableList<Call> = mutableListOf()
             do {
                 do {
                     ensureActive()
@@ -57,7 +57,7 @@ fun CoroutineScope.requestGet(
 
                 ensureActive()
 
-                val removed: MutableSet<Call> = mutableSetOf()
+                val removed: MutableList<Call> = mutableListOf()
                 inFlight.forEach { call ->
                     if (call.state() == CallState.RESPONDED) {
                         removed.add(call)
