@@ -16,7 +16,7 @@ internal fun ByteArray.toLongKey(length: Int): Long {
     return result
 }
 
-
+@Suppress("unused")
 internal fun mismatch(
     a: ByteArray,
     b: ByteArray,
