@@ -24,7 +24,7 @@ fun CoroutineScope.requestAnnounce(
             val closest = ClosestSet(nott, target)
             closest.initialize()
 
-            val inFlight: MutableSet<Call> = ConcurrentHashMap.newKeySet()
+            val inFlight: MutableList<Call> = mutableListOf()
 
             do {
                 do {
@@ -49,7 +49,7 @@ fun CoroutineScope.requestAnnounce(
 
                 ensureActive()
 
-                val removed: MutableSet<Call> = mutableSetOf()
+                val removed: MutableList<Call> = mutableListOf()
                 inFlight.forEach { call ->
                     if (call.state() == CallState.RESPONDED) {
                         removed.add(call)
