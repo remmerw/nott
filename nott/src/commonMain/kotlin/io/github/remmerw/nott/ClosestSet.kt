@@ -67,10 +67,8 @@ internal class ClosestSet(
         request: Request,
         peer: Peer,
     ) : Call {
-        val call = Call(request, peer.id)
         queried.add(peer.id.toLongKey())
-        nott.doRequestCall(call)
-        return call
+        return nott.doRequestCall(request, peer.id)
     }
 
     fun checkTimeoutOrFailure(call: Call): Boolean {
