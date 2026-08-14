@@ -695,7 +695,6 @@ internal fun newerTimeMark(
     return if (markElapsed < cmpElapsed) mark else cmp
 }
 
-
 suspend fun newNott(
     nodeId: ByteArray,
     port: Int = 0,
@@ -754,7 +753,6 @@ fun sha1(bytes: ByteArray): ByteArray {
 }
 
 internal fun createRandomKey(length: Int): ByteArray = Random.nextBytes(ByteArray(length))
-
 
 @Suppress("SameReturnValue")
 private val isError: Boolean

@@ -44,8 +44,6 @@ internal class Peer(
         return true
     }
 
-    
-
     class DistanceOrder(
         val target: ByteArray,
     ) : Comparator<Peer> {
