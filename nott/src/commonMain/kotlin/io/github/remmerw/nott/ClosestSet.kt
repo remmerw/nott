@@ -34,15 +34,15 @@ internal class ClosestSet(
 
     private fun addCandidates(entries: Set<Peer>) {
         for (peer in entries) {
-            candidates[peer.id.toLongKey()] = peer
+            candidates[peer.key()] = peer
         }
     }
 
     private fun sortedLookups(): List<Peer> =
         candidates.values
             .filter { peer ->
-                val hash = peer.id.toLongKey()
-                !queried.contains(hash) && !unreachable.contains(hash)
+                val key = peer.key()
+                !queried.contains(key) && !unreachable.contains(key)
             }.sortedWith { a, b ->
                 threeWayDistance(target, a.id, b.id)
             }
@@ -67,7 +67,7 @@ internal class ClosestSet(
         request: Request,
         peer: Peer,
     ): Call {
-        queried.add(peer.id.toLongKey())
+        queried.add(peer.key())
         return nott.doRequestCall(request, peer.id)
     }
 
@@ -146,7 +146,7 @@ internal class ClosestSet(
             return true
         }
 
-        unreachable.add(peer.id.toLongKey())
+        unreachable.add(peer.key())
         return false
     }
 }
