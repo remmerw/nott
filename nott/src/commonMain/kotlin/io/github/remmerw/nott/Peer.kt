@@ -8,7 +8,7 @@ internal class Peer(
     val id: ByteArray,
     val address: InetSocketAddress,
 ) {
-private val cachedLongKey: Long by lazy { id.toLongKey() }
+private val cachedLongKey: Long by lazy { id.toLong() }
     
     fun key(): Long = cachedLongKey
 
