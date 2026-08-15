@@ -7,8 +7,24 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.seconds
+import io.github.remmerw.buri.Buffer
+import io.github.remmerw.buri.BEReader
+
 
 class Tests {
+
+   @Test
+    fun testTid(){
+        val tid = createTid()
+        val buffer = Buffer(50)
+        buffer.bencodeTid(tid)
+        val data = (buffer.decodeBencode() as BEString).toByteArray()
+        assertEquals(TID_LENGTH,data.size)
+        val cmp = data.toLong(TID_LENGTH)
+        assertEquals(tid,cmp)
+    }
+
+
     @Test
     fun testLong() {
         val originalLong = 1234567890L
