@@ -85,7 +85,7 @@ class Nott(
         expectedId: ByteArray?,
     ): Call {
         val call = Call(request, expectedId)
-        requestCalls[request.tid.toLongKey(TID_LENGTH)] = call
+        requestCalls[request.tid] = call
         send(request, call)
         return call
     }
@@ -137,7 +137,7 @@ class Nott(
     }
 
     internal fun timeout(call: Call) {
-        requestCalls.remove(call.request.tid.toLongKey(TID_LENGTH))
+        requestCalls.remove(call.request.tid)
 
         // don't time out anything if we don't have a connection
         if (call.expectedID != null) {
@@ -469,7 +469,7 @@ class Nott(
             PingRequest(
                 address = address,
                 id = nodeId,
-                tid = tid,
+                tid = tid.toLong(TID_LENGTH)
                 ro = readOnlyState,
             )
         doRequestCall(pr, id) // expectedId can not be available (only address is known)
@@ -490,7 +490,7 @@ class Nott(
         val msg: Message
         try {
             msg = parseMessage(address, map) { tid: ByteArray ->
-                requestCalls[tid.toLongKey(TID_LENGTH)]?.request
+                requestCalls[tid]?.request
             } ?: return
         } catch (throwable: Throwable) {
             debug(throwable)
@@ -526,7 +526,7 @@ class Nott(
             if (call.request.address == msg.address) {
                 // remove call first in case of exception
 
-                requestCalls.remove(msg.tid.toLongKey(TID_LENGTH))
+                requestCalls.remove(msg.tid)
 
                 call.response(msg)
 
