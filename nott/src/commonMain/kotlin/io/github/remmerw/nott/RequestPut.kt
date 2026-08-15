@@ -38,7 +38,7 @@ fun CoroutineScope.requestPut(
                     val peer = closest.nextCandidate()
 
                     if (peer != null) {
-                        val tid = createRandomKey(TID_LENGTH)
+                        val tid = createTid()
                         val request =
                             GetPeersRequest(
                                 address = peer.address,
@@ -69,7 +69,7 @@ fun CoroutineScope.requestPut(
 
                                 if (message.token != null) {
                                     if (gated.add(match.id.toLongKey())) {
-                                        val tid = createRandomKey(TID_LENGTH)
+                                        val tid = createTid()
                                         val request =
                                             PutRequest(
                                                 address = match.address,
