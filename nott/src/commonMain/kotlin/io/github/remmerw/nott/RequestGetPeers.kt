@@ -35,7 +35,7 @@ fun CoroutineScope.requestGetPeers(
 
                     val peer = closest.nextCandidate()
                     if (peer != null) {
-                        val tid = createRandomKey(TID_LENGTH)
+                        val tid = createTid()
                         val request =
                             GetPeersRequest(
                                 address = peer.address,
