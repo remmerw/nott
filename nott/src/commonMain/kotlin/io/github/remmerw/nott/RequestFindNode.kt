@@ -62,7 +62,7 @@ fun CoroutineScope.findNode(
 
                         if (match != null) {
                             if (target.contentEquals(match.id)) {
-                                if (gated.add(match.id.toLongKey())) {
+                                if (gated.add(match.key())) {
                                     send(match.address)
                                 }
                             }
