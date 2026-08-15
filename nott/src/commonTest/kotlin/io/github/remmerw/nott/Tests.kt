@@ -14,10 +14,9 @@ class Tests {
     fun testLong(){
 val originalLong = 1234567890L
 
-// 1. In 4 Bytes umwandeln (da der Wert in 4 Bytes passt)
+
 val byteArray = originalLong.toByteArray(length = 4) 
 
-// 2. Zurück in Long umwandeln mit der ersten Funktion
 val restoredLong = byteArray.toLongKey(length = 4)
      
      assertTrue(originalLong == restoredLong)
