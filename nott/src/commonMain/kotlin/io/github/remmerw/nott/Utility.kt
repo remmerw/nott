@@ -25,6 +25,7 @@ internal fun ByteArray.toLong(length: Int = 8): Long {
         result = (result shl 8) or byteValue
     }
     return result
+}
 
 internal fun Long.toByteArray(length: Int = 8): ByteArray {
     require(length in 1..8) { "Length must be between 1 and 8 bytes for a Long value." }
