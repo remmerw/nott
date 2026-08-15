@@ -8,6 +8,10 @@ internal class Peer(
     val id: ByteArray,
     val address: InetSocketAddress,
 ) {
+private val cachedLongKey: Long by lazy { id.toLongKey() }
+    
+    fun key(): Long = cachedLongKey
+
     private var lastSeen: ValueTimeMark = TimeSource.Monotonic.markNow()
     private var failedQueries = 0
 
