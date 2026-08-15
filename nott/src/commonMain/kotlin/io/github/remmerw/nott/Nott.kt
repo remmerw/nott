@@ -464,12 +464,12 @@ class Nott(
         address: InetSocketAddress,
         id: ByteArray?,
     ) {
-        val tid = createRandomKey(TID_LENGTH)
+        val tid = createTid()
         val pr =
             PingRequest(
                 address = address,
                 id = nodeId,
-                tid = tid.toLong(TID_LENGTH)
+                tid = tid,
                 ro = readOnlyState,
             )
         doRequestCall(pr, id) // expectedId can not be available (only address is known)
@@ -756,6 +756,8 @@ fun sha1(bytes: ByteArray): ByteArray {
 }
 
 internal fun createRandomKey(length: Int): ByteArray = Random.nextBytes(ByteArray(length))
+
+internal fun createTid(): Long = createRandomKey(TID_LENGTH).toLong(TID_LENGTH)
 
 @Suppress("SameReturnValue")
 private val isError: Boolean
