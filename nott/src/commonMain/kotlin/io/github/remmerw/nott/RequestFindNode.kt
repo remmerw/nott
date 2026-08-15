@@ -34,7 +34,7 @@ fun CoroutineScope.findNode(
                     val peer = closest.nextCandidate()
 
                     if (peer != null) {
-                        val tid = createRandomKey(TID_LENGTH)
+                        val tid = createTid()
                         val request =
                             FindNodeRequest(
                                 address = peer.address,
