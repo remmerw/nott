@@ -150,7 +150,7 @@ internal data class FindNodeRequest(
         sink.bencodeEof() // end map
 
         sink.bencodeMapKey(Names.T)
-        sink.bencode(tid.toByteArray(TID_LENGTH))
+        sink.bencodeTid(tid)
 
         sink.bencodeMapKey(Names.Y)
         sink.bencode(Names.Q)
@@ -584,4 +584,12 @@ internal fun Buffer.bencode(isa: InetSocketAddress) {
 
     this.bencodeArrayData(data)
     this.bencodeArrayData(isa.port.toUShort())
+}
+
+internal fun Buffer.bencodeTid(value: Long) {
+    this.bencodeArray(TID_LENGTH)
+for (i in 0 until TID_LENGTH) {
+        val shiftBits = (TID_LENGTH - 1 - i) * 8
+        this.bencodeArrayData((this shr shiftBits) and 0xFFL).toByte())
+    }
 }
