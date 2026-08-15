@@ -65,7 +65,7 @@ fun CoroutineScope.requestAnnounce(
                                 if (rsp.token != null) {
                                     closest.insert(match)
 
-                                    if (gated.add(match.id.toLongKey())) {
+                                    if (gated.add(match.key())) {
                                         val tid = createTid()
                                         val request =
                                             AnnounceRequest(
