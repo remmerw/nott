@@ -8,16 +8,16 @@ internal class RoutingTable internal constructor() {
     private val entries: MutableMap<Long, Peer> = ConcurrentHashMap()
 
     fun insertOrRefresh(peer: Peer) {
-        val entry = entries[peer.id.toLongKey()]
+        val entry = entries[peer.key()]
         if (entry != null) {
             refresh(peer)
         } else {
-            entries[peer.id.toLongKey()] = peer
+            entries[peer.key()] = peer
         }
     }
 
     fun refresh(peer: Peer) {
-        entries[peer.id.toLongKey()]
+        entries[peer.key()]
             ?.mergeInTimestamps(peer)
     }
 
@@ -35,19 +35,19 @@ internal class RoutingTable internal constructor() {
     fun entries(): List<Peer> = entries.values.toList()
 
     fun onTimeout(id: ByteArray) {
-        val peer = entries[id.toLongKey()]
+        val peer = entries[id.toLong()]
         if (peer != null) {
             peer.signalFailure()
             // only removes the entry if it is bad
             if (peer.needsReplacement()) {
-                entries.remove(peer.id.toLongKey())
+                entries.remove(peer.key())
             }
         }
     }
 
-    fun findPeerById(id: ByteArray): Peer? = entries[id.toLongKey()]
+    fun findPeerById(id: ByteArray): Peer? = entries[id.toLong()]
 
     fun notifyOfResponse(msg: Message) {
-        entries[msg.id.toLongKey()]?.signalResponse()
+        entries[msg.id.toLong()]?.signalResponse()
     }
 }
