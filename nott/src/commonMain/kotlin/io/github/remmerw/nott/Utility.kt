@@ -15,6 +15,18 @@ internal fun ByteArray.toLongKey(length: Int = 8): Long {
     return result
 }
 
+internal fun Long.toByteArray(length: Int = 8): ByteArray {
+    require(length in 1..8) { "Length must be between 1 and 8 bytes for a Long value." }
+
+    val result = ByteArray(length)
+    for (i in 0 until length) {
+        val shiftBits = (length - 1 - i) * 8
+        result[i] = ((this shr shiftBits) and 0xFFL).toByte()
+    }
+    return result
+}
+
+
 @Suppress("unused")
 internal fun mismatch(
     a: ByteArray,
