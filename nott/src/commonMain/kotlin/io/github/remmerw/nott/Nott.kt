@@ -489,7 +489,7 @@ class Nott(
 
         val msg: Message
         try {
-            msg = parseMessage(address, map) { tid: ByteArray ->
+            msg = parseMessage(address, map) { tid: Long ->
                 requestCalls[tid]?.request
             } ?: return
         } catch (throwable: Throwable) {
