@@ -17,7 +17,7 @@ val originalLong = 1234567890L
 
 val byteArray = originalLong.toByteArray(length = 4) 
 
-val restoredLong = byteArray.toLongKey(length = 4)
+val restoredLong = byteArray.toLong(length = 4)
      
      assertTrue(originalLong == restoredLong)
 }
