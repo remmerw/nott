@@ -33,7 +33,7 @@ fun CoroutineScope.requestAnnounce(
                     val peer = closest.nextCandidate()
 
                     if (peer != null) {
-                        val tid = createRandomKey(TID_LENGTH)
+                        val tid = createTid()
                         val request =
                             GetPeersRequest(
                                 address = peer.address,
@@ -66,7 +66,7 @@ fun CoroutineScope.requestAnnounce(
                                     closest.insert(match)
 
                                     if (gated.add(match.id.toLongKey())) {
-                                        val tid = createRandomKey(TID_LENGTH)
+                                        val tid = createTid()
                                         val request =
                                             AnnounceRequest(
                                                 address = match.address,
