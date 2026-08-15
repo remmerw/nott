@@ -9,18 +9,17 @@ import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.seconds
 
 class Tests {
-
     @Test
-    fun testLong(){
-val originalLong = 1234567890L
+    fun testLong() {
+        val originalLong = 1234567890L
 
+        val byteArray = originalLong.toByteArray(length = 4)
 
-val byteArray = originalLong.toByteArray(length = 4) 
+        val restoredLong = byteArray.toLong(length = 4)
 
-val restoredLong = byteArray.toLong(length = 4)
-     
-     assertTrue(originalLong == restoredLong)
-}
+        assertTrue(originalLong == restoredLong)
+    }
+
     @Test
     fun testId() {
         val nodeId = nodeId()

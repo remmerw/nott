@@ -3,9 +3,7 @@ package io.github.remmerw.nott
 import java.util.Arrays
 import kotlin.math.min
 
-internal fun ByteArray.toLongKey(): Long {
-    return this.toLong()
-}
+internal fun ByteArray.toLongKey(): Long = this.toLong()
 
 internal fun ByteArray.toLong(length: Int = 8): Long {
     require(length in 1..8) { "Length must be between 1 and 8 bytes for a Long value." }
@@ -29,7 +27,6 @@ internal fun Long.toByteArray(length: Int = 8): ByteArray {
     }
     return result
 }
-
 
 @Suppress("unused")
 internal fun mismatch(
