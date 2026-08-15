@@ -68,7 +68,7 @@ fun CoroutineScope.requestPut(
                                 closest.insert(match)
 
                                 if (message.token != null) {
-                                    if (gated.add(match.id.toLongKey())) {
+                                    if (gated.add(match.key())) {
                                         val tid = createTid()
                                         val request =
                                             PutRequest(
