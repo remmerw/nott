@@ -111,7 +111,7 @@ internal fun readBuckets(
 internal fun parseMessage(
     address: InetSocketAddress,
     map: Map<String, BEObject>,
-    tidMapper: (ByteArray) -> (Request?),
+    tidMapper: (Long) -> (Request?),
 ): Message? {
     val msgType = stringGet(map[Names.Y])
 
@@ -320,7 +320,7 @@ private fun parseRequest(
 private fun parseResponse(
     address: InetSocketAddress,
     map: Map<String, BEObject>,
-    tidMapper: (ByteArray) -> (Request?),
+    tidMapper: (Long) -> (Request?),
 ): Message? {
     val tid = arrayGet(map[Names.T])
 
@@ -329,12 +329,13 @@ private fun parseResponse(
     require(tid.size <= TID_LENGTH) { "invalid transaction ID length " + tid.size }
 
     // responses don't have explicit methods, need to match them to a request to figure that one out
-    val request = tidMapper.invoke(tid)
+    val ltid = tid.toLong(TID_LENGTH)
+    val request = tidMapper.invoke(ltid)
     if (request == null) {
         debug("response does not have a known request (tid)")
         return null
     }
-    return parseResponse(address, map, request,  tid.toLong(TID_LENGTH))
+    return parseResponse(address, map, request, ltid)
 }
 
 private fun parseResponse(
