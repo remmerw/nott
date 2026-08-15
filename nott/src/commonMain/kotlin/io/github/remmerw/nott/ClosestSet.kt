@@ -20,7 +20,7 @@ internal class ClosestSet(
         }
         val rsp = call.response
         if (rsp != null) {
-            return candidates[rsp.id.toLongKey()]
+            return candidates[rsp.id.toLong()]
         }
         return null
     }
@@ -28,7 +28,7 @@ internal class ClosestSet(
     private fun unreachable(call: Call) {
         val rsp = call.response
         if (rsp != null) {
-            unreachable.add(rsp.id.toLongKey())
+            unreachable.add(rsp.id.toLong())
         }
     }
 
