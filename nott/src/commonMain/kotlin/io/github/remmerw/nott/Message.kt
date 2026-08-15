@@ -63,7 +63,7 @@ internal data class AnnounceRequest(
         sink.bencodeEof() // end map
 
         sink.bencodeMapKey(Names.T)
-        sink.bencode(tid.toByteArray(TID_LENGTH))
+        sink.bencodeTid(tid)
         if (ro) {
             sink.bencodeMapKey(Names.RO)
             sink.bencode(1)
@@ -94,8 +94,7 @@ internal data class AnnounceResponse(
         sink.bencodeEof() // end map
 
         sink.bencodeMapKey(Names.T)
-        sink.bencode(tid.toByteArray(TID_LENGTH))
-
+        sink.bencodeTid(tid)
         sink.bencodeMapKey(Names.Y)
         sink.bencode(Names.R)
 
@@ -120,9 +119,8 @@ internal data class Error(
         sink.bencode(message)
         sink.bencodeEof()
 
-        sink.bencodeMapKey(Names.T)
-        sink.bencode(tid.toByteArray(TID_LENGTH))
-
+        sink.bencodeMapKey(Names.T)     
+        sink.bencodeTid(tid)
         sink.bencodeMapKey(Names.Y)
         sink.bencode(Names.E)
 
@@ -194,7 +192,7 @@ internal data class FindNodeResponse(
         sink.bencodeEof() // end map
 
         sink.bencodeMapKey(Names.T)
-        sink.bencode(tid.toByteArray(TID_LENGTH))
+                sink.bencodeTid(tid)
 
         sink.bencodeMapKey(Names.Y)
         sink.bencode(Names.R)
@@ -228,7 +226,7 @@ internal data class GetPeersRequest(
         sink.bencodeEof() // end map
 
         sink.bencodeMapKey(Names.T)
-        sink.bencode(tid.toByteArray(TID_LENGTH))
+                sink.bencodeTid(tid)
 
         sink.bencodeMapKey(Names.Y)
         sink.bencode(Names.Q)
@@ -286,7 +284,7 @@ internal data class GetPeersResponse(
         sink.bencodeEof() // end map
 
         sink.bencodeMapKey(Names.T)
-        sink.bencode(tid.toByteArray(TID_LENGTH))
+                sink.bencodeTid(tid)
 
         sink.bencodeMapKey(Names.Y)
         sink.bencode(Names.R)
@@ -317,7 +315,7 @@ internal data class PingRequest(
         sink.bencodeEof() // end map
 
         sink.bencodeMapKey(Names.T)
-        sink.bencode(tid.toByteArray(TID_LENGTH))
+                sink.bencodeTid(tid)
 
         sink.bencodeMapKey(Names.Y)
         sink.bencode(Names.Q)
@@ -351,7 +349,7 @@ internal data class PingResponse(
         sink.bencodeEof() // end map
 
         sink.bencodeMapKey(Names.T)
-        sink.bencode(tid.toByteArray(TID_LENGTH))
+                sink.bencodeTid(tid)
 
         sink.bencodeMapKey(Names.Y)
         sink.bencode(Names.R)
@@ -413,7 +411,7 @@ internal data class PutRequest(
         sink.bencodeEof() // end map
 
         sink.bencodeMapKey(Names.T)
-        sink.bencode(tid.toByteArray(TID_LENGTH))
+                sink.bencodeTid(tid)
 
         sink.bencodeMapKey(Names.Y)
         sink.bencode(Names.Q)
@@ -447,8 +445,7 @@ internal data class PutResponse(
         sink.bencodeEof() // end map
 
         sink.bencodeMapKey(Names.T)
-        sink.bencode(tid.toByteArray(TID_LENGTH))
-
+        sink.bencodeTid(tid)
         sink.bencodeMapKey(Names.Y)
         sink.bencode(Names.R)
 
@@ -486,7 +483,7 @@ internal data class GetRequest(
         sink.bencodeEof() // end map
 
         sink.bencodeMapKey(Names.T)
-        sink.bencode(tid.toByteArray(TID_LENGTH))
+                sink.bencodeTid(tid)
 
         sink.bencodeMapKey(Names.Y)
         sink.bencode(Names.Q)
@@ -556,8 +553,8 @@ internal data class GetResponse(
         sink.bencodeEof() // end map
 
         sink.bencodeMapKey(Names.T)
-        sink.bencode(tid.toByteArray(TID_LENGTH))
-
+        
+        sink.bencodeTid(tid)
         sink.bencodeMapKey(Names.Y)
         sink.bencode(Names.R)
 
