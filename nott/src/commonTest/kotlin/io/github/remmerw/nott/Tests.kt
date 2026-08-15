@@ -8,7 +8,8 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.seconds
 import io.github.remmerw.buri.Buffer
-import io.github.remmerw.buri.BEReader
+import io.github.remmerw.buri.BEString
+import io.github.remmerw.buri.decodeBencode
 
 
 class Tests {
