@@ -42,7 +42,7 @@ private fun parseError(
     return Error(
         address = address,
         id = id,
-        tid = tid,
+        tid = tid.toLong(TID_LENGTH),
         code = errorCode,
         message = errorMsg.encodeToByteArray(),
     )
@@ -164,7 +164,7 @@ private fun parseRequest(
             PingRequest(
                 address = address,
                 id = id,
-                tid = tid,
+                tid = tid.toLong(TID_LENGTH),
                 ro = ro,
             )
 
@@ -184,7 +184,7 @@ private fun parseRequest(
             FindNodeRequest(
                 address = address,
                 id = id,
-                tid = tid,
+                tid = tid.toLong(TID_LENGTH),
                 ro = ro,
                 target = target,
             )
@@ -205,7 +205,7 @@ private fun parseRequest(
             GetPeersRequest(
                 address = address,
                 id = id,
-                tid = tid,
+                tid = tid.toLong(TID_LENGTH),
                 ro = ro,
                 infoHash = infoHash,
             )
@@ -229,7 +229,7 @@ private fun parseRequest(
             GetRequest(
                 address = address,
                 id = id,
-                tid = tid,
+                tid = tid.toLong(TID_LENGTH),
                 ro = ro,
                 target = target,
                 seq = seq,
@@ -263,7 +263,7 @@ private fun parseRequest(
             PutRequest(
                 address = address,
                 id = id,
-                tid = tid,
+                tid = tid.toLong(TID_LENGTH),
                 ro = ro,
                 token = token,
                 v = v,
@@ -301,7 +301,7 @@ private fun parseRequest(
             AnnounceRequest(
                 address = address,
                 id = id,
-                tid = tid,
+                tid = tid.toLong(TID_LENGTH),
                 ro = ro,
                 infoHash = infoHash,
                 port = port.toInt(),
@@ -334,14 +334,14 @@ private fun parseResponse(
         debug("response does not have a known request (tid)")
         return null
     }
-    return parseResponse(address, map, request, tid)
+    return parseResponse(address, map, request,  tid.toLong(TID_LENGTH))
 }
 
 private fun parseResponse(
     address: InetSocketAddress,
     map: Map<String, BEObject>,
     request: Request,
-    tid: ByteArray,
+    tid: Long,
 ): Message? {
     val inner = map[Names.R]
     if (inner !is BEMap) {
