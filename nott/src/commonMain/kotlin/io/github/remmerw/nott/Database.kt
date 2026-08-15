@@ -11,11 +11,11 @@ internal class Database internal constructor() {
         key: ByteArray,
         address: InetSocketAddress,
     ) {
-        val keyEntry = items[key.toLongKey()]
+        val keyEntry = items[key.toLong()]
         if (keyEntry != null) {
             keyEntry.add(address)
         } else {
-            items[key.toLongKey()] = mutableSetOf<InetSocketAddress>(address)
+            items[key.toLong()] = mutableSetOf<InetSocketAddress>(address)
         }
     }
 
@@ -23,7 +23,7 @@ internal class Database internal constructor() {
         key: ByteArray,
         maxEntries: Int,
     ): List<InetSocketAddress> {
-        val keyEntry = items[key.toLongKey()] ?: return emptyList()
+        val keyEntry = items[key.toLong()] ?: return emptyList()
 
         return keyEntry
             .asSequence()
@@ -33,7 +33,7 @@ internal class Database internal constructor() {
     }
 
     fun insertForKeyAllowed(key: ByteArray): Boolean {
-        val entries = items[key.toLongKey()] ?: return true
+        val entries = items[key.toLong()] ?: return true
 
         val size = entries.size
 
