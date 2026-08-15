@@ -1,5 +1,8 @@
 package io.github.remmerw.nott
 
+import io.github.remmerw.buri.BEString
+import io.github.remmerw.buri.Buffer
+import io.github.remmerw.buri.decodeBencode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -7,24 +10,18 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.seconds
-import io.github.remmerw.buri.Buffer
-import io.github.remmerw.buri.BEString
-import io.github.remmerw.buri.decodeBencode
-
 
 class Tests {
-
-   @Test
-    fun testTid(){
+    @Test
+    fun testTid() {
         val tid = createTid()
         val buffer = Buffer(50)
         buffer.bencodeTid(tid)
         val data = (buffer.decodeBencode() as BEString).toByteArray()
-        assertEquals(TID_LENGTH,data.size)
+        assertEquals(TID_LENGTH, data.size)
         val cmp = data.toLong(TID_LENGTH)
-        assertEquals(tid,cmp)
+        assertEquals(tid, cmp)
     }
-
 
     @Test
     fun testLong() {
