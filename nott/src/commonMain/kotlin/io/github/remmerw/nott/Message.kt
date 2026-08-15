@@ -590,6 +590,6 @@ internal fun Buffer.bencodeTid(value: Long) {
     this.bencodeArray(TID_LENGTH)
 for (i in 0 until TID_LENGTH) {
         val shiftBits = (TID_LENGTH - 1 - i) * 8
-        this.bencodeArrayData((this shr shiftBits) and 0xFFL).toByte())
+        this.bencodeArrayData((value shr shiftBits) and 0xFFL).toByte())
     }
 }
