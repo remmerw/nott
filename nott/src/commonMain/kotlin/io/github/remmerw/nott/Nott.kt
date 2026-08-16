@@ -28,7 +28,7 @@ class Nott(
     val readOnlyState: Boolean = true,
     val bootstrap: Set<InetSocketAddress> = defaultBootstrap(),
 ) {
-    private val unsolicitedThrottle: MutableMap<InetSocketAddress, Long> =
+    private val unsolicitedThrottle: MutableMap<Address, Long> =
         mutableMapOf() // runs in same thread
 
     private val requestCalls: MutableMap<Long, Call> = ConcurrentHashMap()
@@ -45,7 +45,7 @@ class Nott(
     suspend fun bootstrap() {
         try {
             bootstrap.forEach { address: InetSocketAddress ->
-                ping(address, null)
+                ping(Adresse(address.address.address,address.port.toUShort(), null)
             }
         } catch (throwable: Throwable) {
             debug(throwable)
@@ -60,7 +60,7 @@ class Nott(
                 while (isActive) {
                     socket.receive(packet)
 
-                    val inet = InetSocketAddress(packet.address, packet.port)
+                    val inet = Address(packet.address.address, packet.port.toUShort())
                     val length = packet.length
 
                     // * no conceivable DHT message is smaller than 10 bytes
@@ -107,7 +107,7 @@ class Nott(
             message.encode(buffer)
             val address = message.address
 
-            val datagram = DatagramPacket(buffer.data, buffer.length, address)
+            val datagram = DatagramPacket(buffer.data, buffer.length, address.toInetAddress(), address.port.toInt())
 
             try {
                 socket.send(datagram)
@@ -182,11 +182,11 @@ class Nott(
                 ip = request.address,
                 nodes =
                     entries.filter { peer: Peer ->
-                        peer.address.address.address.size == 4
+                        peer.address.address.size == 4
                     },
                 nodes6 =
                     entries.filter { peer: Peer ->
-                        peer.address.address.address.size == 16
+                        peer.address.address.size == 16
                     },
             )
 
@@ -208,8 +208,8 @@ class Nott(
             token =
                 tokenManager.generateToken(
                     request.id,
-                    request.address.address.address,
-                    request.address.port.toUShort(),
+                    request.address.address,
+                    request.address.port,
                     request.infoHash,
                 )
         }
@@ -225,11 +225,11 @@ class Nott(
                 token = token,
                 nodes =
                     entries.filter { peer: Peer ->
-                        peer.address.address.address.size == 4
+                        peer.address.address.size == 4
                     },
                 nodes6 =
                     entries.filter { peer: Peer ->
-                        peer.address.address.address.size == 16
+                        peer.address.address.size == 16
                     },
                 values = values,
             )
@@ -266,11 +266,11 @@ class Nott(
                 token = token,
                 nodes =
                     entries.filter { peer: Peer ->
-                        peer.address.address.address.size == 4
+                        peer.address.address.size == 4
                     },
                 nodes6 =
                     entries.filter { peer: Peer ->
-                        peer.address.address.address.size == 16
+                        peer.address.address.size == 16
                     },
                 null,
                 null,
@@ -291,8 +291,8 @@ class Nott(
         if (!tokenManager.checkToken(
                 request.token,
                 request.id,
-                request.address.address.address,
-                request.address.port.toUShort(),
+                request.address.address,
+                request.address.port,
                 sha1(request.v),
             )
         ) {
@@ -329,8 +329,8 @@ class Nott(
         if (!tokenManager.checkToken(
                 request.token,
                 request.id,
-                request.address.address.address,
-                request.address.port.toUShort(),
+                request.address.address,
+                request.address.port,
                 request.infoHash,
             )
         ) {
@@ -447,7 +447,7 @@ class Nott(
     /**
      * @return true if it should be throttled
      */
-    private fun updateAndCheckThrottle(addr: InetSocketAddress): Boolean {
+    private fun updateAndCheckThrottle(addr: Address): Boolean {
         val oldValue: Long? = unsolicitedThrottle[addr]
         val newValue: Long =
             if (oldValue == null) {
@@ -463,7 +463,7 @@ class Nott(
     internal fun isLocalId(id: ByteArray): Boolean = nodeId.contentEquals(id)
 
     internal suspend fun ping(
-        address: InetSocketAddress,
+        address: Address,
         id: ByteArray?,
     ) {
         val tid = createTid()
@@ -479,7 +479,7 @@ class Nott(
 
     private suspend fun handlePacket(
         reader: BEReader,
-        address: InetSocketAddress,
+        address: Address,
     ) {
         val map: Map<String, BEObject>
         try {
