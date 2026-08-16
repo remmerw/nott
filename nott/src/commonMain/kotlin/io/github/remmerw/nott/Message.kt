@@ -98,6 +98,10 @@ internal data class AnnounceResponse(
         sink.bencodeMapKey(Names.Y)
         sink.bencode(Names.R)
 
+        if (ip != null) {
+            sink.bencodeMapKey(Names.IP)
+            sink.bencode(ip)
+        }
         sink.bencodeEof() // end map
     }
 }
