@@ -4,7 +4,7 @@ import java.util.concurrent.ConcurrentHashMap
 import kotlin.random.Random
 
 internal class Database internal constructor() {
-    private val items: MutableMap<Long, MutableSet<Address>> = ConcurrentHashMap()
+    private val items: MutableMap<Long, MutableSet<Address> = ConcurrentHashMap()
 
     fun store(
         key: ByteArray,
