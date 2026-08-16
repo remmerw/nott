@@ -1,7 +1,7 @@
 package io.github.remmerw.nott
 
 @Suppress("ArrayInDataClass")
-data class Address(
+internal data class Address(
     val address: ByteArray,
     val port: UShort,
 ) {
