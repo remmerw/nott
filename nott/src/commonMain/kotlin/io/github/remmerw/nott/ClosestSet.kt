@@ -9,13 +9,11 @@ internal class ClosestSet(
     private val target: ByteArray,
 ) {
     private val closest: MutableSet<Peer> = mutableSetOf()
-    private val unreachable: MutableSet<Long> = sortedSetOf()
     private val queried: MutableSet<Long> = sortedSetOf()
     private val candidates: MutableSet<Peer> = mutableSetOf()
 
     private fun acceptedResponse(call: Call): Peer? {
         if (!call.matchesExpectedID()) {
-            unreachable(call)
             return null
         }
         val rsp = call.response
@@ -25,18 +23,11 @@ internal class ClosestSet(
         return null
     }
 
-    private fun unreachable(call: Call) {
-        val rsp = call.response
-        if (rsp != null) {
-            unreachable.add(rsp.id.toLong())
-        }
-    }
-
     private fun addCandidates(entries: Set<Peer>) {
         for (peer in entries) {
             if (goodForRequest(peer)) {
                 val key = peer.key()
-                if (!queried.contains(key) && !unreachable.contains(key)) {
+                if (!queried.contains(key)) {
                     candidates.add(peer)
                 }
             }
@@ -47,7 +38,7 @@ internal class ClosestSet(
         candidates
             .filter { peer ->
                 val key = peer.key()
-                !queried.contains(key) && !unreachable.contains(key)
+                !queried.contains(key)
             }.sortedWith { a, b ->
                 threeWayDistance(target, a.id, b.id)
             }
@@ -71,6 +62,7 @@ internal class ClosestSet(
         peer: Peer,
     ): Call {
         queried.add(peer.key())
+        candidates.remove(peer)
         return nott.doRequestCall(request, peer.id)
     }
 
