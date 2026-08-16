@@ -94,16 +94,16 @@ internal class ClosestSet(
             val message = call.response
             if (message is NodesResponse) {
                 val returnedNodes: MutableSet<Peer> = mutableSetOf()
-
-                message.nodes6
-                    .filter { peer: Peer ->
-                        !nott.isLocalId(peer.id)
-                    }.forEach { e: Peer -> returnedNodes.add(e) }
-
-                message.nodes
-                    .filter { peer: Peer ->
-                        !nott.isLocalId(peer.id)
-                    }.forEach { e: Peer -> returnedNodes.add(e) }
+for (peer in message.nodes6) {
+            if (!nott.isLocalId(peer.id)) {
+                returnedNodes.add(peer)
+            }
+        }
+        for (peer in message.nodes) {
+            if (!nott.isLocalId(peer.id)) {
+                returnedNodes.add(peer)
+            }
+        }
 
                 addCandidates(returnedNodes)
             }
