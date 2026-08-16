@@ -8,10 +8,9 @@ import io.github.remmerw.buri.bencodeEof
 import io.github.remmerw.buri.bencodeList
 import io.github.remmerw.buri.bencodeMap
 import io.github.remmerw.buri.bencodeMapKey
-import java.net.InetSocketAddress
 
 internal sealed interface Message {
-    val address: InetSocketAddress
+    val address: Address
     val id: ByteArray
     val tid: Long
 
@@ -19,7 +18,7 @@ internal sealed interface Message {
 }
 
 internal sealed interface Response : Message {
-    val ip: InetSocketAddress?
+    val ip: Address?
 }
 
 internal sealed interface NodesResponse : Response {
@@ -33,7 +32,7 @@ internal sealed interface Request : Message {
 
 @Suppress("ArrayInDataClass")
 internal data class AnnounceRequest(
-    override val address: InetSocketAddress,
+    override val address: Address,
     override val id: ByteArray,
     override val tid: Long,
     override val ro: Boolean,
@@ -79,10 +78,10 @@ internal data class AnnounceRequest(
 
 @Suppress("ArrayInDataClass")
 internal data class AnnounceResponse(
-    override val address: InetSocketAddress,
+    override val address: Address,
     override val id: ByteArray,
     override val tid: Long,
-    override val ip: InetSocketAddress?,
+    override val ip: Address?,
 ) : Response {
     override fun encode(sink: Buffer) {
         sink.bencodeMap() // new map
@@ -108,7 +107,7 @@ internal data class AnnounceResponse(
 
 @Suppress("ArrayInDataClass")
 internal data class Error(
-    override val address: InetSocketAddress,
+    override val address: Address,
     override val id: ByteArray,
     override val tid: Long,
     val code: Int,
@@ -134,7 +133,7 @@ internal data class Error(
 
 @Suppress("ArrayInDataClass")
 internal data class FindNodeRequest(
-    override val address: InetSocketAddress,
+    override val address: Address,
     override val id: ByteArray,
     override val tid: Long,
     override val ro: Boolean,
@@ -171,10 +170,10 @@ internal data class FindNodeRequest(
 
 @Suppress("ArrayInDataClass")
 internal data class FindNodeResponse(
-    override val address: InetSocketAddress,
+    override val address: Address,
     override val id: ByteArray,
     override val tid: Long,
-    override val ip: InetSocketAddress?,
+    override val ip: Address?,
     override val nodes: List<Peer>,
     override val nodes6: List<Peer>,
 ) : NodesResponse {
@@ -212,7 +211,7 @@ internal data class FindNodeResponse(
 
 @Suppress("ArrayInDataClass")
 internal data class GetPeersRequest(
-    override val address: InetSocketAddress,
+    override val address: Address,
     override val id: ByteArray,
     override val tid: Long,
     override val ro: Boolean,
@@ -249,14 +248,14 @@ internal data class GetPeersRequest(
 
 @Suppress("ArrayInDataClass")
 internal data class GetPeersResponse(
-    override val address: InetSocketAddress,
+    override val address: Address,
     override val id: ByteArray,
     override val tid: Long,
-    override val ip: InetSocketAddress?,
+    override val ip: Address?,
     val token: ByteArray?,
     override val nodes: List<Peer>,
     override val nodes6: List<Peer>,
-    val values: List<InetSocketAddress>,
+    val values: List<Address>,
 ) : NodesResponse {
     override fun encode(sink: Buffer) {
         sink.bencodeMap() // new map
@@ -304,7 +303,7 @@ internal data class GetPeersResponse(
 
 @Suppress("ArrayInDataClass")
 internal data class PingRequest(
-    override val address: InetSocketAddress,
+    override val address: Address,
     override val id: ByteArray,
     override val tid: Long,
     override val ro: Boolean,
@@ -338,10 +337,10 @@ internal data class PingRequest(
 
 @Suppress("ArrayInDataClass")
 internal data class PingResponse(
-    override val address: InetSocketAddress,
+    override val address: Address,
     override val id: ByteArray,
     override val tid: Long,
-    override val ip: InetSocketAddress?,
+    override val ip: Address?,
 ) : Response {
     override fun encode(sink: Buffer) {
         sink.bencodeMap() // new map
@@ -369,7 +368,7 @@ internal data class PingResponse(
 
 @Suppress("ArrayInDataClass")
 internal data class PutRequest(
-    override val address: InetSocketAddress,
+    override val address: Address,
     override val id: ByteArray,
     override val tid: Long,
     override val ro: Boolean,
@@ -434,10 +433,10 @@ internal data class PutRequest(
 
 @Suppress("ArrayInDataClass")
 internal data class PutResponse(
-    override val address: InetSocketAddress,
+    override val address: Address,
     override val id: ByteArray,
     override val tid: Long,
-    override val ip: InetSocketAddress?,
+    override val ip: Address?,
 ) : Response {
     override fun encode(sink: Buffer) {
         sink.bencodeMap() // new map
@@ -464,7 +463,7 @@ internal data class PutResponse(
 
 @Suppress("ArrayInDataClass")
 internal data class GetRequest(
-    override val address: InetSocketAddress,
+    override val address: Address,
     override val id: ByteArray,
     override val tid: Long,
     override val ro: Boolean,
@@ -506,10 +505,10 @@ internal data class GetRequest(
 
 @Suppress("ArrayInDataClass")
 internal data class GetResponse(
-    override val address: InetSocketAddress,
+    override val address: Address,
     override val id: ByteArray,
     override val tid: Long,
-    override val ip: InetSocketAddress?,
+    override val ip: Address?,
     val token: ByteArray?,
     override val nodes: List<Peer>,
     override val nodes6: List<Peer>,
@@ -578,14 +577,6 @@ internal fun Buffer.bencodePeers(
     }
 }
 
-internal fun Buffer.bencode(isa: InetSocketAddress) {
-    val data = isa.address.address
-
-    this.bencodeArray((data.size + 2))
-
-    this.bencodeArrayData(data)
-    this.bencodeArrayData(isa.port.toUShort())
-}
 
 internal fun Buffer.bencodeTid(value: Long) {
     this.bencodeArray(TID_LENGTH)
