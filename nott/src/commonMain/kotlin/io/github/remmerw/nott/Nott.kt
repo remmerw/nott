@@ -40,6 +40,7 @@ class Nott(
     private val routingTable = RoutingTable()
     private val buffer = Buffer(UDP_PACKET)
     private val received = ByteArray(UDP_PACKET)
+
     fun port(): Int = socket.localPort
 
     suspend fun bootstrap() {
@@ -55,7 +56,6 @@ class Nott(
     fun startup() {
         scope.launch {
             try {
-                
                 val packet = DatagramPacket(received, UDP_PACKET)
                 while (isActive) {
                     socket.receive(packet)
@@ -173,9 +173,9 @@ class Nott(
         }
 
         val entries = routingTable.closestPeers(request.target, 8)
-val (ipv4Peers, ipv6Peers) = entries
-    .partition { it.address.address.size == 4 }
-
+        val (ipv4Peers, ipv6Peers) =
+            entries
+                .partition { it.address.address.size == 4 }
 
         val response =
             FindNodeResponse(
@@ -212,9 +212,9 @@ val (ipv4Peers, ipv6Peers) = entries
         }
 
         val entries = routingTable.closestPeers(request.infoHash, 8)
-val (ipv4Peers, ipv6Peers) = entries
-    .partition { it.address.address.size == 4 }
-
+        val (ipv4Peers, ipv6Peers) =
+            entries
+                .partition { it.address.address.size == 4 }
 
         val resp =
             GetPeersResponse(
@@ -250,9 +250,9 @@ val (ipv4Peers, ipv6Peers) = entries
         }
 
         val entries = routingTable.closestPeers(request.target, 8)
-val (ipv4Peers, ipv6Peers) = entries
-    .partition { it.address.address.size == 4 }
-
+        val (ipv4Peers, ipv6Peers) =
+            entries
+                .partition { it.address.address.size == 4 }
 
         val resp =
             GetResponse(
@@ -693,7 +693,7 @@ internal fun newerTimeMark(
 
 suspend fun newNott(
     nodeId: ByteArray,
-    port: Int = 0,   
+    port: Int = 0,
     bootstrap: Set<InetSocketAddress> = defaultBootstrap(),
 ): Nott {
     val nott = Nott(nodeId, port = port, bootstrap = bootstrap)
