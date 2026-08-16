@@ -5,11 +5,9 @@ import io.github.remmerw.buri.BEList
 import io.github.remmerw.buri.BEMap
 import io.github.remmerw.buri.BEObject
 import io.github.remmerw.buri.BEString
-import java.net.InetAddress
-import java.net.InetSocketAddress
 
 private fun parseError(
-    address: InetSocketAddress,
+    address: Address,
     map: Map<String, BEObject>,
 ): Message {
     val error = map[Names.E]
@@ -94,9 +92,9 @@ internal fun readBuckets(
                 val peer =
                     Peer(
                         rawId,
-                        InetSocketAddress(
-                            InetAddress.getByAddress(raw),
-                            port.toInt(),
+                        Address(
+                            raw,
+                            port,
                         ),
                     )
                 result.add(peer)
@@ -109,7 +107,7 @@ internal fun readBuckets(
 }
 
 internal fun parseMessage(
-    address: InetSocketAddress,
+    address: Address,
     map: Map<String, BEObject>,
     tidMapper: (Long) -> (Request?),
 ): Message? {
@@ -141,7 +139,7 @@ internal fun parseMessage(
 }
 
 private fun parseRequest(
-    address: InetSocketAddress,
+    address: Address,
     map: Map<String, BEObject>,
 ): Message? {
     val ro = roGet(map[Names.RO])
@@ -318,7 +316,7 @@ private fun parseRequest(
 }
 
 private fun parseResponse(
-    address: InetSocketAddress,
+    address: Address,
     map: Map<String, BEObject>,
     tidMapper: (Long) -> (Request?),
 ): Message? {
@@ -339,7 +337,7 @@ private fun parseResponse(
 }
 
 private fun parseResponse(
-    address: InetSocketAddress,
+    address: Address,
     map: Map<String, BEObject>,
     request: Request,
     tid: Long,
@@ -395,7 +393,7 @@ private fun parseResponse(
             val token = arrayGet(args[Names.TOKEN])
             val nodes6 = extractNodes6(args)
             val nodes = extractNodes(args)
-            val addresses: MutableList<InetSocketAddress> = mutableListOf()
+            val addresses: MutableList<Address> = mutableListOf()
 
             var vals: List<ByteArray> = listOf()
             val values = args[Names.VALUES]
@@ -425,9 +423,9 @@ private fun parseResponse(
 
                             if (port > 0.toUShort() && port <= 65535.toUShort()) {
                                 addresses.add(
-                                    InetSocketAddress(
-                                        InetAddress.getByAddress(address),
-                                        port.toInt(),
+                                    Address(
+                                        address,
+                                        port,
                                     ),
                                 )
                             }
@@ -447,9 +445,9 @@ private fun parseResponse(
 
                             if (port > 0.toUShort() && port <= 65535.toUShort()) {
                                 addresses.add(
-                                    InetSocketAddress(
-                                        InetAddress.getByAddress(address),
-                                        port.toInt(),
+                                    Address(
+                                        address,
+                                        port,
                                     ),
                                 )
                             }
