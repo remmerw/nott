@@ -1,15 +1,14 @@
 package io.github.remmerw.nott
 
-import java.net.InetSocketAddress
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.random.Random
 
 internal class Database internal constructor() {
-    private val items: MutableMap<Long, MutableSet<InetSocketAddress>> = ConcurrentHashMap()
+    private val items: MutableMap<Long, MutableSet<Address>> = ConcurrentHashMap()
 
     fun store(
         key: ByteArray,
-        address: InetSocketAddress,
+        address: Address,
     ) {
         val keyEntry = items[key.toLong()]
         if (keyEntry != null) {
@@ -22,7 +21,7 @@ internal class Database internal constructor() {
     fun sample(
         key: ByteArray,
         maxEntries: Int,
-    ): List<InetSocketAddress> {
+    ): List<Address> {
         val keyEntry = items[key.toLong()] ?: return emptyList()
 
         if (keyEntry.size <= maxEntries) {
@@ -30,7 +29,7 @@ internal class Database internal constructor() {
         }
 
         // Reservoir Sampling Algorithm
-        val result = mutableListOf<InetSocketAddress>()
+        val result = mutableListOf<Address>()
         keyEntry.forEachIndexed { index, item ->
             if (index < maxEntries) {
                 result.add(item)
