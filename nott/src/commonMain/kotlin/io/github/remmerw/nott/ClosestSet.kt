@@ -36,7 +36,13 @@ internal class ClosestSet(
     }
 
     private fun sortCandidates() {
-        candidates.sortedWith { a, b ->
+        candidates.sortWith { a, b ->
+            threeWayDistance(target, a.id, b.id)
+        }
+    }
+
+    private fun sortClosest() {
+        closest.sortWith { a, b ->
             threeWayDistance(target, a.id, b.id)
         }
     }
@@ -115,12 +121,9 @@ internal class ClosestSet(
 
     fun insert(peer: Peer) {
         if (closest.add(peer)) {
+            sortClosest()
             if (closest.size > MAX_ENTRIES_PER_BUCKET) {
-                val last =
-                    closest
-                        .sortedWith { a, b ->
-                            threeWayDistance(target, a.id, b.id)
-                        }.last()
+                val last = closest.last()
                 closest.remove(last)
             }
         }
