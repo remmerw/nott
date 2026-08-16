@@ -5,6 +5,10 @@ import java.net.InetSocketAddress
 import java.util.Arrays
 import kotlin.math.min
 
+fun InetSocketAddress.toAddress(): Address {
+     return Address(this.address.address, this.port.toUShort())
+}
+
 internal fun Address.toInetSocketAddress(): InetSocketAddress {
     val inetAddress = InetAddress.getByAddress(this.address)
 
