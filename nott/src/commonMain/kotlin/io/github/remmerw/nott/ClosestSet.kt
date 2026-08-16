@@ -1,7 +1,5 @@
 package io.github.remmerw.nott
 
-import java.util.TreeSet
-import kotlin.comparisons.comparator
 
 /*
 * We need to detect when the closest set is stable
@@ -15,6 +13,11 @@ internal class ClosestSet(
     private val queried: MutableSet<Long> = sortedSetOf()
     private val candidates = mutableListOf<Peer>()
 
+    private fun sortCandidates(){
+       candidates.sortWith{ a, b ->
+          threeWayDistance(target, a.id, b.id) 
+       }
+   }
 
     private fun acceptedResponse(call: Call): Peer? {
         if (!call.matchesExpectedID()) {
