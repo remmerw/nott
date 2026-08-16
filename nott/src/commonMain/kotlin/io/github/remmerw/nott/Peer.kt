@@ -1,12 +1,11 @@
 package io.github.remmerw.nott
 
-import java.net.InetSocketAddress
 import kotlin.time.TimeSource
 import kotlin.time.TimeSource.Monotonic.ValueTimeMark
 
 internal class Peer(
     val id: ByteArray,
-    val address: InetSocketAddress,
+    val address: Address,
 ) {
     private val cachedLongKey: Long by lazy { id.toLong() }
 
