@@ -11,13 +11,11 @@ internal class ClosestSet(
     private val nott: Nott,
     private val target: ByteArray,
 ) {
-    private val closest = TreeSet<Peer>(comparator{
-        candidates.sortedWith { a, b ->
+    private val closest = TreeSet<Peer>( comparator{ a, b ->
             threeWayDistance(target, a.id, b.id)
         })
     private val queried: MutableSet<Long> = sortedSetOf()
-    private val candidates = TreeSet<Peer>(comparator{
-        candidates.sortedWith { a, b ->
+    private val candidates = TreeSet<Peer>( comparator{ a, b ->
             threeWayDistance(target, a.id, b.id)
         })
 
