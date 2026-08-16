@@ -71,7 +71,7 @@ fun CoroutineScope.requestGetPeers(
                             }
 
                             if (list.isNotEmpty()) {
-                                send(PeerResponse(message.address, list))
+                                send(PeerResponse(message.address.toInetSocketAddress(), list))
                             }
 
                             closest.insert(match)
