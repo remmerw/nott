@@ -8,9 +8,9 @@ internal class ClosestSet(
     private val nott: Nott,
     private val target: ByteArray,
 ) {
-    private val closest: MutableSet<Peer> = mutableSetOf()
+    private val closest: MutableList<Peer> = mutableListOf()
     private val queried: MutableSet<Long> = sortedSetOf()
-    private val candidates: MutableSet<Peer> = mutableSetOf()
+    private val candidates: MutableList<Peer> = mutableListOf()
 
     private fun acceptedResponse(call: Call): Peer? {
         if (!call.matchesExpectedID()) {
