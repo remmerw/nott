@@ -35,7 +35,7 @@ internal class ClosestSet(
 
     private fun addCandidates(entries: Set<Peer>) {
         for (peer in entries) {
-            if(goodForRequest(peer){
+            if(goodForRequest(peer)){
             candidates.add(peer)
 }
         }
