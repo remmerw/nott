@@ -84,14 +84,14 @@ class PutTest {
                 }
             }
 
-            delay(5.seconds)
+            delay(10.seconds)
 
             val bootstrap: MutableSet<InetSocketAddress> = mutableSetOf()
             bootstrap.addAll(defaultBootstrap())
             bootstrap.addAll(peers)
 
             val read = AtomicInt(0)
-            withTimeoutOrNull(30.seconds) {
+            withTimeoutOrNull(60.seconds) {
                 val nott = newNott(nodeId(), bootstrap = bootstrap)
                 try {
                     val channel =
