@@ -66,7 +66,7 @@ fun CoroutineScope.findNode(
                                     send(match.address)
                                 }
                             }
-                            closest.insert(match)
+                            closest.insert(match.toInetSocketAddress())
                         }
                     } else {
                         val failure = closest.checkTimeoutOrFailure(call)
