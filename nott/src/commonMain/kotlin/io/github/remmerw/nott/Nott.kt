@@ -80,6 +80,9 @@ class Nott(
         }
     }
 
+    internal fun findPeerById(id: ByteArray) : Peer? = routingTable.findPeerById(id)
+
+
     internal suspend fun doRequestCall(
         request: Request,
         expectedId: ByteArray?,
