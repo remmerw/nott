@@ -3,7 +3,7 @@ package io.github.remmerw.nott
 @Suppress("ArrayInDataClass")
 internal data class Address(
     val address: ByteArray,
-    val port: UShort
+    val port: UShort,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
