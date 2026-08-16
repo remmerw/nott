@@ -37,9 +37,10 @@ internal class ClosestSet(
 
     private fun sortCandidates() {
         candidates.sortedWith { a, b ->
-                threeWayDistance(target, a.id, b.id)
-            }
-}
+            threeWayDistance(target, a.id, b.id)
+        }
+    }
+
     suspend fun initialize() {
         val entries = nott.closestPeers(target, 32)
         if (entries.isEmpty()) {
@@ -54,7 +55,7 @@ internal class ClosestSet(
         return candidates
             .filter { peer ->
                 !queried.contains(peer.key())
-           }.firstOrNull()
+            }.firstOrNull()
     }
 
     suspend fun requestCall(
@@ -93,16 +94,16 @@ internal class ClosestSet(
             val message = call.response
             if (message is NodesResponse) {
                 val returnedNodes: MutableSet<Peer> = mutableSetOf()
-for (peer in message.nodes6) {
-            if (!nott.isLocalId(peer.id)) {
-                returnedNodes.add(peer)
-            }
-        }
-        for (peer in message.nodes) {
-            if (!nott.isLocalId(peer.id)) {
-                returnedNodes.add(peer)
-            }
-        }
+                for (peer in message.nodes6) {
+                    if (!nott.isLocalId(peer.id)) {
+                        returnedNodes.add(peer)
+                    }
+                }
+                for (peer in message.nodes) {
+                    if (!nott.isLocalId(peer.id)) {
+                        returnedNodes.add(peer)
+                    }
+                }
 
                 addCandidates(returnedNodes)
             }
