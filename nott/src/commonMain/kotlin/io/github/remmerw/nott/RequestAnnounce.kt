@@ -56,7 +56,7 @@ fun CoroutineScope.requestAnnounce(
 
                         val rsp = call.response
                         if (rsp is AnnounceResponse) {
-                            send(rsp.address)
+                            send(rsp.address.toInetSocketAddress())
                         }
                         if (rsp is GetPeersResponse) {
                             val match = closest.acceptResponse(call)
