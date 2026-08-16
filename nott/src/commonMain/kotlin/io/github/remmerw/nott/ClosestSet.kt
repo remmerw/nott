@@ -32,17 +32,14 @@ internal class ClosestSet(
                 }
             }
         }
+        sortCandidates()
     }
 
-    private fun sortedLookups(): List<Peer> =
-        candidates
-            .filter { peer ->
-                val key = peer.key()
-                !queried.contains(key)
-            }.sortedWith { a, b ->
+    private fun sortCandidates() {
+        candidates.sortedWith { a, b ->
                 threeWayDistance(target, a.id, b.id)
             }
-
+}
     suspend fun initialize() {
         val entries = nott.closestPeers(target, 32)
         if (entries.isEmpty()) {
@@ -53,8 +50,12 @@ internal class ClosestSet(
     }
 
     fun nextCandidate(): Peer? {
-        val sorted = sortedLookups()
-        return sorted.firstOrNull()
+        sortCandidates()
+        return candidates
+            .filter { peer ->
+                val key = peer.key()
+                !queried.contains(key)
+           }.firstOrNull()
     }
 
     suspend fun requestCall(
