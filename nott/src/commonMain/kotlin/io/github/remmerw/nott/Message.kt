@@ -577,7 +577,6 @@ internal fun Buffer.bencodePeers(
     }
 }
 
-
 internal fun Buffer.bencodeTid(value: Long) {
     this.bencodeArray(TID_LENGTH)
 
