@@ -1,5 +1,7 @@
 package io.github.remmerw.nott
 
+import java.util.TreeSet
+
 /*
 * We need to detect when the closest set is stable
 *  - in principle we're done as soon as there is no request candidates
@@ -8,9 +10,15 @@ internal class ClosestSet(
     private val nott: Nott,
     private val target: ByteArray,
 ) {
-    private val closest: MutableList<Peer> = mutableListOf()
+    private val closest = TreeSet<Peer>(comparator{
+        candidates.sortedWith { a, b ->
+            threeWayDistance(target, a.id, b.id)
+        })
     private val queried: MutableSet<Long> = sortedSetOf()
-    private val candidates: MutableList<Peer> = mutableListOf()
+    private val candidates = TreeSet<Peer>(comparator{
+        candidates.sortedWith { a, b ->
+            threeWayDistance(target, a.id, b.id)
+        })
 
     private fun acceptedResponse(call: Call): Peer? {
         if (!call.matchesExpectedID()) {
@@ -32,20 +40,10 @@ internal class ClosestSet(
                 }
             }
         }
-        sortCandidates()
+        
     }
 
-    private fun sortCandidates() {
-        candidates.sortedWith { a, b ->
-            threeWayDistance(target, a.id, b.id)
-        }
-    }
-
-    private fun sortClosest() {
-        closest.sortedWith { a, b ->
-            threeWayDistance(target, a.id, b.id)
-        }
-    }
+   
 
     suspend fun initialize() {
         val entries = nott.closestPeers(target, 32)
@@ -57,7 +55,7 @@ internal class ClosestSet(
     }
 
     fun nextCandidate(): Peer? {
-        sortCandidates()
+       
         return candidates
             .filter { peer ->
                 !queried.contains(peer.key())
@@ -121,7 +119,7 @@ internal class ClosestSet(
 
     fun insert(peer: Peer) {
         if (closest.add(peer)) {
-            sortClosest()
+       
             if (closest.size > MAX_ENTRIES_PER_BUCKET) {
                 val last = closest.last()
                 closest.remove(last)
