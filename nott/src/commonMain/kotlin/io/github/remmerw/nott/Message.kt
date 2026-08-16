@@ -585,7 +585,7 @@ internal fun Buffer.bencode(isa: InetSocketAddress) {
 
 internal fun Buffer.bencodeTid(value: Long) {
     this.bencodeArray(TID_LENGTH)
-    
+
     this.bencodeArrayData(((value shr 40) and 0xFFL).toByte())
     this.bencodeArrayData(((value shr 32) and 0xFFL).toByte())
     this.bencodeArrayData(((value shr 24) and 0xFFL).toByte())
@@ -593,4 +593,3 @@ internal fun Buffer.bencodeTid(value: Long) {
     this.bencodeArrayData(((value shr 8) and 0xFFL).toByte())
     this.bencodeArrayData((value and 0xFFL).toByte())
 }
-
