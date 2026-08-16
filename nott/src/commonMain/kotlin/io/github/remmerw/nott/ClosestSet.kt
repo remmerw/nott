@@ -36,13 +36,13 @@ internal class ClosestSet(
     }
 
     private fun sortCandidates() {
-        candidates.sortWith { a, b ->
+        candidates.sortedWith { a, b ->
             threeWayDistance(target, a.id, b.id)
         }
     }
 
     private fun sortClosest() {
-        closest.sortWith { a, b ->
+        closest.sortedWith { a, b ->
             threeWayDistance(target, a.id, b.id)
         }
     }
