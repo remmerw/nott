@@ -585,8 +585,12 @@ internal fun Buffer.bencode(isa: InetSocketAddress) {
 
 internal fun Buffer.bencodeTid(value: Long) {
     this.bencodeArray(TID_LENGTH)
-    for (i in 0 until TID_LENGTH) {
-        val shiftBits = (TID_LENGTH - 1 - i) * 8
-        this.bencodeArrayData(((value shr shiftBits) and 0xFFL).toByte())
-    }
+    
+    this.bencodeArrayData(((value shr 40) and 0xFFL).toByte())
+    this.bencodeArrayData(((value shr 32) and 0xFFL).toByte())
+    this.bencodeArrayData(((value shr 24) and 0xFFL).toByte())
+    this.bencodeArrayData(((value shr 16) and 0xFFL).toByte())
+    this.bencodeArrayData(((value shr 8) and 0xFFL).toByte())
+    this.bencodeArrayData((value and 0xFFL).toByte())
 }
+
