@@ -476,7 +476,7 @@ private fun parseResponse(
     return msg
 }
 
-fun stringGet(beObject: BEObject?): String? {
+internal fun stringGet(beObject: BEObject?): String? {
     if (beObject == null) {
         return null
     }
@@ -487,7 +487,7 @@ fun stringGet(beObject: BEObject?): String? {
     return null
 }
 
-fun arrayGet(beObject: BEObject?): ByteArray? {
+internal fun arrayGet(beObject: BEObject?): ByteArray? {
     if (beObject == null) {
         return null
     }
@@ -498,7 +498,7 @@ fun arrayGet(beObject: BEObject?): ByteArray? {
     return null
 }
 
-fun inetGet(beObject: BEObject?): Address? {
+internal fun inetGet(beObject: BEObject?): Address? {
     if (beObject == null) {
         return null
     }
@@ -523,7 +523,7 @@ fun inetGet(beObject: BEObject?): Address? {
     return null
 }
 
-fun longGet(beObject: BEObject?): Long? {
+internal fun longGet(beObject: BEObject?): Long? {
     if (beObject == null) {
         return null
     }
@@ -533,7 +533,7 @@ fun longGet(beObject: BEObject?): Long? {
     return null
 }
 
-fun roGet(beObject: BEObject?): Boolean {
+internal fun roGet(beObject: BEObject?): Boolean {
     if (beObject == null) {
         return false
     }
