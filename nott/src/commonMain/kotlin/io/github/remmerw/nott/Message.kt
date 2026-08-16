@@ -572,8 +572,8 @@ internal fun Buffer.bencodePeers(
     this.bencodeArray(list.size * size)
     list.forEach { peer: Peer ->
         this.bencodeArrayData(peer.id)
-        this.bencodeArrayData(peer.address.address.address)
-        this.bencodeArrayData(peer.address.port.toUShort())
+        this.bencodeArrayData(peer.address.address)
+        this.bencodeArrayData(peer.address.port)
     }
 }
 
