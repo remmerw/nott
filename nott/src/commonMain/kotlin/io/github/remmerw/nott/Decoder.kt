@@ -498,7 +498,7 @@ fun arrayGet(beObject: BEObject?): ByteArray? {
     return null
 }
 
-fun inetGet(beObject: BEObject?): InetSocketAddress? {
+fun inetGet(beObject: BEObject?): Address? {
     if (beObject == null) {
         return null
     }
@@ -515,9 +515,9 @@ fun inetGet(beObject: BEObject?): InetSocketAddress? {
                 ) shl 8 or (data[length + 1].toInt() and 0xFF)
             ).toUShort()
 
-        return InetSocketAddress(
-            InetAddress.getByAddress(address),
-            port.toInt(),
+        return Address(
+            address,
+            port,
         )
     }
     return null
