@@ -53,8 +53,7 @@ internal class ClosestSet(
         sortCandidates()
         return candidates
             .filter { peer ->
-                val key = peer.key()
-                !queried.contains(key)
+                !queried.contains(peer.key())
            }.firstOrNull()
     }
 
