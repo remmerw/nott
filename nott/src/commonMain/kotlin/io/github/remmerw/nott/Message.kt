@@ -597,3 +597,12 @@ internal fun Buffer.bencodeTid(value: Long) {
     this.bencodeArrayData(((value shr 8) and 0xFFL).toByte())
     this.bencodeArrayData((value and 0xFFL).toByte())
 }
+
+internal fun Buffer.bencode(address: Address) {
+    val data = address.address
+
+    this.bencodeArray(data.size + 2)
+
+    this.bencodeArrayData(data)
+    this.bencodeArrayData(address.port)
+}
