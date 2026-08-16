@@ -18,7 +18,7 @@ suspend fun requestPing(
     val tid = createTid()
     val request =
         PingRequest(
-            address = Address(address.address.address, address.port.toUShort()),
+            address = address.toAddress(),
             id = nott.nodeId,
             tid = tid,
             ro = nott.readOnlyState,
