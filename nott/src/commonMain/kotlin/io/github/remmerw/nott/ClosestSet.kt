@@ -11,16 +11,11 @@ internal class ClosestSet(
     private val nott: Nott,
     private val target: ByteArray,
 ) {
-    private val closest = TreeSet<Peer>(comparator { a, b ->
-    // Deine Funktion MUSS einen Int (-1, 0, 1) zurückgeben
-    threeWayDistance(target, a.id, b.id) 
-})
+    private val closest = mutableListOf<Peer>()
     private val queried: MutableSet<Long> = sortedSetOf()
-    
-private val candidates = TreeSet<Peer>(comparator { a, b ->
-    // Deine Funktion MUSS einen Int (-1, 0, 1) zurückgeben
-    threeWayDistance(target, a.id, b.id) 
-})
+    private val candidates = mutableListOf<Peer>()
+
+
     private fun acceptedResponse(call: Call): Peer? {
         if (!call.matchesExpectedID()) {
             return null
