@@ -20,8 +20,7 @@ internal class ClosestSet(
         }
         val rsp = call.response
         if (rsp != null) {
-           return nott.findPeerById(rsp.id) // Todo test
-           // return candidates[rsp.id.toLong()]
+           return nott.findPeerById(rsp.id)
         }
         return null
     }
@@ -36,7 +35,10 @@ internal class ClosestSet(
     private fun addCandidates(entries: Set<Peer>) {
         for (peer in entries) {
             if(goodForRequest(peer)){
+                val key = peer.key()
+                if(!queried.contains(key) && !unreachable.contains(key)){
             candidates.add(peer)
+}
 }
         }
     }
