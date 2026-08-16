@@ -1,6 +1,7 @@
 package io.github.remmerw.nott
 
 import java.util.TreeSet
+import kotlin.comparisons.comparator
 
 /*
 * We need to detect when the closest set is stable
