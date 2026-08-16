@@ -61,7 +61,7 @@ fun CoroutineScope.requestPut(
                         removed.add(call)
                         val message = call.response
                         if (message is PutResponse) {
-                            send(message.address)
+                            send(message.address.toInetSocketAddress())
                         } else if (message is GetPeersResponse) {
                             val match = closest.acceptResponse(call)
                             if (match != null) {
