@@ -1,6 +1,5 @@
 package io.github.remmerw.nott
 
-
 /*
 * We need to detect when the closest set is stable
 *  - in principle we're done as soon as there is no request candidates
@@ -13,17 +12,17 @@ internal class ClosestSet(
     private val queried: MutableSet<Long> = sortedSetOf()
     private val candidates = mutableListOf<Peer>()
 
-    private fun sortCandidates(){
-       candidates.sortWith{ a, b ->
-          threeWayDistance(target, a.id, b.id) 
-       }
-   }
+    private fun sortCandidates() {
+        candidates.sortWith { a, b ->
+            threeWayDistance(target, a.id, b.id)
+        }
+    }
 
-    private fun sortClosest(){
-       closest.sortWith{ a, b ->
-          threeWayDistance(target, a.id, b.id) 
-       }
-   }
+    private fun sortClosest() {
+        closest.sortWith { a, b ->
+            threeWayDistance(target, a.id, b.id)
+        }
+    }
 
     private fun acceptedResponse(call: Call): Peer? {
         if (!call.matchesExpectedID()) {
@@ -48,8 +47,6 @@ internal class ClosestSet(
         sortCandidates()
     }
 
-   
-
     suspend fun initialize() {
         val entries = nott.closestPeers(target, 32)
         if (entries.isEmpty()) {
@@ -59,13 +56,11 @@ internal class ClosestSet(
         }
     }
 
-    fun nextCandidate(): Peer? {
-       
-        return candidates
+    fun nextCandidate(): Peer? =
+        candidates
             .filter { peer ->
                 !queried.contains(peer.key())
             }.firstOrNull()
-    }
 
     suspend fun requestCall(
         request: Request,
