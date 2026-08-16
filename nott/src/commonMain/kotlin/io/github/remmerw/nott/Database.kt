@@ -14,7 +14,7 @@ internal class Database internal constructor() {
         if (keyEntry != null) {
             keyEntry.add(address)
         } else {
-            items[key.toLong()] = mutableSetOf<InetSocketAddress>(address)
+            items[key.toLong()] = mutableSetOf<Address>(address)
         }
     }
 
