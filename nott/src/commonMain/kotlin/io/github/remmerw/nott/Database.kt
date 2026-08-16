@@ -24,13 +24,13 @@ fun sample(
     key: ByteArray,
     maxEntries: Int,
 ): List<InetSocketAddress> {
-    val keyEntry = items[key.toLongKey()] ?: return emptyList()
+    val keyEntry = items[key.toLong()] ?: return emptyList()
     
     if (keyEntry.size <= maxEntries) {
         return keyEntry.toList()
     }
     
-    // Reservoir Sampling Algorithm - O(n) aber nur O(maxEntries) Speicher
+    // Reservoir Sampling Algorithm 
     val result = mutableListOf<InetSocketAddress>()
     keyEntry.forEachIndexed { index, item ->
         if (index < maxEntries) {
