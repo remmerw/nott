@@ -20,7 +20,8 @@ internal class ClosestSet(
         }
         val rsp = call.response
         if (rsp != null) {
-            return candidates[rsp.id.toLong()]
+           return nott.findPeerById(tsp.id) // Todo test
+           // return candidates[rsp.id.toLong()]
         }
         return null
     }
