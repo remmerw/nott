@@ -19,32 +19,30 @@ internal class Database internal constructor() {
         }
     }
 
+    fun sample(
+        key: ByteArray,
+        maxEntries: Int,
+    ): List<InetSocketAddress> {
+        val keyEntry = items[key.toLong()] ?: return emptyList()
 
-fun sample(
-    key: ByteArray,
-    maxEntries: Int,
-): List<InetSocketAddress> {
-    val keyEntry = items[key.toLong()] ?: return emptyList()
-    
-    if (keyEntry.size <= maxEntries) {
-        return keyEntry.toList()
-    }
-    
-    // Reservoir Sampling Algorithm 
-    val result = mutableListOf<InetSocketAddress>()
-    keyEntry.forEachIndexed { index, item ->
-        if (index < maxEntries) {
-            result.add(item)
-        } else {
-            val randomIndex = Random.nextInt(index + 1)
-            if (randomIndex < maxEntries) {
-                result[randomIndex] = item
+        if (keyEntry.size <= maxEntries) {
+            return keyEntry.toList()
+        }
+
+        // Reservoir Sampling Algorithm
+        val result = mutableListOf<InetSocketAddress>()
+        keyEntry.forEachIndexed { index, item ->
+            if (index < maxEntries) {
+                result.add(item)
+            } else {
+                val randomIndex = Random.nextInt(index + 1)
+                if (randomIndex < maxEntries) {
+                    result[randomIndex] = item
+                }
             }
         }
+        return result
     }
-    return result
-}
-    
 
     fun insertForKeyAllowed(key: ByteArray): Boolean {
         val entries = items[key.toLong()] ?: return true
