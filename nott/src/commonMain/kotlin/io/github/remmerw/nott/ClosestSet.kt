@@ -11,7 +11,7 @@ internal class ClosestSet(
     private val closest: MutableSet<Peer> = mutableSetOf()
     private val unreachable: MutableSet<Long> = sortedSetOf()
     private val queried: MutableSet<Long> = sortedSetOf()
-    private val candidates: MutableSet<Peer> = sortedSetOf()
+    private val candidates: MutableSet<Peer> = mutableSetOf()
 
     private fun acceptedResponse(call: Call): Peer? {
         if (!call.matchesExpectedID()) {
@@ -35,7 +35,9 @@ internal class ClosestSet(
 
     private fun addCandidates(entries: Set<Peer>) {
         for (peer in entries) {
+            if(goodForRequest(peer){
             candidates.add(peer)
+}
         }
     }
 
@@ -58,9 +60,7 @@ internal class ClosestSet(
 
     fun nextCandidate(): Peer? {
         val sorted = sortedLookups()
-        return sorted.firstOrNull { peer: Peer ->
-            goodForRequest(peer)
-        }
+        return sorted.firstOrNull()
     }
 
     suspend fun requestCall(
@@ -146,7 +146,6 @@ internal class ClosestSet(
             return true
         }
 
-        unreachable.add(peer.key())
         return false
     }
 }
