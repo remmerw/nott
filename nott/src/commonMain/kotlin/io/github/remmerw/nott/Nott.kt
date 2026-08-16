@@ -39,7 +39,7 @@ class Nott(
     private var socket = DatagramSocket(port)
     private val routingTable = RoutingTable()
     private val buffer = Buffer(UDP_PACKET)
-
+    private val received = ByteArray(UDP_PACKET)
     fun port(): Int = socket.localPort
 
     suspend fun bootstrap() {
@@ -55,8 +55,8 @@ class Nott(
     fun startup() {
         scope.launch {
             try {
-                val data = ByteArray(UDP_PACKET)
-                val packet = DatagramPacket(data, UDP_PACKET)
+                
+                val packet = DatagramPacket(received, UDP_PACKET)
                 while (isActive) {
                     socket.receive(packet)
 
