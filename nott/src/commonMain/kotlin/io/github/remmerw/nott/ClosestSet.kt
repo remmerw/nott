@@ -1,7 +1,6 @@
 package io.github.remmerw.nott
 
 import java.util.TreeSet
-import kotlin.comparisons.comparator
 
 /*
 * We need to detect when the closest set is stable
@@ -11,11 +10,11 @@ internal class ClosestSet(
     private val nott: Nott,
     private val target: ByteArray,
 ) {
-    private val closest = TreeSet<Peer>( comparator{ a, b ->
+    private val closest = TreeSet<Peer>(comparator { a, b ->
             threeWayDistance(target, a.id, b.id)
         })
     private val queried: MutableSet<Long> = sortedSetOf()
-    private val candidates = TreeSet<Peer>( comparator{ a, b ->
+    private val candidates = TreeSet<Peer>(comparator { a, b ->
             threeWayDistance(target, a.id, b.id)
         })
 
