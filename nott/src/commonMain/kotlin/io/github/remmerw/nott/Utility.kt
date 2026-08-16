@@ -5,17 +5,17 @@ import java.net.InetSocketAddress
 import java.util.Arrays
 import kotlin.math.min
 
-fun InetSocketAddress.toAddress(): Address {
+internal fun InetSocketAddress.toAddress(): Address {
      return Address(this.address.address, this.port.toUShort())
 }
 
-fun Address.toInetSocketAddress(): InetSocketAddress {
+internal fun Address.toInetSocketAddress(): InetSocketAddress {
     val inetAddress = InetAddress.getByAddress(this.address)
 
     return InetSocketAddress(inetAddress, this.port.toInt())
 }
 
-fun Address.toInetAddress(): InetAddress = InetAddress.getByAddress(this.address)
+internal fun Address.toInetAddress(): InetAddress = InetAddress.getByAddress(this.address)
 
 internal fun ByteArray.toLong(length: Int = 8): Long {
     require(length in 1..8) { "Length must be between 1 and 8 bytes for a Long value." }
