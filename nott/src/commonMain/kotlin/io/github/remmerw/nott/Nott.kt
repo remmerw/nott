@@ -46,7 +46,7 @@ class Nott(
     suspend fun bootstrap() {
         try {
             bootstrap.forEach { address: InetSocketAddress ->
-                ping(address.toAddress()), null)
+                ping(address.toAddress(), null)
             }
         } catch (throwable: Throwable) {
             debug(throwable)
