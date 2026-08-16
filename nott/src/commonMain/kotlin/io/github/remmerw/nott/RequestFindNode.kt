@@ -63,10 +63,10 @@ fun CoroutineScope.findNode(
                         if (match != null) {
                             if (target.contentEquals(match.id)) {
                                 if (gated.add(match.key())) {
-                                    send(match.address)
+                                    send(match.address.toInetSocketAddress())
                                 }
                             }
-                            closest.insert(match.toInetSocketAddress())
+                            closest.insert(match)
                         }
                     } else {
                         val failure = closest.checkTimeoutOrFailure(call)
