@@ -696,7 +696,7 @@ suspend fun newNott(
     port: Int = 0,   
     bootstrap: Set<InetSocketAddress> = defaultBootstrap(),
 ): Nott {
-    val nott = Nott(nodeId, port, bootstrap)
+    val nott = Nott(nodeId, port = port, bootstrap = bootstrap)
     nott.startup()
     nott.bootstrap()
     return nott
