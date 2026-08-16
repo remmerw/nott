@@ -67,7 +67,7 @@ class Nott(
                     // * port 0 is reserved
                     // -> immediately discard junk on the read loop, don't even allocate a
                     // buffer for it
-                    if (length < 10 || inet.port == 0) continue
+                    if (length < 10 || inet.port.toInt() == 0) continue
 
                     val reader = BEReader(packet.data, length)
                     handlePacket(reader, inet)
@@ -249,8 +249,8 @@ class Nott(
             token =
                 tokenManager.generateToken(
                     request.id,
-                    request.address.address.address,
-                    request.address.port.toUShort(),
+                    request.address.address,
+                    request.address.port,
                     request.target,
                 )
         }
