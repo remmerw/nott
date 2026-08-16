@@ -2,6 +2,17 @@ package io.github.remmerw.nott
 
 import java.util.Arrays
 import kotlin.math.min
+import java.net.InetAddress
+import java.net.InetSocketAddress
+
+internal fun Address.toInetSocketAddress(): InetSocketAddress {
+    val inetAddress = InetAddress.getByAddress(this.address)
+    
+    return InetSocketAddress(inetAddress, this.port.toInt())
+}
+
+internal fun Address.toInetAddress(): InetAddress = InetAddress.getByAddress(this.address)
+    
 
 internal fun ByteArray.toLong(length: Int = 8): Long {
     require(length in 1..8) { "Length must be between 1 and 8 bytes for a Long value." }
