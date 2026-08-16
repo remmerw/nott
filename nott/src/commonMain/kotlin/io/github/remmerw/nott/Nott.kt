@@ -173,6 +173,9 @@ class Nott(
         }
 
         val entries = routingTable.closestPeers(request.target, 8)
+val (ipv4Peers, ipv6Peers) = entries
+    .partition { it.address.address.size == 4 }
+
 
         val response =
             FindNodeResponse(
@@ -180,14 +183,8 @@ class Nott(
                 id = nodeId,
                 tid = request.tid,
                 ip = request.address,
-                nodes =
-                    entries.filter { peer: Peer ->
-                        peer.address.address.size == 4
-                    },
-                nodes6 =
-                    entries.filter { peer: Peer ->
-                        peer.address.address.size == 16
-                    },
+                nodes = ipv4Peers,
+                nodes6 = ipv6Peers,
             )
 
         sendMessage(response)
@@ -215,6 +212,9 @@ class Nott(
         }
 
         val entries = routingTable.closestPeers(request.infoHash, 8)
+val (ipv4Peers, ipv6Peers) = entries
+    .partition { it.address.address.size == 4 }
+
 
         val resp =
             GetPeersResponse(
@@ -223,14 +223,8 @@ class Nott(
                 tid = request.tid,
                 ip = request.address,
                 token = token,
-                nodes =
-                    entries.filter { peer: Peer ->
-                        peer.address.address.size == 4
-                    },
-                nodes6 =
-                    entries.filter { peer: Peer ->
-                        peer.address.address.size == 16
-                    },
+                nodes = ipv4Peers,
+                nodes6 = ipv6Peers,
                 values = values,
             )
 
@@ -256,6 +250,9 @@ class Nott(
         }
 
         val entries = routingTable.closestPeers(request.target, 8)
+val (ipv4Peers, ipv6Peers) = entries
+    .partition { it.address.address.size == 4 }
+
 
         val resp =
             GetResponse(
@@ -264,14 +261,8 @@ class Nott(
                 tid = request.tid,
                 ip = request.address,
                 token = token,
-                nodes =
-                    entries.filter { peer: Peer ->
-                        peer.address.address.size == 4
-                    },
-                nodes6 =
-                    entries.filter { peer: Peer ->
-                        peer.address.address.size == 16
-                    },
+                nodes = ipv4Peers,
+                nodes6 = ipv6Peers,
                 null,
                 null,
                 null,
