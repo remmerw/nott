@@ -3,7 +3,6 @@ package io.github.remmerw.nott
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
-import java.net.InetSocketAddress
 import kotlin.test.Test
 import kotlin.time.Duration.Companion.seconds
 
@@ -15,7 +14,7 @@ class PingTest {
 
             val nott = newNott(nodeId())
             try {
-                val addresses: MutableSet<InetSocketAddress> = mutableSetOf()
+                val addresses: MutableSet<Address> = mutableSetOf()
                 withTimeoutOrNull(30.seconds) {
                     val channel =
                         findNode(nott, target) {
