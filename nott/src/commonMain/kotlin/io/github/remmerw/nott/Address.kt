@@ -9,8 +9,7 @@ data class Address(
 ) {
     private val inetAddress: InetAddress by lazy { InetAddress.getByAddress(address) }
 
-   
-    fun inetAddress(): InetAddress = inetAddress 
+    fun inetAddress(): InetAddress = inetAddress
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
