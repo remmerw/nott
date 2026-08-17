@@ -16,7 +16,6 @@ import org.kotlincrypto.hash.sha1.SHA1
 import java.net.DatagramPacket
 import java.net.DatagramSocket
 import java.net.InetAddress
-import java.net.InetSocketAddress
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.min
 import kotlin.random.Random
@@ -26,7 +25,7 @@ class Nott(
     val nodeId: ByteArray,
     port: Int = 0,
     val readOnlyState: Boolean = true,
-    val bootstrap: Set<InetSocketAddress> = defaultBootstrap(),
+    val bootstrap: Set<Address> = defaultBootstrap(),
 ) {
     private val unsolicitedThrottle: MutableMap<Address, Long> =
         mutableMapOf() // runs in same thread
@@ -45,8 +44,8 @@ class Nott(
 
     suspend fun bootstrap() {
         try {
-            bootstrap.forEach { address: InetSocketAddress ->
-                ping(address.toAddress(), null)
+            bootstrap.forEach { address: Address ->
+                ping(address, null)
             }
         } catch (throwable: Throwable) {
             debug(throwable)
@@ -694,7 +693,7 @@ internal fun newerTimeMark(
 suspend fun newNott(
     nodeId: ByteArray,
     port: Int = 0,
-    bootstrap: Set<InetSocketAddress> = defaultBootstrap(),
+    bootstrap: Set<Address> = defaultBootstrap(),
 ): Nott {
     val nott = Nott(nodeId, port = port, bootstrap = bootstrap)
     nott.startup()
@@ -715,8 +714,8 @@ fun nodeId(): ByteArray {
     return Random.nextBytes(id, 8)
 }
 
-fun defaultBootstrap(): Set<InetSocketAddress> {
-    val result = mutableSetOf<InetSocketAddress>()
+fun defaultBootstrap(): Set<Address> {
+    val result = mutableSetOf<Address>()
 
     result.addAll(allByName("dht.transmissionbt.com", 6881))
     result.addAll(allByName("dht.libtorrent.org", 25401))
@@ -729,12 +728,12 @@ fun defaultBootstrap(): Set<InetSocketAddress> {
 private fun allByName(
     hostname: String,
     port: Int,
-): Set<InetSocketAddress> {
-    val result = mutableSetOf<InetSocketAddress>()
+): Set<Address> {
+    val result = mutableSetOf<Address>()
     try {
         val inets = InetAddress.getAllByName(hostname)
         inets.forEach { address ->
-            result.add(InetSocketAddress(address, port))
+            result.add(Address(address, port))
         }
     } catch (throwable: Throwable) {
         debug(throwable)
