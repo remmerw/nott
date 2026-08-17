@@ -10,8 +10,8 @@ import java.net.InetSocketAddress
 import kotlin.time.Duration.Companion.milliseconds
 
 data class PeerResponse(
-    val peer: InetSocketAddress,
-    val addresses: List<InetSocketAddress>,
+    val peer: Address,
+    val addresses: List<Address>,
 )
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -63,15 +63,15 @@ fun CoroutineScope.requestGetPeers(
                             val message = call.response
                             message as GetPeersResponse
 
-                            val list = mutableListOf<InetSocketAddress>()
+                            val list = mutableListOf<Address>()
                             for (item in message.values) {
                                 if (gated.add(item.hashCode())) {
-                                    list.add(item.toInetSocketAddress())
+                                    list.add(item)
                                 }
                             }
 
                             if (list.isNotEmpty()) {
-                                send(PeerResponse(message.address.toInetSocketAddress(), list))
+                                send(PeerResponse(message.address, list))
                             }
 
                             closest.insert(match)
