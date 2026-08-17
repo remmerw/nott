@@ -6,7 +6,6 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
-import java.net.InetSocketAddress
 import kotlin.time.Duration.Companion.milliseconds
 
 data class PeerResponse(
