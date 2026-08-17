@@ -733,7 +733,7 @@ private fun allByName(
     try {
         val inets = InetAddress.getAllByName(hostname)
         inets.forEach { address ->
-            result.add(Address(address, port))
+            result.add(Address(address, port.toUShort()))
         }
     } catch (throwable: Throwable) {
         debug(throwable)
