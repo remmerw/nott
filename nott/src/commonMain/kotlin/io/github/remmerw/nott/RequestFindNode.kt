@@ -6,7 +6,6 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
-import java.net.InetSocketAddress
 import kotlin.time.Duration.Companion.milliseconds
 
 /**
@@ -17,7 +16,7 @@ fun CoroutineScope.findNode(
     nott: Nott,
     target: ByteArray,
     intermediateTimeout: () -> Long,
-): ReceiveChannel<InetSocketAddress> =
+): ReceiveChannel<Address> =
     produce {
         val gated: MutableSet<Long> = sortedSetOf()
 
@@ -63,7 +62,7 @@ fun CoroutineScope.findNode(
                         if (match != null) {
                             if (target.contentEquals(match.id)) {
                                 if (gated.add(match.key())) {
-                                    send(match.address.toInetSocketAddress())
+                                    send(match.address)
                                 }
                             }
                             closest.insert(match)
