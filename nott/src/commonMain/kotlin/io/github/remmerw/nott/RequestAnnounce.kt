@@ -6,7 +6,6 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
-import java.net.InetSocketAddress
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -16,7 +15,7 @@ fun CoroutineScope.requestAnnounce(
     target: ByteArray,
     port: Int,
     intermediateTimeout: () -> Long,
-): ReceiveChannel<InetSocketAddress> =
+): ReceiveChannel<Address> =
     produce {
         val gated: MutableSet<Long> = sortedSetOf()
 
@@ -56,7 +55,7 @@ fun CoroutineScope.requestAnnounce(
 
                         val rsp = call.response
                         if (rsp is AnnounceResponse) {
-                            send(rsp.address.toInetSocketAddress())
+                            send(rsp.address)
                         }
                         if (rsp is GetPeersResponse) {
                             val match = closest.acceptResponse(call)
