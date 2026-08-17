@@ -1,14 +1,13 @@
 package io.github.remmerw.nott
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import java.net.InetSocketAddress
 import kotlin.concurrent.atomics.AtomicBoolean
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
 
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalAtomicApi::class)
 suspend fun requestPing(
     nott: Nott,
-    address: InetSocketAddress,
+    address: Address,
     id: ByteArray,
 ): Boolean {
     val result = AtomicBoolean(false)
@@ -18,7 +17,7 @@ suspend fun requestPing(
     val tid = createTid()
     val request =
         PingRequest(
-            address = address.toAddress(),
+            address = address,
             id = nott.nodeId,
             tid = tid,
             ro = nott.readOnlyState,
