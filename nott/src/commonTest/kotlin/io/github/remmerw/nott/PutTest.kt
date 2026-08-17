@@ -11,7 +11,6 @@ import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.io.Buffer
 import kotlinx.io.readByteArray
-import java.net.InetSocketAddress
 import kotlin.concurrent.atomics.AtomicInt
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.concurrent.atomics.incrementAndFetch
@@ -50,7 +49,7 @@ class PutTest {
 
             val target = sha1(k)
 
-            val peers = mutableListOf<InetSocketAddress>()
+            val peers = mutableListOf<Address>()
             val added = AtomicInt(0)
             withTimeout(60.seconds) {
                 val nott = newNott(nodeId())
@@ -86,7 +85,7 @@ class PutTest {
 
             delay(10.seconds)
 
-            val bootstrap: MutableSet<InetSocketAddress> = mutableSetOf()
+            val bootstrap: MutableSet<Address> = mutableSetOf()
             bootstrap.addAll(defaultBootstrap())
             bootstrap.addAll(peers)
 
