@@ -106,7 +106,7 @@ class Nott(
             message.encode(buffer)
             val address = message.address
 
-            val datagram = DatagramPacket(buffer.data, buffer.length, address.toInetAddress(), address.port.toInt())
+            val datagram = DatagramPacket(buffer.data, buffer.length, address.inetAddress(), address.port.toInt())
 
             try {
                 socket.send(datagram)
@@ -741,7 +741,7 @@ private fun allByName(
     return result
 }
 
-fun sha1(bytes: ByteArray): ByteArray {
+internal fun sha1(bytes: ByteArray): ByteArray {
     val digest = SHA1()
     digest.update(bytes)
     return digest.digest()
