@@ -742,7 +742,7 @@ private fun allByName(
     return result
 }
 
-internal fun sha1(bytes: ByteArray): ByteArray {
+fun sha1(bytes: ByteArray): ByteArray {
     val digest = SHA1()
     digest.update(bytes)
     return digest.digest()
