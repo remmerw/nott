@@ -520,12 +520,14 @@ class Nott(
 
                 requestCalls.remove(msg.tid)
 
-                call.response(msg)
+              
 
                 // apply after checking for a proper response
                 if (msg is Response) {
                     recieved(msg, call)
                 }
+
+                call.response(msg)
                 return
             }
 
