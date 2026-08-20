@@ -14,7 +14,7 @@ internal class Call(
     @Volatile
     private var state: CallState = CallState.UNSENT
 
-    var response: Message? = null
+    var response: Response? = null
         private set
 
     fun matchesExpectedID(): Boolean = expectedID!!.contentEquals(response!!.id)
@@ -23,15 +23,12 @@ internal class Call(
         state = CallState.ERROR
     }
 
-    fun response(rsp: Message) {
+    fun response(rsp: Response) {
         response = rsp
+    }
 
-        state =
-            when (rsp) {
-                is Response -> CallState.RESPONDED
-                is Error -> CallState.ERROR
-                else -> throw IllegalStateException("should not happen")
-            }
+    fun done(){
+        state = CallState.RESPONDED
     }
 
     fun hasSend() {
