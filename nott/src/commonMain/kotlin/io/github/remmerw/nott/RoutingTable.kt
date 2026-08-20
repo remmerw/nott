@@ -13,13 +13,13 @@ internal class RoutingTable internal constructor() {
         key: ByteArray,
         take: Int,
     ): Set<Peer> =
-        entries()
+        entries.values
             .sortedWith { a, b ->
                 threeWayDistance(key, a.id, b.id)
             }.take(take)
             .toSet()
 
-    private fun entries(): List<Peer> = entries.values
+    private fun entries(): List<Peer> = entries.values.toList()
 
     fun remove(id: ByteArray) {
         entries.remove(id.toLong())
