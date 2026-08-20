@@ -83,7 +83,6 @@ internal class ClosestSet(
                     val elapsed = sendTime.elapsedNow().inWholeMilliseconds
                     if (elapsed > RESPONSE_TIMEOUT) {
                         nott.timeout(call)
-                        call.injectError()
                         return true
                     }
                 }
