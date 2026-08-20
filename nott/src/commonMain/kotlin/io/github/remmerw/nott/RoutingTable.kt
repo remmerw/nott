@@ -12,12 +12,11 @@ internal class RoutingTable internal constructor() {
     fun closestPeers(
         key: ByteArray,
         take: Int,
-    ): Set<Peer> =
+    ): List<Peer> =
         entries.values
             .sortedWith { a, b ->
                 threeWayDistance(key, a.id, b.id)
             }.take(take)
-            .toSet()
 
     fun remove(id: ByteArray) {
         entries.remove(id.toLong())
