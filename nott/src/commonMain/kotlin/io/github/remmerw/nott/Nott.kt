@@ -90,7 +90,7 @@ class Nott(
     internal fun closestPeers(
         key: ByteArray,
         take: Int,
-    ): Set<Peer> = routingTable.closestPeers(key, take)
+    ): List<Peer> = routingTable.closestPeers(key, take)
 
     private suspend fun send(
         message: Message,
