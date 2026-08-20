@@ -472,13 +472,11 @@ class Nott(
 
                 return
             }
+            timeout(call)
         }
         
 
-        debug("ignoring message "  + msg.toString()  )
-
-       
-        call.injectError()
+        debug("ignoring message " + msg.toString())
     }
 
     internal suspend fun sendMessage(msg: Message) {
