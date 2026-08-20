@@ -96,8 +96,8 @@ internal class ClosestSet(
         if (match != null) {
             val message = call.response
             if (message is NodesResponse) {
-                addCandidates(message.nodes6.toSet())
-                addCandidates(message.nodes.toSet())
+                addCandidates(message.nodes6)
+                addCandidates(message.nodes)
             }
         }
         return match
