@@ -15,7 +15,8 @@ internal class RoutingTable internal constructor() {
         key: ByteArray,
         take: Int,
     ): Set<Peer> =
-        entries().sortedWith { a, b ->
+        entries()
+            .sortedWith { a, b ->
                 threeWayDistance(key, a.id, b.id)
             }.take(take)
             .toSet()
@@ -27,6 +28,4 @@ internal class RoutingTable internal constructor() {
     }
 
     fun findPeerById(id: ByteArray): Peer? = entries[id.toLong()]
-
-
 }
