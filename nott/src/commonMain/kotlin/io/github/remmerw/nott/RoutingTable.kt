@@ -3,8 +3,6 @@ package io.github.remmerw.nott
 import java.util.concurrent.ConcurrentHashMap
 
 internal class RoutingTable internal constructor() {
-    // note long key is not perfect (better would  the peer id)
-    // but it is not yet really necessary (not enough peers in the routing table)
     private val entries: MutableMap<Long, Peer> = ConcurrentHashMap()
 
     fun insert(peer: Peer) {
