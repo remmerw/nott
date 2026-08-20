@@ -396,7 +396,6 @@ class Nott(
         routingTable.insert(newEntry)
     }
 
-    internal fun isLocalId(id: ByteArray): Boolean = nodeId.contentEquals(id)
 
     internal suspend fun ping(
         address: Address,
