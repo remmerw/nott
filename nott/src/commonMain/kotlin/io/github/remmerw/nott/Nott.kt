@@ -390,6 +390,11 @@ class Nott(
         // it's fishy at least. don't insert even if it proves useful during a lookup
         if (entryById == null && expectedId != null && !expectedId.contentEquals(id)) return
 
+
+        if(entryById != null){
+             return
+        }
+
         val newEntry = Peer(id, msg.address)
         
         
