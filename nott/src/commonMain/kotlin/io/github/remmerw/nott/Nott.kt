@@ -27,8 +27,6 @@ class Nott(
     val readOnlyState: Boolean = true,
     val bootstrap: Set<Address> = defaultBootstrap(),
 ) {
-    private val unsolicitedThrottle: MutableMap<Address, Long> =
-        mutableMapOf() // runs in same thread
 
     private val requestCalls: MutableMap<Long, Call> = ConcurrentHashMap()
     private val database: Database = Database()
@@ -412,7 +410,7 @@ class Nott(
         val newEntry = Peer(id, msg.address)
         // throttle the insert-attempts for unsolicited requests, update-only once they exceed the threshold
         // does not apply to responses
-        if (associatedCall == null && updateAndCheckThrottle(newEntry.address)) {
+        if (associatedCall == null) {
             routingTable.refresh(newEntry)
             return
         }
@@ -435,21 +433,6 @@ class Nott(
         }
     }
 
-    /**
-     * @return true if it should be throttled
-     */
-    private fun updateAndCheckThrottle(addr: Address): Boolean {
-        val oldValue: Long? = unsolicitedThrottle[addr]
-        val newValue: Long =
-            if (oldValue == null) {
-                THROTTLE_INCREMENT
-            } else {
-                min((oldValue + THROTTLE_INCREMENT), THROTTLE_SATURATION)
-            }
-        unsolicitedThrottle[addr] = newValue
-
-        return (newValue - THROTTLE_INCREMENT) > THROTTLE_THRESHOLD
-    }
 
     internal fun isLocalId(id: ByteArray): Boolean = nodeId.contentEquals(id)
 
