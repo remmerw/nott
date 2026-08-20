@@ -35,7 +35,7 @@ internal class ClosestSet(
         return null
     }
 
-    private fun addCandidates(entries: Set<Peer>) {
+    private fun addCandidates(entries: List<Peer>) {
         for (peer in entries) {
             if (goodForRequest(peer)) {
                 val key = peer.key()
