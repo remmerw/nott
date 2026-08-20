@@ -435,7 +435,7 @@ class Nott(
             return
         }
 
-        // just respond to incoming requests, no need to match them to pending requests
+        
         if (msg is Request) {
             // if readOnlyState is true we are in "Read-Only State"
             // It no longer responds to 'query' messages that it receives,
@@ -458,9 +458,8 @@ class Nott(
         val call = requestCalls[msg.tid]
 
         if (call != null) {
+            requestCalls.remove(msg.tid)
             if (call.request.address == msg.address) {
-                requestCalls.remove(msg.tid)
-
                 if (msg is Response) {
                     call.response(msg)
                     recieved(msg, call)
@@ -473,85 +472,13 @@ class Nott(
 
                 return
             }
-
-            // 1. the message is not a request
-            // 2. transaction ID matched
-            // 3. request destination did not match response source!!
-            // 4. we're using random 48 bit MTIDs
-            // this happening by chance is exceedingly unlikely
-
-            // indicates either port-mangling NAT, a multhomed host listening on
-            // any-local address or some kind of attack
-            // -> ignore response
-
-            debug(
-                "tid matched, socket address did not, ignoring message, request: " +
-                    call.request.address + " -> response: " + msg.address,
-            )
-
-            if (msg !is Error) {
-                // this is more likely due to incorrect binding implementation in ipv6. notify peers about that
-                // don't bother with ipv4, there are too many complications
-                val err: Message =
-                    Error(
-                        address = call.request.address,
-                        id = nodeId,
-                        tid = msg.tid,
-                        code = GENERIC_ERROR,
-                        message =
-                            (
-                                "A request was sent to " + call.request.address +
-                                    " and a response with matching transaction id was received from " +
-                                    msg.address + " . Multihomed nodes should ensure that sockets are " +
-                                    "properly bound and responses are sent with the " +
-                                    "correct source socket address. See BEPs 32 and 45."
-                            ).encodeToByteArray(),
-                    )
-
-                sendMessage(err)
-            }
-
-            // but expect an upcoming timeout if it's really just a misbehaving node
-            call.injectError()
-
-            return
         }
+        
 
-        // a) it's a response
-        // b) didn't find a call
-        // c) uptime is high enough that
-        // it's not a stray from a restart
-        // -> did not expect this response
-        if (msg is Response) {
-            val err =
-                Error(
-                    address = msg.address,
-                    id = nodeId,
-                    tid = msg.tid,
-                    code = SERVER_ERROR,
-                    message =
-                        (
-                            "received a response message whose transaction ID did not " +
-                                "match a pending request or transaction expired"
-                        ).encodeToByteArray(),
-                )
-            sendMessage(err)
-            return
-        }
+        debug("ignoring message "  + msg.toString()  )
 
-        if (msg is Error) {
-            val b = StringBuilder()
-            b
-                .append(" [")
-                .append(msg.code)
-                .append("] from: ")
-                .append(msg.address)
-            b.append(" Message: \"").append(msg.message.contentToString()).append("\"")
-            debug("ErrorMessage $b")
-            return
-        }
-
-        debug("not sure how to handle message $msg")
+       
+        call.injectError()
     }
 
     internal suspend fun sendMessage(msg: Message) {
