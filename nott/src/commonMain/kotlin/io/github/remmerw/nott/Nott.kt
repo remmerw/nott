@@ -145,11 +145,7 @@ class Nott(
     }
 
     internal suspend fun ping(request: PingRequest) {
-        // ignore requests we get from ourselves
-        if (isLocalId(request.id)) {
-            return
-        }
-
+        
         val rsp =
             PingResponse(
                 address = request.address,
@@ -162,10 +158,7 @@ class Nott(
     }
 
     internal suspend fun findNode(request: FindNodeRequest) {
-        // ignore requests we get from ourselves
-        if (isLocalId(request.id)) {
-            return
-        }
+      
 
         val entries = routingTable.closestPeers(request.target, 8)
         val (ipv4Peers, ipv6Peers) =
@@ -186,10 +179,7 @@ class Nott(
     }
 
     internal suspend fun getPeers(request: GetPeersRequest) {
-        // ignore requests we get from ourselves
-        if (isLocalId(request.id)) {
-            return
-        }
+      
 
         val values = database.sample(request.infoHash, MAX_PEERS_PER_ANNOUNCE)
 
@@ -227,11 +217,7 @@ class Nott(
     }
 
     internal suspend fun get(request: GetRequest) {
-        // ignore requests we get from ourselves
-        if (isLocalId(request.id)) {
-            return
-        }
-
+    
         // generate a token
         var token: ByteArray? = null
         if (database.insertForKeyAllowed(request.target)) {
@@ -268,10 +254,7 @@ class Nott(
     }
 
     internal suspend fun put(request: PutRequest) {
-        // ignore requests we get from ourselves
-        if (isLocalId(request.id)) {
-            return
-        }
+        
 
         // first check if the token is OK
         if (!tokenManager.checkToken(
@@ -306,11 +289,7 @@ class Nott(
     }
 
     internal suspend fun announce(request: AnnounceRequest) {
-        // ignore requests we get from ourselves
-        if (isLocalId(request.id)) {
-            return
-        }
-
+        
         // first check if the token is OK
         if (!tokenManager.checkToken(
                 request.token,
