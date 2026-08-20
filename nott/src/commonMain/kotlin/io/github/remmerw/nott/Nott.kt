@@ -365,28 +365,11 @@ class Nott(
     }
 
     internal fun recieved(
-        msg: Message,
+        msg: Response,
         associatedCall: Call?,
     ) {
         val ip = msg.address
         val id = msg.id
-
-        if (msg is Request) {
-            if (msg.ro) {
-                // A node that receives DHT messages should inspect incoming queries for the 'ro'
-                // flag set to 1. If it is found, the node should not add the message sender
-                // to its routing table.
-                return
-            }
-        }
-
-        /* Someday in the future the IP might be used in the implementation
-        if (msg is Response) {
-           val ip = msg.ip
-           if (ip != null) {
-                debug("My IP " + ip)
-            }
-        }*/
 
         val expectedId = associatedCall?.expectedID
 
@@ -408,8 +391,8 @@ class Nott(
         if (entryById == null && expectedId != null && !expectedId.contentEquals(id)) return
 
         val newEntry = Peer(id, msg.address)
-        // throttle the insert-attempts for unsolicited requests, update-only once they exceed the threshold
-        // does not apply to responses
+        
+        
         if (associatedCall == null) {
             routingTable.refresh(newEntry)
             return
@@ -423,14 +406,12 @@ class Nott(
             routingTable.insertOrRefresh(newEntry)
         }
 
-        // we already should have the bucket. might be an old one by now due to splitting,
-        // but it doesn't matter, we just need to update the entry, which should stay the
-        // same object across bucket splits
-        if (msg is Response) {
-            if (associatedCall != null) {
-                routingTable.notifyOfResponse(msg)
-            }
+
+        
+        if (associatedCall != null) {
+             routingTable.notifyOfResponse(msg)
         }
+        
     }
 
 
@@ -488,7 +469,7 @@ class Nott(
                     is PingRequest -> ping(msg)
                 }
             }
-            recieved(msg, null)
+           
             return
         }
 
@@ -504,13 +485,18 @@ class Nott(
 
                 requestCalls.remove(msg.tid)
 
-                call.response(msg)
+                
 
                 // apply after checking for a proper response
                 if (msg is Response) {
+                    call.response(msg)
                     recieved(msg, call)
+                    call.done()
                 }
 
+                if (msg is Error){
+                    call.injectError()
+                }
                 
                 return
             }
