@@ -115,7 +115,6 @@ class Nott(
                 debug(throwable)
 
                 if (associatedCall != null) {
-                    associatedCall.injectError()
                     timeout(associatedCall)
                 }
             }
@@ -137,6 +136,7 @@ class Nott(
     }
 
     internal fun timeout(call: Call) {
+        call.injectError()
         requestCalls.remove(call.request.tid)
 
         // don't time out anything if we don't have a connection
@@ -396,11 +396,8 @@ class Nott(
         }
 
         val newEntry = Peer(id, msg.address)
-       
         
         routingTable.insert(newEntry)
-
-  
     }
 
 
@@ -465,18 +462,11 @@ class Nott(
         // check if this is a response to an outstanding request
         val call = requestCalls[msg.tid]
 
-        // message matches transaction ID and origin == destination
+       
         if (call != null) {
-            // we only check the IP address here. the routing table applies more strict
-            // checks to also verify a stable port
             if (call.request.address == msg.address) {
-                // remove call first in case of exception
-
                 requestCalls.remove(msg.tid)
 
-                
-
-                // apply after checking for a proper response
                 if (msg is Response) {
                     call.response(msg)
                     recieved(msg, call)
@@ -484,7 +474,7 @@ class Nott(
                 }
 
                 if (msg is Error){
-                    call.injectError()
+                    timeout(call)
                 }
                 
                 return
