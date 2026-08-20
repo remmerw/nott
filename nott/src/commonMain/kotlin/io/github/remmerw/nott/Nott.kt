@@ -17,7 +17,6 @@ import java.net.DatagramPacket
 import java.net.DatagramSocket
 import java.net.InetAddress
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.math.min
 import kotlin.random.Random
 import kotlin.time.TimeSource.Monotonic.ValueTimeMark
 
@@ -27,7 +26,6 @@ class Nott(
     val readOnlyState: Boolean = true,
     val bootstrap: Set<Address> = defaultBootstrap(),
 ) {
-
     private val requestCalls: MutableMap<Long, Call> = ConcurrentHashMap()
     private val database: Database = Database()
     private val tokenManager = TokenManager()
@@ -39,7 +37,6 @@ class Nott(
     private val received = ByteArray(UDP_PACKET)
 
     fun port(): Int = socket.localPort
-
 
     suspend fun bootstrap() {
         try {
@@ -390,16 +387,14 @@ class Nott(
         // it's fishy at least. don't insert even if it proves useful during a lookup
         if (entryById == null && expectedId != null && !expectedId.contentEquals(id)) return
 
-
-        if(entryById != null){
-             return
+        if (entryById != null) {
+            return
         }
 
         val newEntry = Peer(id, msg.address)
-        
+
         routingTable.insert(newEntry)
     }
-
 
     internal fun isLocalId(id: ByteArray): Boolean = nodeId.contentEquals(id)
 
@@ -455,14 +450,13 @@ class Nott(
                     is PingRequest -> ping(msg)
                 }
             }
-           
+
             return
         }
 
         // check if this is a response to an outstanding request
         val call = requestCalls[msg.tid]
 
-       
         if (call != null) {
             if (call.request.address == msg.address) {
                 requestCalls.remove(msg.tid)
@@ -473,10 +467,10 @@ class Nott(
                     call.done()
                 }
 
-                if (msg is Error){
+                if (msg is Error) {
                     timeout(call)
                 }
-                
+
                 return
             }
 
