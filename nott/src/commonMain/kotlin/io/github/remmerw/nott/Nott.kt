@@ -145,7 +145,6 @@ class Nott(
     }
 
     internal suspend fun ping(request: PingRequest) {
-        
         val rsp =
             PingResponse(
                 address = request.address,
@@ -158,8 +157,6 @@ class Nott(
     }
 
     internal suspend fun findNode(request: FindNodeRequest) {
-      
-
         val entries = routingTable.closestPeers(request.target, 8)
         val (ipv4Peers, ipv6Peers) =
             entries
@@ -179,8 +176,6 @@ class Nott(
     }
 
     internal suspend fun getPeers(request: GetPeersRequest) {
-      
-
         val values = database.sample(request.infoHash, MAX_PEERS_PER_ANNOUNCE)
 
         // generate a token
@@ -217,7 +212,6 @@ class Nott(
     }
 
     internal suspend fun get(request: GetRequest) {
-    
         // generate a token
         var token: ByteArray? = null
         if (database.insertForKeyAllowed(request.target)) {
@@ -254,8 +248,6 @@ class Nott(
     }
 
     internal suspend fun put(request: PutRequest) {
-        
-
         // first check if the token is OK
         if (!tokenManager.checkToken(
                 request.token,
@@ -289,7 +281,6 @@ class Nott(
     }
 
     internal suspend fun announce(request: AnnounceRequest) {
-        
         // first check if the token is OK
         if (!tokenManager.checkToken(
                 request.token,
@@ -375,7 +366,6 @@ class Nott(
         routingTable.insert(newEntry)
     }
 
-
     internal suspend fun ping(
         address: Address,
         id: ByteArray?,
@@ -413,7 +403,6 @@ class Nott(
             return
         }
 
-        
         if (msg is Request) {
             // if readOnlyState is true we are in "Read-Only State"
             // It no longer responds to 'query' messages that it receives,
@@ -452,7 +441,6 @@ class Nott(
             }
             timeout(call)
         }
-        
 
         debug("ignoring message " + msg.toString())
     }
