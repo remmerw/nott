@@ -141,7 +141,7 @@ class Nott(
 
         // don't time out anything if we don't have a connection
         if (call.expectedID != null) {
-            routingTable.onTimeout(
+            routingTable.remove(
                 call.expectedID,
             )
         }
@@ -396,27 +396,11 @@ class Nott(
         }
 
         val newEntry = Peer(id, msg.address)
+       
         
-        
-        if (associatedCall == null) {
-            routingTable.refresh(newEntry)
-            return
-        }
+        routingTable.insert(newEntry)
 
-        if (associatedCall != null) {
-            newEntry.signalResponse()
-        }
-
-        if (!nodeId.contentEquals(newEntry.id)) {
-            routingTable.insertOrRefresh(newEntry)
-        }
-
-
-        
-        if (associatedCall != null) {
-             routingTable.notifyOfResponse(msg)
-        }
-        
+  
     }
 
 
