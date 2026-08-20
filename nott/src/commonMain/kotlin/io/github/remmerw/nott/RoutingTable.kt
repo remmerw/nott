@@ -19,7 +19,6 @@ internal class RoutingTable internal constructor() {
             }.take(take)
             .toSet()
 
-
     fun remove(id: ByteArray) {
         entries.remove(id.toLong())
     }
