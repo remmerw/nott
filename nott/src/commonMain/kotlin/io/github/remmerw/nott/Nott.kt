@@ -24,7 +24,6 @@ import kotlin.time.TimeSource.Monotonic.ValueTimeMark
 
 class Nott(
     val nodeId: ByteArray,
-    val port: Int = 0,
     val readOnlyState: Boolean = true,
     val bootstrap: Set<Address> = defaultBootstrap(),
 ) {
@@ -51,7 +50,7 @@ class Nott(
     }
 
     fun startup() {
-        channel.bind(InetSocketAddress())
+        channel.bind(InetSocketAddress(0))
         scope.launch {
             try {
                
