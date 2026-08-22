@@ -59,7 +59,9 @@ class Nott(
                     received.clear()
                     val address = channel.receive(received) as InetSocketAddress 
                     received.flip()
-                    val inet = Address(address.address, address.port.toUShort())
+
+                    val inet = Address(address.address.address, address.port.toUShort())
+
                     val length = received.remaining()
 
                     // * no conceivable DHT message is smaller than 10 bytes
