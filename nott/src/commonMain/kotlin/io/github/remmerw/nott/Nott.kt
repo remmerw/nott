@@ -534,10 +534,9 @@ internal fun newerTimeMark(
 
 suspend fun newNott(
     nodeId: ByteArray,
-    port: Int = 0,
     bootstrap: Set<Address> = defaultBootstrap(),
 ): Nott {
-    val nott = Nott(nodeId, port = port, bootstrap = bootstrap)
+    val nott = Nott(nodeId, bootstrap = bootstrap)
     nott.startup()
     nott.bootstrap()
     return nott
