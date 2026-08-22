@@ -24,7 +24,7 @@ import kotlin.time.TimeSource.Monotonic.ValueTimeMark
 
 class Nott(
     val nodeId: ByteArray,
-    port: Int = 0,
+    val port: Int = 0,
     val readOnlyState: Boolean = true,
     val bootstrap: Set<Address> = defaultBootstrap(),
 ) {
@@ -38,7 +38,7 @@ class Nott(
     private val sending = ByteBuffer.allocateDirect(UDP_PACKET)
     private val received = ByteBuffer.allocateDirect(UDP_PACKET)
 
-    fun port(): Int = port
+  
 
     suspend fun bootstrap() {
         try {
