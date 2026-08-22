@@ -51,7 +51,7 @@ class Nott(
     }
 
     fun startup() {
-        channel.bind(new InetSocketAddress(port))
+        channel.bind(InetSocketAddress(port()))
         scope.launch {
             try {
                
