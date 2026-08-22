@@ -51,13 +51,13 @@ class Nott(
     }
 
     fun startup() {
-        channel.bind(InetSocketAddress(port()))
+        channel.bind(InetSocketAddress(port))
         scope.launch {
             try {
                
                 while (isActive) {
                     received.clear()
-                    val address = channel.receive()
+                    val address = channel.receive(received)
                     received.flip()
                     val inet = Address(address.address, address.port.toUShort())
                     val length = received.remaining()
@@ -73,7 +73,7 @@ class Nott(
                     handlePacket(reader, inet)
                 }
             } catch (throwable: Throwable) {
-                if (!socket.isClosed) {
+                if (! channel.isClosed) {
                     debug(throwable)
                 }
             }
