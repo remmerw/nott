@@ -3,7 +3,7 @@ package io.github.remmerw.nott
 import io.github.remmerw.buri.BEMap
 import io.github.remmerw.buri.BEObject
 import io.github.remmerw.buri.BEReader
-import io.github.remmerw.buri.Buffer
+import java.nio.ByteBuffer
 import io.github.remmerw.buri.decodeBencode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -33,7 +33,7 @@ class Nott(
     private val scope = CoroutineScope(Dispatchers.IO)
     private var socket = DatagramSocket(port)
     private val routingTable = RoutingTable()
-    private val buffer = Buffer(UDP_PACKET)
+    private val sending = ByteBuffer.allocateDirect(UDP_PACKET)
     private val received = ByteArray(UDP_PACKET)
 
     fun port(): Int = socket.localPort
@@ -63,7 +63,8 @@ class Nott(
                     // -> immediately discard junk on the read loop, don't even allocate a
                     // buffer for it
                     if (length < 10 || inet.port.toInt() == 0) continue
-
+                    
+  
                     val reader = BEReader(packet.data, length)
                     handlePacket(reader, inet)
                 }
