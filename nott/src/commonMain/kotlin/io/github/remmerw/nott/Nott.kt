@@ -133,7 +133,7 @@ class Nott(
         }
 
         try {
-            socket.close()
+            channel.close()
         } catch (throwable: Throwable) {
             debug(throwable)
         }
