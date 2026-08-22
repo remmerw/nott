@@ -38,7 +38,7 @@ class Nott(
     private val sending = ByteBuffer.allocateDirect(UDP_PACKET)
     private val received = ByteBuffer.allocateDirect(UDP_PACKET)
 
-  
+    fun port():Int = channel.socket().getLocalPort()
 
     suspend fun bootstrap() {
         try {
@@ -51,7 +51,7 @@ class Nott(
     }
 
     fun startup() {
-        channel.bind(InetSocketAddress(port))
+        channel.bind(InetSocketAddress())
         scope.launch {
             try {
                
