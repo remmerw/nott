@@ -57,7 +57,7 @@ class Nott(
                
                 while (isActive) {
                     received.clear()
-                    val address = channel.receive(received)
+                    val address = channel.receive(received) as InetSocketAddress 
                     received.flip()
                     val inet = Address(address.address, address.port.toUShort())
                     val length = received.remaining()
@@ -73,9 +73,7 @@ class Nott(
                     handlePacket(reader, inet)
                 }
             } catch (throwable: Throwable) {
-                if (! channel.isClosed) {
-                    debug(throwable)
-                }
+                debug(throwable)
             }
         }
     }
