@@ -4,6 +4,7 @@ import io.github.remmerw.buri.BEMap
 import io.github.remmerw.buri.BEObject
 import io.github.remmerw.buri.BEReader
 import java.nio.ByteBuffer
+import java.nio.channels.DatagramChannel
 import io.github.remmerw.buri.decodeBencode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -16,6 +17,7 @@ import org.kotlincrypto.hash.sha1.SHA1
 import java.net.DatagramPacket
 import java.net.DatagramSocket
 import java.net.InetAddress
+import java.net.InetSocketAddress
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.random.Random
 import kotlin.time.TimeSource.Monotonic.ValueTimeMark
@@ -31,12 +33,12 @@ class Nott(
     private val tokenManager = TokenManager()
     private val mutex = Mutex()
     private val scope = CoroutineScope(Dispatchers.IO)
-    private var socket = DatagramSocket(port)
+    private var channel = DatagramChannel.open()
     private val routingTable = RoutingTable()
     private val sending = ByteBuffer.allocateDirect(UDP_PACKET)
-    private val received = ByteArray(UDP_PACKET)
+    private val received = ByteBuffer.allocateDirect(UDP_PACKET)
 
-    fun port(): Int = socket.localPort
+    fun port(): Int = port
 
     suspend fun bootstrap() {
         try {
@@ -49,14 +51,16 @@ class Nott(
     }
 
     fun startup() {
+        channel.bind(new InetSocketAddress(port))
         scope.launch {
             try {
-                val packet = DatagramPacket(received, UDP_PACKET)
+               
                 while (isActive) {
-                    socket.receive(packet)
-
-                    val inet = Address(packet.address.address, packet.port.toUShort())
-                    val length = packet.length
+                    received.clear()
+                    val address = channel.receive()
+                    received.flip()
+                    val inet = Address(address.address, address.port.toUShort())
+                    val length = received.remaining()
 
                     // * no conceivable DHT message is smaller than 10 bytes
                     // * port 0 is reserved
@@ -65,7 +69,7 @@ class Nott(
                     if (length < 10 || inet.port.toInt() == 0) continue
                     
   
-                    val reader = BEReader(packet.data, length)
+                    val reader = BEReader(received)
                     handlePacket(reader, inet)
                 }
             } catch (throwable: Throwable) {
@@ -105,10 +109,10 @@ class Nott(
 
             val address = message.address
 
-            val datagram = DatagramPacket(buffer.data, buffer.length, address.inetAddress(), address.port.toInt())
+            val ios = InetSocketAddress (address.inetAddress(), address.port.toInt())
 
             try {
-                socket.send(datagram)
+                channel.send(sending, ios)
 
                 associatedCall?.hasSend()
             } catch (throwable: Throwable) {
