@@ -98,9 +98,11 @@ class Nott(
         associatedCall: Call?,
     ) {
         mutex.withLock {
-            buffer.reset()
+            sending.clear()
 
-            message.encode(buffer)
+            message.encode(sending)
+            sending.flip()
+
             val address = message.address
 
             val datagram = DatagramPacket(buffer.data, buffer.length, address.inetAddress(), address.port.toInt())
