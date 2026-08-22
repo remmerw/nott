@@ -1,7 +1,7 @@
 package io.github.remmerw.nott
 
 import io.github.remmerw.buri.BEString
-import io.github.remmerw.buri.Buffer
+import java.nio.ByteBuffer
 import io.github.remmerw.buri.decodeBencode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -15,8 +15,9 @@ class Tests {
     @Test
     fun testTid() {
         val tid = createTid()
-        val buffer = Buffer(50)
+        val buffer = ByteBuffer.allocate(50)
         buffer.bencodeTid(tid)
+        buffer.flip()
         val data = (buffer.decodeBencode() as BEString).toByteArray()
         assertEquals(TID_LENGTH, data.size)
         val cmp = data.toLong(TID_LENGTH)
