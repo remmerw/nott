@@ -575,7 +575,7 @@ private fun allByName(
     try {
         val inets = InetAddress.getAllByName(hostname)
         inets.forEach { address ->
-            result.add(Address(address.address, port.toUShort()))
+           // Todo just give inet result.add(createAddress(address.address, port.toUShort()))
         }
     } catch (throwable: Throwable) {
         debug(throwable)
