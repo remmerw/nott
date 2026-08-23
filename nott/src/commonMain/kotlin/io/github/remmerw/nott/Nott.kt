@@ -60,7 +60,7 @@ class Nott(
                     val address = channel.receive(received) as InetSocketAddress 
                     received.flip()
 
-                    val inet = Address(address.address.address, address.port.toUShort())
+                    val inet = createAddress(address)
 
                     val length = received.remaining()
 
@@ -109,7 +109,7 @@ class Nott(
 
             val address = message.address
 
-            val ios = InetSocketAddress (address.inetAddress(), address.port.toInt())
+            val ios = address.toInetSocketAddress()
 
             try {
                 channel.send(sending, ios)
