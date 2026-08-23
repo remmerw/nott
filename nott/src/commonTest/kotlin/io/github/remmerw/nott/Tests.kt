@@ -56,7 +56,7 @@ class Tests {
     @Test
     fun closestPeers(): Unit =
         runBlocking(Dispatchers.IO) {
-if(internet()) }
+if(internet()) {
             val nott = newNott(nodeId())
 
             delay(5.seconds)
