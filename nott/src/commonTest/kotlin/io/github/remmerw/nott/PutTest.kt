@@ -26,7 +26,7 @@ class PutTest {
     fun putTest(): Unit =
         runBlocking(Dispatchers.IO) {
 
-            if(!internet()) return
+            if(internet()) {
             // https://www.bittorrent.org/beps/bep_0044.html
 
             val data = Random.nextBytes(50)
@@ -117,4 +117,5 @@ class PutTest {
 
             assertTrue(read.load() >= 5)
         }
+}
 }
