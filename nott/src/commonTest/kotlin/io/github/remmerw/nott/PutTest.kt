@@ -25,6 +25,8 @@ class PutTest {
     @Test
     fun putTest(): Unit =
         runBlocking(Dispatchers.IO) {
+
+            if(!internet()) return
             // https://www.bittorrent.org/beps/bep_0044.html
 
             val data = Random.nextBytes(50)
