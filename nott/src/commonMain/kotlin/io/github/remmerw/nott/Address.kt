@@ -1,15 +1,14 @@
 package io.github.remmerw.nott
 
 import java.net.InetAddress
+import java.net.InetSocketAddress
 
-@Suppress("ArrayInDataClass")
-data class Address(
-    val address: ByteArray,
-    val port: UShort,
-) {
-    private val inetAddress: InetAddress by lazy { InetAddress.getByAddress(address) }
+sealed interface Address {
+    val address: Address
+    val port: UShort 
 
-    fun inetAddress(): InetAddress = inetAddress
+    fun inetAddress(): InetAddress
+    fun inetSocketAddress(): InetSocketAddress 
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -28,4 +27,26 @@ data class Address(
         result = 31 * result + port.hashCode()
         return result
     }
+}
+@Suppress("ArrayInDataClass")
+internal data class RawAddress(
+    val address: ByteArray,
+    val port: UShort,
+) : Address {
+    private val inetAddress: InetAddress by lazy { InetAddress.getByAddress(address) }
+    
+    private val inetSocketAddress: InetSocketAddress by lazy { InetSocketAddress(inetAddress(), port.toInt()
+     }
+
+    fun inetAddress(): InetAddress = inetAddress
+
+    fun inetSocketAddress(): InetSocketAddress = inetSocketAddress 
+}
+
+fun createAddress(iso: InetSocketAddress): Address { 
+    return RawAddress(iso.address.address, iso.port.toUShort()
+}
+
+fun createAddress(address: ByteArray, port: UShort): Address {
+    return RawAddress(address,port)
 }
