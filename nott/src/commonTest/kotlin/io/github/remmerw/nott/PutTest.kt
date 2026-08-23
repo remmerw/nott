@@ -25,97 +25,96 @@ class PutTest {
     @Test
     fun putTest(): Unit =
         runBlocking(Dispatchers.IO) {
+            if (internet()) {
+                // https://www.bittorrent.org/beps/bep_0044.html
 
-            if(internet()) {
-            // https://www.bittorrent.org/beps/bep_0044.html
+                val data = Random.nextBytes(50)
 
-            val data = Random.nextBytes(50)
+                val keys = Ed25519Sign.KeyPair.newKeyPair()
 
-            val keys = Ed25519Sign.KeyPair.newKeyPair()
+                val v = data
+                val cas: Long? = null
+                val k: ByteArray = keys.getPublicKey()
+                val salt: ByteArray? = null
+                val seq: Long = Clock.System.now().toEpochMilliseconds()
+                val signBuffer = Buffer()
+                signBuffer.write("3:seqi".encodeToByteArray())
+                signBuffer.write(seq.toString().encodeToByteArray())
+                signBuffer.write("e1:v".encodeToByteArray())
+                signBuffer.write(data.size.toString().encodeToByteArray())
+                signBuffer.write(":".encodeToByteArray())
+                signBuffer.write(data)
 
-            val v = data
-            val cas: Long? = null
-            val k: ByteArray = keys.getPublicKey()
-            val salt: ByteArray? = null
-            val seq: Long = Clock.System.now().toEpochMilliseconds()
-            val signBuffer = Buffer()
-            signBuffer.write("3:seqi".encodeToByteArray())
-            signBuffer.write(seq.toString().encodeToByteArray())
-            signBuffer.write("e1:v".encodeToByteArray())
-            signBuffer.write(data.size.toString().encodeToByteArray())
-            signBuffer.write(":".encodeToByteArray())
-            signBuffer.write(data)
+                val signer = Ed25519Sign(keys.getPrivateKey())
+                val sig = signer.sign(signBuffer.readByteArray())
 
-            val signer = Ed25519Sign(keys.getPrivateKey())
-            val sig = signer.sign(signBuffer.readByteArray())
+                val target = sha1(k)
 
-            val target = sha1(k)
+                val peers = mutableListOf<Address>()
+                val added = AtomicInt(0)
+                withTimeout(60.seconds) {
+                    val nott = newNott(nodeId())
+                    try {
+                        val channel =
+                            requestPut(
+                                nott,
+                                target,
+                                v,
+                                cas,
+                                k,
+                                salt,
+                                seq,
+                                sig,
+                            ) {
+                                if (added.load() >= 20) {
+                                    -1 // done
+                                } else {
+                                    5000 // wait 5 sec and put
+                                }
+                            }
 
-            val peers = mutableListOf<Address>()
-            val added = AtomicInt(0)
-            withTimeout(60.seconds) {
-                val nott = newNott(nodeId())
-                try {
-                    val channel =
-                        requestPut(
-                            nott,
-                            target,
-                            v,
-                            cas,
-                            k,
-                            salt,
-                            seq,
-                            sig,
-                        ) {
-                            if (added.load() >= 20) {
-                                -1 // done
-                            } else {
-                                5000 // wait 5 sec and put
+                        for (address in channel) {
+                            println("put to $address")
+                            peers.add(address)
+                            added.incrementAndFetch()
+                        }
+                    } catch (_: CancellationException) {
+                    } finally {
+                        nott.shutdown()
+                    }
+                }
+
+                delay(10.seconds)
+
+                val bootstrap: MutableSet<Address> = mutableSetOf()
+                bootstrap.addAll(defaultBootstrap())
+                bootstrap.addAll(peers)
+
+                val read = AtomicInt(0)
+                withTimeoutOrNull(60.seconds) {
+                    val nott = newNott(nodeId(), bootstrap = bootstrap)
+                    try {
+                        val channel =
+                            requestGet(nott, target) {
+                                5000
+                            }
+
+                        for (data in channel) {
+                            println(
+                                "data received " + data.v.toString() + " " +
+                                    data.k.decodeToString(),
+                            )
+                            if (read.incrementAndFetch() > 5) {
+                                coroutineContext.cancelChildren()
                             }
                         }
-
-                    for (address in channel) {
-                        println("put to $address")
-                        peers.add(address)
-                        added.incrementAndFetch()
+                    } catch (_: CancellationException) {
+                    } finally {
+                        nott.shutdown()
                     }
-                } catch (_: CancellationException) {
-                } finally {
-                    nott.shutdown()
                 }
+
+                assertTrue(read.load() >= 5)
             }
-
-            delay(10.seconds)
-
-            val bootstrap: MutableSet<Address> = mutableSetOf()
-            bootstrap.addAll(defaultBootstrap())
-            bootstrap.addAll(peers)
-
-            val read = AtomicInt(0)
-            withTimeoutOrNull(60.seconds) {
-                val nott = newNott(nodeId(), bootstrap = bootstrap)
-                try {
-                    val channel =
-                        requestGet(nott, target) {
-                            5000
-                        }
-
-                    for (data in channel) {
-                        println(
-                            "data received " + data.v.toString() + " " +
-                                data.k.decodeToString(),
-                        )
-                        if (read.incrementAndFetch() > 5) {
-                            coroutineContext.cancelChildren()
-                        }
-                    }
-                } catch (_: CancellationException) {
-                } finally {
-                    nott.shutdown()
-                }
-            }
-
-            assertTrue(read.load() >= 5)
         }
-}
 }

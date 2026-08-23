@@ -56,22 +56,21 @@ class Tests {
     @Test
     fun closestPeers(): Unit =
         runBlocking(Dispatchers.IO) {
-if(internet()) {
-            val nott = newNott(nodeId())
+            if (internet()) {
+                val nott = newNott(nodeId())
 
-            delay(5.seconds)
-            val peers = nott.closestPeers(createRandomKey(32), 32)
-            assertTrue(peers.isNotEmpty())
+                delay(5.seconds)
+                val peers = nott.closestPeers(createRandomKey(32), 32)
+                assertTrue(peers.isNotEmpty())
 
-            nott.shutdown()
-}
+                nott.shutdown()
+            }
         }
 
     @Test
-    fun bootstrap() : Unit {
-       if(!internet()) return
-       val peers = defaultBootstrap()
-            assertTrue(peers.isNotEmpty())
-
-        }
+    fun bootstrap() {
+        if (!internet()) return
+        val peers = defaultBootstrap()
+        assertTrue(peers.isNotEmpty())
+    }
 }
