@@ -10,7 +10,7 @@ sealed interface Address {
     fun inetAddress(): InetAddress
     fun inetSocketAddress(): InetSocketAddress 
 
-    override fun equals(other: Any?): Boolean {
+    fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
@@ -22,7 +22,7 @@ sealed interface Address {
         return true
     }
 
-    override fun hashCode(): Int {
+    fun hashCode(): Int {
         var result = address.contentHashCode()
         result = 31 * result + port.hashCode()
         return result
@@ -30,17 +30,17 @@ sealed interface Address {
 }
 @Suppress("ArrayInDataClass")
 internal data class RawAddress(
-    val address: ByteArray,
-    val port: UShort,
+    override val address: ByteArray,
+    override val port: UShort,
 ) : Address {
     private val inetAddress: InetAddress by lazy { InetAddress.getByAddress(address) }
     
     private val inetSocketAddress: InetSocketAddress by lazy { InetSocketAddress(inetAddress(), port.toInt()
      }
 
-    fun inetAddress(): InetAddress = inetAddress
+    override fun inetAddress(): InetAddress = inetAddress
 
-    fun inetSocketAddress(): InetSocketAddress = inetSocketAddress 
+    override fun inetSocketAddress(): InetSocketAddress = inetSocketAddress 
 }
 
 fun createAddress(iso: InetSocketAddress): Address { 
