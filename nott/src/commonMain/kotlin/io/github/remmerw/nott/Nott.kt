@@ -574,8 +574,8 @@ private fun allByName(
     val result = mutableSetOf<Address>()
     try {
         val inets = InetAddress.getAllByName(hostname)
-        inets.forEach { address ->
-           // Todo just give inet result.add(createAddress(address.address, port.toUShort()))
+        inets.forEach { inet ->
+           result.add(createAddress(inet, port))
         }
     } catch (throwable: Throwable) {
         debug(throwable)
