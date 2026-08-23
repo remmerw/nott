@@ -92,7 +92,7 @@ internal fun readBuckets(
                 val peer =
                     Peer(
                         rawId,
-                        Address(
+                        createAddress(
                             raw,
                             port,
                         ),
