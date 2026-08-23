@@ -3,8 +3,6 @@ package io.github.remmerw.nott
 import io.github.remmerw.buri.BEMap
 import io.github.remmerw.buri.BEObject
 import io.github.remmerw.buri.BEReader
-import java.nio.ByteBuffer
-import java.nio.channels.DatagramChannel
 import io.github.remmerw.buri.decodeBencode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -14,11 +12,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.kotlincrypto.hash.sha1.SHA1
-import java.net.DatagramPacket
-import java.net.DatagramSocket
 import java.net.InetAddress
 import java.net.InetSocketAddress
-import java.net.SocketAddress
+import java.nio.ByteBuffer
+import java.nio.channels.DatagramChannel
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.random.Random
 import kotlin.time.TimeSource.Monotonic.ValueTimeMark
@@ -38,7 +35,7 @@ class Nott(
     private val sending = ByteBuffer.allocateDirect(UDP_PACKET)
     private val received = ByteBuffer.allocateDirect(UDP_PACKET)
 
-    fun port():Int = channel.socket().getLocalPort()
+    fun port(): Int = channel.socket().getLocalPort()
 
     suspend fun bootstrap() {
         try {
@@ -54,10 +51,9 @@ class Nott(
         channel.bind(InetSocketAddress(0))
         scope.launch {
             try {
-               
                 while (isActive) {
                     received.clear()
-                    val address = channel.receive(received) as InetSocketAddress 
+                    val address = channel.receive(received) as InetSocketAddress
                     received.flip()
 
                     val inet = createAddress(address)
@@ -69,8 +65,7 @@ class Nott(
                     // -> immediately discard junk on the read loop, don't even allocate a
                     // buffer for it
                     if (length < 10 || inet.port.toInt() == 0) continue
-                    
-  
+
                     val reader = BEReader(received)
                     handlePacket(reader, inet)
                 }
@@ -575,7 +570,7 @@ private fun allByName(
     try {
         val inets = InetAddress.getAllByName(hostname)
         inets.forEach { inet ->
-           result.add(createAddress(inet, port))
+            result.add(createAddress(inet, port))
         }
     } catch (throwable: Throwable) {
         debug(throwable)

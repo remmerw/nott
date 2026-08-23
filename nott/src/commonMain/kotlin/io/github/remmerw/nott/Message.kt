@@ -1,6 +1,5 @@
 package io.github.remmerw.nott
 
-import java.nio.ByteBuffer
 import io.github.remmerw.buri.bencode
 import io.github.remmerw.buri.bencodeArray
 import io.github.remmerw.buri.bencodeArrayData
@@ -8,6 +7,7 @@ import io.github.remmerw.buri.bencodeEof
 import io.github.remmerw.buri.bencodeList
 import io.github.remmerw.buri.bencodeMap
 import io.github.remmerw.buri.bencodeMapKey
+import java.nio.ByteBuffer
 
 internal sealed interface Message {
     val address: Address
