@@ -423,7 +423,7 @@ private fun parseResponse(
 
                             if (port > 0.toUShort() && port <= 65535.toUShort()) {
                                 addresses.add(
-                                    Address(
+                                    createAddress(
                                         address,
                                         port,
                                     ),
@@ -445,7 +445,7 @@ private fun parseResponse(
 
                             if (port > 0.toUShort() && port <= 65535.toUShort()) {
                                 addresses.add(
-                                    Address(
+                                    createAddress(
                                         address,
                                         port,
                                     ),
@@ -515,7 +515,7 @@ internal fun inetGet(beObject: BEObject?): Address? {
                 ) shl 8 or (data[length + 1].toInt() and 0xFF)
             ).toUShort()
 
-        return Address(
+        return createAddress(
             address,
             port,
         )
