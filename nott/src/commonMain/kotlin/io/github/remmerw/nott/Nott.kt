@@ -109,7 +109,7 @@ class Nott(
 
             val address = message.address
 
-            val ios = address.toInetSocketAddress()
+            val ios = address.inetSocketAddress()
 
             try {
                 channel.send(sending, ios)
