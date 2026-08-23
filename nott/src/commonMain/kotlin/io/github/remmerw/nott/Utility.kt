@@ -4,7 +4,7 @@ import java.net.InetSocketAddress
 import java.util.Arrays
 import kotlin.math.min
 
-fun InetSocketAddress.toAddress(): Address = Address(this.address.address, this.port.toUShort())
+fun InetSocketAddress.toAddress(): Address = createAddress(this)
 
 internal fun ByteArray.toLong(length: Int = 8): Long {
     require(length in 1..8) { "Length must be between 1 and 8 bytes for a Long value." }
