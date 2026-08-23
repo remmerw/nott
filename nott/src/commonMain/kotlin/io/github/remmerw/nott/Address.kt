@@ -19,7 +19,7 @@ internal data class IosAddress(
     override val port: UShort,
 ) : Address {
     
-    override fun inetAddress(): InetAddress = ios.getInetAddress()
+    override fun inetAddress(): InetAddress = ios.address
 
     override fun inetSocketAddress(): InetSocketAddress = ios
 
