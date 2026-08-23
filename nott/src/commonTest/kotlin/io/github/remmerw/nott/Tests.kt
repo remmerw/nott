@@ -1,11 +1,11 @@
 package io.github.remmerw.nott
 
 import io.github.remmerw.buri.BEString
-import java.nio.ByteBuffer
 import io.github.remmerw.buri.decodeBencode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import java.nio.ByteBuffer
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue

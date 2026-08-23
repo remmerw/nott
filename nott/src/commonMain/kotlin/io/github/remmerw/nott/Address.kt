@@ -8,21 +8,23 @@ sealed interface Address {
     val port: UShort
 
     fun inetAddress(): InetAddress
-    fun inetSocketAddress(): InetSocketAddress 
+
+    fun inetSocketAddress(): InetSocketAddress
 }
+
 @Suppress("ArrayInDataClass")
 internal data class InetAddress(
     val inetAddress: InetAddress,
     override val address: ByteArray,
     override val port: UShort,
 ) : Address {
-    private val inetSocketAddress: InetSocketAddress by lazy { 
-        InetSocketAddress(inetAddress(), port.toInt()) 
+    private val inetSocketAddress: InetSocketAddress by lazy {
+        InetSocketAddress(inetAddress(), port.toInt())
     }
 
     override fun inetAddress(): InetAddress = inetAddress
 
-    override fun inetSocketAddress(): InetSocketAddress = inetSocketAddress 
+    override fun inetSocketAddress(): InetSocketAddress = inetSocketAddress
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -49,7 +51,6 @@ internal data class IosAddress(
     override val address: ByteArray,
     override val port: UShort,
 ) : Address {
-    
     override fun inetAddress(): InetAddress = ios.address
 
     override fun inetSocketAddress(): InetSocketAddress = ios
@@ -80,13 +81,13 @@ internal data class RawAddress(
 ) : Address {
     private val inetAddress: InetAddress by lazy { InetAddress.getByAddress(address) }
 
-    private val inetSocketAddress: InetSocketAddress by lazy { 
-        InetSocketAddress(inetAddress(), port.toInt()) 
+    private val inetSocketAddress: InetSocketAddress by lazy {
+        InetSocketAddress(inetAddress(), port.toInt())
     }
 
     override fun inetAddress(): InetAddress = inetAddress
 
-    override fun inetSocketAddress(): InetSocketAddress = inetSocketAddress 
+    override fun inetSocketAddress(): InetSocketAddress = inetSocketAddress
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -107,16 +108,14 @@ internal data class RawAddress(
     }
 }
 
-fun createAddress(inet: InetAddress, port: Int): Address { 
-    return InetAddress(inet, inet.address, port.toUShort())
-}
+fun createAddress(
+    inet: InetAddress,
+    port: Int,
+): Address = InetAddress(inet, inet.address, port.toUShort())
 
-fun createAddress(iso: InetSocketAddress): Address { 
-    return IosAddress(iso, iso.address.address, iso.port.toUShort())
-}
+fun createAddress(iso: InetSocketAddress): Address = IosAddress(iso, iso.address.address, iso.port.toUShort())
 
-fun createAddress(address: ByteArray, port: UShort): Address {
-    return RawAddress(address, port)
-}
-
-
+fun createAddress(
+    address: ByteArray,
+    port: UShort,
+): Address = RawAddress(address, port)
