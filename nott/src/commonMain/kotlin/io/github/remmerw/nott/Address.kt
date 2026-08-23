@@ -4,8 +4,8 @@ import java.net.InetAddress
 import java.net.InetSocketAddress
 
 sealed interface Address {
-    val address: Address
-    val port: UShort 
+    val address: ByteArray,
+    val port: UShort,
 
     fun inetAddress(): InetAddress
     fun inetSocketAddress(): InetSocketAddress 
