@@ -66,8 +66,8 @@ class Tests {
         }
 
     @Test
-    fun defaultBootstrap() : Unit {
-            val peers = defaultBootstrap()
+    fun bootstrap() : Unit {
+       val peers = defaultBootstrap()
             assertTrue(peers.isNotEmpty())
 
         }
