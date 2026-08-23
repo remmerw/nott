@@ -54,7 +54,7 @@ class Tests {
         }
 
     @Test
-    fun defaultBootstrap(): Unit =
+    fun closestPeers(): Unit =
         runBlocking(Dispatchers.IO) {
             val nott = newNott(nodeId())
 
@@ -63,5 +63,12 @@ class Tests {
             assertTrue(peers.isNotEmpty())
 
             nott.shutdown()
+        }
+
+    @Test
+    fun defaultBootstrap() {
+            val peers = defaultBootstrap()
+            assertTrue(peers.isNotEmpty())
+
         }
 }
