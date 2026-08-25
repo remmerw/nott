@@ -9,7 +9,6 @@ internal const val UDP_PACKET = 1400
 
 internal const val TID_LENGTH = 6
 
-
 // DHT
 internal const val RESPONSE_TIMEOUT = 3000
 internal const val MAX_ENTRIES_PER_BUCKET: Int = 8
@@ -21,4 +20,3 @@ internal const val ADDRESS_LENGTH_IPV6 = 16 + 2
 internal const val ADDRESS_LENGTH_IPV4 = 4 + 2
 internal const val NODE_ENTRY_LENGTH_IPV6 = ADDRESS_LENGTH_IPV6 + SHA1_HASH_LENGTH
 internal const val NODE_ENTRY_LENGTH_IPV4 = ADDRESS_LENGTH_IPV4 + SHA1_HASH_LENGTH
-
