@@ -3,25 +3,25 @@
 // often around 1400 bytes. This is smaller than the theoretical maximum
 // of 65535 bytes for UDP packets.
 
-internal const val UDP_PACKET = 1400
+const val UDP_PACKET = 1400
 
-internal const val TID_LENGTH = 6
+const val TID_LENGTH = 6
 
 // haven't seen it for a long time + timeout == evict sooner than pure timeout
 // based threshold. e.g. for old entries that we haven't touched for a long time
 internal const val OLD_AND_STALE_TIME = 15 * 60 * 1000
 
 // DHT
-internal const val RESPONSE_TIMEOUT = 3000
-internal const val MAX_ENTRIES_PER_BUCKET: Int = 8
+const val RESPONSE_TIMEOUT = 3000
+const val MAX_ENTRIES_PER_BUCKET: Int = 8
 internal const val TOKEN_TIMEOUT: Int = 5 * 60 * 1000
-internal const val MAX_DB_ENTRIES_PER_KEY: Int = 6000
+const val MAX_DB_ENTRIES_PER_KEY: Int = 6000
 internal const val MAX_PEERS_PER_ANNOUNCE: Int = 10
-internal const val SHA1_HASH_LENGTH: Int = 20
-internal const val ADDRESS_LENGTH_IPV6 = 16 + 2
-internal const val ADDRESS_LENGTH_IPV4 = 4 + 2
-internal const val NODE_ENTRY_LENGTH_IPV6 = ADDRESS_LENGTH_IPV6 + SHA1_HASH_LENGTH
-internal const val NODE_ENTRY_LENGTH_IPV4 = ADDRESS_LENGTH_IPV4 + SHA1_HASH_LENGTH
+const val SHA1_HASH_LENGTH: Int = 20
+const val ADDRESS_LENGTH_IPV6 = 16 + 2
+const val ADDRESS_LENGTH_IPV4 = 4 + 2
+const val NODE_ENTRY_LENGTH_IPV6 = ADDRESS_LENGTH_IPV6 + SHA1_HASH_LENGTH
+const val NODE_ENTRY_LENGTH_IPV4 = ADDRESS_LENGTH_IPV4 + SHA1_HASH_LENGTH
 
 // -1 token per minute, 60 saturation, 30 threshold
 // if we see more than 1 per minute then it'll take 30 minutes until an
