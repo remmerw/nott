@@ -456,22 +456,6 @@ class Nott(
 
 
 
-// returns the newer timestamp
-internal fun newerTimeMark2(
-    mark: ValueTimeMark?,
-    cmp: ValueTimeMark?,
-): ValueTimeMark? {
-    if (mark == null) {
-        return cmp
-    }
-    if (cmp == null) {
-        return mark
-    }
-    val markElapsed = mark.elapsedNow().inWholeMilliseconds
-    val cmpElapsed = cmp.elapsedNow().inWholeMilliseconds
-    return if (markElapsed < cmpElapsed) mark else cmp
-}
-
 suspend fun newNott(
     nodeId: ByteArray,
     bootstrap: Set<Address> = defaultBootstrap(),
