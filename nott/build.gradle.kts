@@ -53,7 +53,7 @@ kotlin {
             dependencies {
                 implementation(libs.kotlin.test)
                 implementation(libs.borr)
-                implementation(libs.kotlinx.io.core) // Todo remove 
+                implementation(libs.kotlinx.io.core) // Todo remove
             }
         }
     }
