@@ -457,7 +457,7 @@ class Nott(
 
 
 // returns the newer timestamp
-internal fun newerTimeMark(
+internal fun newerTimeMark2(
     mark: ValueTimeMark?,
     cmp: ValueTimeMark?,
 ): ValueTimeMark? {
