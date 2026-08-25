@@ -44,7 +44,7 @@ kotlin {
             dependencies {
                 implementation(libs.kotlin.stdlib)
                 implementation(libs.kotlinx.coroutines.core)
-                implementation(libs.sha1)
+                implementation(libs.sha1) // Todo remove
                 implementation(libs.buri)
             }
         }
@@ -53,7 +53,7 @@ kotlin {
             dependencies {
                 implementation(libs.kotlin.test)
                 implementation(libs.borr)
-                //implementation(libs.kotlinx.io.core)
+                implementation(libs.kotlinx.io.core) // Todo remove 
             }
         }
     }
